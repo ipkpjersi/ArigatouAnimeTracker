@@ -35,10 +35,18 @@ class ImportAnimeData extends Command
             $count = count($data['data']);
             $this->info("Importing " . $count . " anime records...");
 
+            $startTime = microtime(true);
+
             foreach ($data['data'] as $animeData) {
                 //Find or create related models like anime type, status, etc.
                 $type = AnimeType::firstOrCreate(['type' => $animeData['type']]);
+                if ($type->wasRecentlyCreated) {
+                    \Log::info("New anime type created: " . $type->type);
+                }
                 $status = AnimeStatus::firstOrCreate(['status' => $animeData['status']]);
+                if ($status->wasRecentlyCreated) {
+                    \Log::info("New anime status created: " . $status->status);
+                }
                 $title = str_replace('"', '', $animeData['title']);
 
                 //Create the anime record
@@ -61,6 +69,7 @@ class ImportAnimeData extends Command
             \Log::error($e);
             exit(1);
         }
-        $this->info('Imported ' . $count . ' anime records successfully.');
+        $duration = microtime(true) - $startTime;
+        $this->info('Imported ' . $count . ' anime records successfully in ' . number_format($duration, 2) . ' seconds');
     }
 }
