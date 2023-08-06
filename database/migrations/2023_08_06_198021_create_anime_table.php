@@ -4,6 +4,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/*
+ * The anime table is the base table for our project. It is the most important and largest table we have.
+ * The schema for the anime table is modeled after anime-offline-database/anime-offline-database.json
+ */
 return new class extends Migration
 {
     /**
