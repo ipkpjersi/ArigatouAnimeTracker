@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('anime', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->foreignId('anime_type_id')->constrained('anime_types');
+            $table->integer('episodes');
+            $table->foreignId('anime_status_id')->constrained('anime_status');
+            $table->string('season');
+            $table->integer('year');
+            $table->string('picture');
+            $table->string('thumbnail');
+            $table->text('synonyms')->nullable();
+            $table->text('relations')->nullable();
+            $table->text('tags')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('anime');
+    }
+};
