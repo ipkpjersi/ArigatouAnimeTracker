@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schema;
 /*
  * The anime table is the base table for our project. It is the most important and largest table we have.
  * The schema for the anime table is modeled after anime-offline-database/anime-offline-database.json
+ * The anime-offline-database table is provided manami-project, so thank you to them for providing it.
  */
 return new class extends Migration
 {
