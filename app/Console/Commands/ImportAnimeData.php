@@ -41,10 +41,12 @@ class ImportAnimeData extends Command
                 //Find or create related models like anime type, status, etc.
                 $type = AnimeType::firstOrCreate(['type' => $animeData['type']]);
                 if ($type->wasRecentlyCreated) {
+                    $this->info("New anime type created: " . $type->type);
                     \Log::info("New anime type created: " . $type->type);
                 }
                 $status = AnimeStatus::firstOrCreate(['status' => $animeData['status']]);
                 if ($status->wasRecentlyCreated) {
+                    $this->info("New anime status created: " . $status->status);
                     \Log::info("New anime status created: " . $status->status);
                 }
                 $title = str_replace('"', '', $animeData['title']);
