@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//Unprotected routes
 Route::get('/', function () {
     if (Auth::user() != null) {
         return redirect('dashboard');
@@ -22,11 +23,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
+//Protected routes
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    Route::get('/home', function () {
+        return view('dashboard');
+    })->name('home');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
