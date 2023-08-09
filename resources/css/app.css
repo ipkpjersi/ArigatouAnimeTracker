@@ -3,20 +3,17 @@
 @tailwind utilities;
 
 .dataTables_length select {
-  -webkit-appearance: none; /* Safari and Chrome */
-  -moz-appearance: none;    /* Firefox */
-  appearance: none;         /* Standard */
-  background: none;         /* Remove any background that may have been set */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: none;
 }
-.dark .dataTables_filter,
-.dark .dataTables_length label,
-.dark .dataTables_info,
-.dark .dataTables_paginate.paging_simple_numbers,
+
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button,
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button.previous.disabled,
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button.next.disabled,
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button.current {
-  color: white !important; /* Or another light color that fits your dark theme */
+    color: white !important;
 }
 
 .dark p,
