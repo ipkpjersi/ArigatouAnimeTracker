@@ -8,6 +8,7 @@
                     <a href="/">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
+                    <span class="ml-3 text-xl text-gray-800 dark:text-gray-200">Arigatou Anime Tracker</span>
                 </div>
 
                 <!-- Navigation Links -->
