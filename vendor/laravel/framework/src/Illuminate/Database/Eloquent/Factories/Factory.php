@@ -104,7 +104,7 @@ abstract class Factory
      *
      * @var string
      */
-    protected static $namespace = 'Database\\Factories\\';
+    public static $namespace = 'Database\\Factories\\';
 
     /**
      * The default model name resolver.
@@ -185,7 +185,7 @@ abstract class Factory
     /**
      * Configure the factory.
      *
-     * @return $this
+     * @return static
      */
     public function configure()
     {
@@ -471,7 +471,7 @@ abstract class Factory
         return collect($definition)
             ->map($evaluateRelations = function ($attribute) {
                 if ($attribute instanceof self) {
-                    $attribute = $this->getRandomRecycledModel($attribute->modelName())
+                    $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
                         ?? $attribute->recycle($this->recycle)->create()->getKey();
                 } elseif ($attribute instanceof Model) {
                     $attribute = $attribute->getKey();

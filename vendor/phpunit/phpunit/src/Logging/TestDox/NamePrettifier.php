@@ -184,9 +184,9 @@ final class NamePrettifier
                 $variables = array_map(
                     static fn (string $variable): string => sprintf(
                         '/%s(?=\b)/',
-                        preg_quote($variable, '/')
+                        preg_quote($variable, '/'),
                     ),
-                    array_keys($providedData)
+                    array_keys($providedData),
                 );
 
                 $result = trim(preg_replace($variables, $providedData, $annotation));
@@ -251,6 +251,10 @@ final class NamePrettifier
 
             if (!is_scalar($value)) {
                 $value = gettype($value);
+
+                if ($value === 'NULL') {
+                    $value = 'null';
+                }
             }
 
             if (is_bool($value) || is_int($value) || is_float($value)) {
