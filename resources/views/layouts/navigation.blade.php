@@ -12,8 +12,14 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link href="{{ route('welcome') }}" :active="request()->routeIs('welcome')">
+                    <x-nav-link href="{{ route('welcome') }}" :active="request()->routeIs('welcome') || request()->routeIs('home')">
                         {{ __('Home') }}
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('anime.list') }}" :active="request()->routeIs('anime.list')">
+                        {{ __('Anime') }}
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('users.list') }}" :active="request()->routeIs('users.list')">
+                        {{ __('Users') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -71,6 +77,12 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('welcome')" :active="request()->routeIs('welcome')">
                 {{ __('Home') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('anime.list') }}" :active="request()->routeIs('anime.list')">
+                {{ __('Anime') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('users.list') }}" :active="request()->routeIs('users.list')">
+                {{ __('Users') }}
             </x-responsive-nav-link>
         </div>
 

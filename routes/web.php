@@ -18,10 +18,18 @@ use Illuminate\Support\Facades\Route;
 //Unprotected routes
 Route::get('/', function () {
     if (Auth::user() != null) {
-        return redirect('dashboard');
+        return redirect('home');
     }
     return view('welcome');
 })->name("welcome");
+
+Route::get('/anime', function() {
+    return view ('animelist');
+})->name("anime.list");
+
+Route::get('/users', function() {
+    return view ('userlist');
+})->name("users.list");
 
 //Protected routes
 Route::middleware('auth')->group(function () {
