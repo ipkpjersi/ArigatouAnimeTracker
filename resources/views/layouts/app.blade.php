@@ -1,8 +1,5 @@
 <!DOCTYPE html>
-<html
-    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-    @if(Auth::user() != null && Auth::user()->dark_mode === 1) class="dark" @endif
->
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @if(Auth::user() != null && Auth::user()->dark_mode === 1) class="dark" @endif>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">

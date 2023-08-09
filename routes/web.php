@@ -21,7 +21,7 @@ Route::get('/', function () {
         return redirect('dashboard');
     }
     return view('welcome');
-});
+})->name("welcome");
 
 //Protected routes
 Route::middleware('auth')->group(function () {
