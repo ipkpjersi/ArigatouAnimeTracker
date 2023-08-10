@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('dark_mode')->default(true);
             $table->boolean('show_adult_content')->default(false);
             $table->string('avatar')->nullable();
-            $table->integer('banned')->default(0);
+            $table->integer('is_banned')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
