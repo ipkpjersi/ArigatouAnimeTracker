@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->boolean('is_admin')->default(false);
             $table->boolean('dark_mode')->default(false);
+            $table->boolean('show_adult_content')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

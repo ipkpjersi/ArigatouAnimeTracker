@@ -43,6 +43,21 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('dark_mode')" />
 
+            <x-input-label class="mt-4" for="show_adult_content" :value="__('Show Adult Content')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_adult_content" type="radio" name="show_adult_content" value="1" class="form-radio"
+                           @if(old('show_adult_content', $user->show_adult_content) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_adult_content" type="radio" name="show_adult_content" value="0" class="form-radio"
+                           @if(old('show_adult_content', $user->show_adult_content) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_adult_content')" />
+
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>

@@ -21,6 +21,10 @@ class AnimeController extends Controller
         ->orderBy('year', 'desc')
         ->orderBy('season_sort', 'desc');
 
+        if (auth()->user()->show_adult_content == false) {
+            $query = $query->where('tags', 'NOT LIKE', '%adult%');
+        }
+
         return DataTables::of($query)
             ->make(true);
     }
