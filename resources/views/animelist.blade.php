@@ -40,9 +40,9 @@
                         return '<img src="' + data + '" alt="Thumbnail" style="width:50px; max-height: 70px"  onerror="this.onerror=null; this.src=\'/img/notfound.gif\';" />';
                     }},
                     { data: 'title', name: 'title' },
-                    { data: 'anime_type.type', name: 'type' },
+                    { data: 'anime_type.type', name: 'type', searchable: 'false' },
                     { data: 'episodes', name: 'episodes' },
-                    { data: 'anime_status.status', name: 'status' },
+                    { data: 'anime_status.status', name: 'status', searchable: 'false' },
                     { data: 'season', name: 'season', render: function(data, type, row) {
                         return data === 'UNDEFINED' ? 'UNKNOWN' : data;
                     }},
