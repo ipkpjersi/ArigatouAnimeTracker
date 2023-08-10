@@ -26,4 +26,14 @@ class Anime extends Model
         'tags'
     ];
 
+    public function anime_type()
+    {
+        return $this->belongsTo(AnimeType::class, 'anime_type_id');
+    }
+
+    public function anime_status()
+    {
+        return $this->belongsTo(AnimeStatus::class, 'anime_status_id');
+    }
+
 }

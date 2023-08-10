@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnimeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,10 @@ Route::get('/anime', function() {
 Route::get('/users', function() {
     return view ('userlist');
 })->name("users.list");
+
+Route::get('/anime/', [AnimeController::class, 'list'])->name("anime.list");
+
+Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->name("anime.data");
 
 //Protected routes
 Route::middleware('auth')->group(function () {
