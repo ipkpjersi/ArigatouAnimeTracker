@@ -29,6 +29,7 @@ return new class extends Migration
             $table->text('synonyms')->nullable();
             $table->text('relations')->nullable();
             $table->text('tags')->nullable();
+            $table->integer('deleted')->default(0);
             $table->timestamps();
         });
     }
