@@ -28,8 +28,9 @@
         </div>
     </div>
     <script type="module">
+        import '/js/jquery.dataTables.yadcf.js';
         $(document).ready(function () {
-            $('#animeTable').DataTable({
+            let dataTable = $('#animeTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route('anime.data') }}',
@@ -51,6 +52,12 @@
                     }},
                 ]
             });
+            yadcf.init(dataTable, [
+                {
+                    column_number: 2,
+                    filter_type: "text"
+                },
+            ]);
         });
     </script>
 </x-app-layout>
