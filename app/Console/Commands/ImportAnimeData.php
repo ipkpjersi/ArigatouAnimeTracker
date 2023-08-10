@@ -30,6 +30,7 @@ class ImportAnimeData extends Command
     {
         $this->info("Starting anime data import...");
         try {
+            $count = 0;
             $json = file_get_contents(storage_path('app/imports/anime-offline-database.json'));
             $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
             $total = count($data['data']);
