@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('is_admin')->default(false);
             $table->boolean('dark_mode')->default(true);
             $table->boolean('show_adult_content')->default(false);
+            $table->string('avatar')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
