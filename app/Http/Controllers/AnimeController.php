@@ -21,8 +21,9 @@ class AnimeController extends Controller
         ->orderBy('year', 'desc')
         ->orderBy('season_sort', 'desc');
 
-        if (auth()->user()->show_adult_content == false) {
-            $query = $query->where('tags', 'NOT LIKE', '%adult%');
+        if (auth()->user() == null || auth()->user()->show_adult_content == false) {
+            //No need for this to be plain-text, so we'll use rot13.
+            $query = $query->where('tags', 'NOT LIKE', '%' . str_rot13('uragnv') . '%');
         }
 
         return DataTables::of($query)
