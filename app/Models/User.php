@@ -21,7 +21,8 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'dark_mode'
+        'dark_mode',
+        'show_adult_content'
     ];
 
     /**
