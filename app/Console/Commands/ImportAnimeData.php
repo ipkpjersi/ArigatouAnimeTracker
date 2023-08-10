@@ -32,14 +32,24 @@ class ImportAnimeData extends Command
         try {
             $json = file_get_contents(storage_path('app/imports/anime-offline-database.json'));
             $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-            $count = count($data['data']);
-            $this->info("Importing " . $count . " anime records...");
+            $total = count($data['data']);
+            $this->info("Importing " . $total . " anime records...");
 
             $startTime = microtime(true);
 
             foreach ($data['data'] as $animeData) {
+                $title = str_replace('"', '', $animeData['title']);
+                $existingAnime = Anime::where('title', $title)
+                          ->where('year', $animeData['animeSeason']['year'])
+                          ->first();
+
+                if ($existingAnime) {
+                    $this->info("Skipping existing anime: " . $title);
+                    continue;
+                }
+                
                 //Find or create related models like anime type, status, etc.
-                $type = AnimeType::firstOrCreate(['type' => $animeData['type']]);
+                $type = AnimeType::first(['type' => $animeData['type']]);
                 if ($type->wasRecentlyCreated) {
                     $this->info("New anime type created: " . $type->type);
                     \Log::info("New anime type created: " . $type->type);
@@ -49,7 +59,6 @@ class ImportAnimeData extends Command
                     $this->info("New anime status created: " . $status->status);
                     \Log::info("New anime status created: " . $status->status);
                 }
-                $title = str_replace('"', '', $animeData['title']);
 
                 //Create the anime record
                 $anime = Anime::create([
@@ -65,6 +74,7 @@ class ImportAnimeData extends Command
                     'relations' => implode(', ', $animeData['relations']),
                     'tags' => implode(', ', $animeData['tags']),
                 ]);
+                $count++;
             }
         } catch (\Exception $e) {
             $this->error('An error occurred during import: ' . $e->getMessage());
@@ -72,6 +82,6 @@ class ImportAnimeData extends Command
             exit(1);
         }
         $duration = microtime(true) - $startTime;
-        $this->info('Imported ' . $count . ' anime records successfully in ' . number_format($duration, 2) . ' seconds');
+        $this->info("Imported $count anime records successfully (out of $total anime records) in " . number_format($duration, 2) . " seconds");
     }
 }
