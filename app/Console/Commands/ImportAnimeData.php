@@ -43,11 +43,12 @@ class ImportAnimeData extends Command
                           ->where('year', $animeData['animeSeason']['year'])
                           ->first();
 
+                //Skip the anime if it exists.
                 if ($existingAnime) {
                     $this->info("Skipping existing anime: " . $title);
                     continue;
                 }
-                
+
                 //Find or create related models like anime type, status, etc.
                 $type = AnimeType::first(['type' => $animeData['type']]);
                 if ($type->wasRecentlyCreated) {
