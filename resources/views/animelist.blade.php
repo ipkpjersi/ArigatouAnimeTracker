@@ -44,10 +44,8 @@
                     { data: 'anime_type.type', name: 'type', searchable: 'false' },
                     { data: 'episodes', name: 'episodes' },
                     { data: 'anime_status.status', name: 'status', searchable: 'false' },
-                    { data: 'season', name: 'season', render: function(data, type, row) {
-                        return data === 'UNDEFINED' ? 'UNKNOWN' : data;
-                    }},
-                    { data: 'year', name: 'year', render: function(data, type, row) {
+                    { data: 'season_display', name: 'season', width: "15%" },
+                    { data: 'year', name: 'year', width: "10%", render: function(data, type, row) {
                         return data === null ? 'UNKNOWN' : data;
                     }},
                 ]
@@ -55,6 +53,14 @@
             yadcf.init(dataTable, [
                 {
                     column_number: 2,
+                    filter_type: "text"
+                },
+                {
+                    column_number: 6,
+                    filter_type: "text"
+                },
+                {
+                    column_number: 7,
                     filter_type: "text"
                 },
             ]);

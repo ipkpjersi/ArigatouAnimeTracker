@@ -20,3 +20,29 @@
 .dark div {
     color: #F3F4F6; /* text-gray-100 */
 }
+
+.yadcf-filter {
+    background: var(--dt-html-background);
+    color: #F3F4F6;
+    border-radius: 6px;
+}
+
+.dataTables_filter > label:nth-child(1) > input:nth-child(1) {
+    border-radius: 6px;
+}
+
+#yadcf-filter--animeTable-2 {
+    max-width: 200px;
+}
+
+#yadcf-filter--animeTable-6 {
+    max-width: 120px;
+}
+
+#yadcf-filter--animeTable-7 {
+    max-width: 62px;
+}
+
+.yadcf-filter-reset-button {
+    margin-left: 10px;
+}

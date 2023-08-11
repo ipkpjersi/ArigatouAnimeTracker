@@ -11,6 +11,7 @@ class AnimeController extends Controller
     public function getAnimeData()
     {
         $query = Anime::with('anime_type', 'anime_status')->selectRaw('*,
+            CASE WHEN season = "UNDEFINED" THEN "UNKNOWN" ELSE season END as season_display,
             CASE season
                 WHEN "SPRING" THEN 1
                 WHEN "SUMMER" THEN 2
@@ -27,6 +28,11 @@ class AnimeController extends Controller
         }
 
         return DataTables::of($query)
+            ->filterColumn('season', function($query, $keyword) {
+                if (strtoupper($keyword) === 'UNKNOWN') {
+                    $query->orWhere('season', 'UNDEFINED');
+                }
+            })
             ->make(true);
     }
 
