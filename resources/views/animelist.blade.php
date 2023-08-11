@@ -56,7 +56,7 @@
                     filter_type: "text"
                 },
                 {
-                    column_number: 6,
+                    column_number: 6, //TODO: season should be dropdown
                     filter_type: "text"
                 },
                 {
