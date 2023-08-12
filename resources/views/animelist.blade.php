@@ -30,6 +30,7 @@
     <script type="module">
         import '/js/jquery.dataTables.yadcf.js';
         $(document).ready(function () {
+            let initialSearch = new URLSearchParams(window.location.search).get('search') || "";
             let dataTable = $('#animeTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -48,7 +49,8 @@
                     { data: 'year', name: 'year', width: "10%", render: function(data, type, row) {
                         return data === null ? 'UNKNOWN' : data;
                     }},
-                ]
+                ],
+                search: { search: initialSearch }
             });
             yadcf.init(dataTable, [
                 {
@@ -56,8 +58,15 @@
                     filter_type: "text"
                 },
                 {
-                    column_number: 6, //TODO: season should be dropdown
-                    filter_type: "text"
+                    column_number: 6,
+                    filter_type: "select",
+                    data: [
+                        { value: "WINTER", label: "Winter" },
+                        { value: "SPRING", label: "Spring" },
+                        { value: "SUMMER", label: "Summer" },
+                        { value: "FALL", label: "Fall" }
+                    ],
+                    filter_default_label: "All Seasons"
                 },
                 {
                     column_number: 7,

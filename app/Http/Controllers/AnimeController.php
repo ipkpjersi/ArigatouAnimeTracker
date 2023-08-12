@@ -31,6 +31,8 @@ class AnimeController extends Controller
             ->filterColumn('season', function($query, $keyword) {
                 if (strtoupper($keyword) === 'UNKNOWN') {
                     $query->orWhere('season', 'UNDEFINED');
+                } elseif (in_array(strtoupper($keyword), ["WINTER", "SPRING", "SUMMER", "FALL"])) {
+                    $query->orWhere('season', strtoupper($keyword));
                 }
             })
             ->make(true);

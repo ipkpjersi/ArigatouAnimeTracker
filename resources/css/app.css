@@ -9,6 +9,25 @@
     background: none;
 }
 
+.no_dropdown_arrow {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: transparent;
+    position: relative;
+    padding-right: 36px;
+}
+
+.no_dropdown_arrow::after {
+    content: '\25BC';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #333;
+}
+
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button,
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button.previous.disabled,
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button.next.disabled,

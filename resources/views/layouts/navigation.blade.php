@@ -8,7 +8,9 @@
                     <a href="/">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
-                    <span class="ml-3 text-xl text-gray-800 dark:text-gray-200">Arigatou Anime Tracker</span>
+                    <a href="/" class="ml-3 text-xl text-gray-800 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-200 no-underline">
+                        <span>Arigatou Anime Tracker</span>
+                    </a>
                 </div>
 
                 <!-- Navigation Links -->
@@ -23,6 +25,15 @@
                         {{ __('Users') }}
                     </x-nav-link>
                 </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <input id="globalSearch" type="text" class="dark:bg-gray-800 dark:text-gray-400 rounded-md p-2" placeholder="Search...">
+                <select id="searchType" class="rounded-md p-2 dark:bg-gray-800 dark:text-gray-400 no_dropdown_arrow">
+                    <option value="anime">Anime</option>
+                    <option value="users">Users</option>
+                </select>
+                <button id="searchButton" class="p-2 bg-blue-500 text-white rounded-md">Search</button>
             </div>
 
             <!-- Settings Dropdown -->
