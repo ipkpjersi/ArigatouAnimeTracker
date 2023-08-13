@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AnimeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -24,13 +25,9 @@ Route::get('/', function () {
     return view('welcome');
 })->name("welcome");
 
-Route::get('/anime', function() {
-    return view ('animelist');
-})->name("anime.list");
+Route::get('/users/', [UserController::class, 'list'])->name("users.list");
 
-Route::get('/users', function() {
-    return view ('userlist');
-})->name("users.list");
+Route::get('/user/getUserData', [UserController::class, 'getUserData'])->name('users.data');
 
 Route::get('/anime/', [AnimeController::class, 'list'])->name("anime.list");
 
