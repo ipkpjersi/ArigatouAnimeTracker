@@ -35,6 +35,14 @@ class AnimeController extends Controller
                     $query->orWhere('season', strtoupper($keyword));
                 }
             })
+            ->filterColumn('tags', function($query, $keyword) {
+                $searchTags = collect(explode(',', $keyword))
+                            ->map(fn($tag) => trim(strtolower($tag)));
+
+                foreach ($searchTags as $tag) {
+                    $query->whereRaw('LOWER(tags) LIKE ?', ["%$tag%"]);
+                }
+            })
             ->make(true);
     }
 
