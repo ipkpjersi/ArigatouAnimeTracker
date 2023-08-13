@@ -15,13 +15,11 @@ class AnimeTypeSeeder extends Seeder
      */
     public function run()
     {
-        AnimeType::insert([
-            ['type' => 'TV'],
-            ['type' => 'MOVIE'],
-            ['type' => 'OVA'],
-            ['type' => 'ONA'],
-            ['type' => 'SPECIAL'],
-            ['type' => 'UNKNOWN'],
-        ]);
+        AnimeType::firstOrCreate(['type' => 'TV']);
+        AnimeType::firstOrCreate(['type' => 'MOVIE']);
+        AnimeType::firstOrCreate(['type' => 'OVA']);
+        AnimeType::firstOrCreate(['type' => 'ONA']);
+        AnimeType::firstOrCreate(['type' => 'SPECIAL']);
+        AnimeType::firstOrCreate(['type' => 'UNKNOWN']);
     }
 }

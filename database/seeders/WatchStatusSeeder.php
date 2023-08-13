@@ -15,13 +15,10 @@ class WatchStatusSeeder extends Seeder
      */
     public function run()
     {
-        WatchStatus::insert([
-            ['status' => 'WATCHING'],
-            ['status' => 'COMPLETED'],
-            ['status' => 'ON-HOLD'],
-            ['status' => 'DROPPED'],
-            ['status' => 'PLAN-TO-WATCH'],
-        ]);
-
+        WatchStatus::firstOrCreate(['status' => 'WATCHING']);
+        WatchStatus::firstOrCreate(['status' => 'COMPLETED']);
+        WatchStatus::firstOrCreate(['status' => 'ON-HOLD']);
+        WatchStatus::firstOrCreate(['status' => 'DROPPED']);
+        WatchStatus::firstOrCreate(['status' => 'PLAN-TO-WATCH']);
     }
 }

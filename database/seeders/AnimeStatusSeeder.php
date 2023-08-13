@@ -15,11 +15,9 @@ class AnimeStatusSeeder extends Seeder
      */
     public function run()
     {
-        AnimeStatus::insert([
-            ['status' => 'FINISHED'],
-            ['status' => 'ONGOING'],
-            ['status' => 'UPCOMING'],
-            ['status' => 'UNKNOWN'],
-        ]);
+        AnimeStatus::firstOrCreate(['status' => 'FINISHED']);
+        AnimeStatus::firstOrCreate(['status' => 'ONGOING']);
+        AnimeStatus::firstOrCreate(['status' => 'UPCOMING']);
+        AnimeStatus::firstOrCreate(['status' => 'UNKNOWN']);
     }
 }
