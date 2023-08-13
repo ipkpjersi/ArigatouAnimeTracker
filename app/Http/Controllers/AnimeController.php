@@ -45,7 +45,9 @@ class AnimeController extends Controller
     public function detail($id, $title = null)
     {
         $anime = Anime::with('anime_type', 'anime_status')->findOrFail($id);  // Fetch the anime or fail if not found
-
+        if ($anime->season === "UNDEFINED") {
+            $anime->season = "UNKNOWN";
+        }
         return view('animedetail', compact('anime'));
     }
 }
