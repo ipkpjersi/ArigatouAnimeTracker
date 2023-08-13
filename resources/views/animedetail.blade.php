@@ -12,7 +12,7 @@
                     <!-- Left Column -->
                     <div class="w-full md:w-56 mb-6 md:mb-0 md:mr-6 flex-none mt-0">
                         <h3 class="font-bold mb-1">{{ $anime->title }}</h3>
-                        <img onerror="this.onerror=null; this.src='/img/notfound.gif';" class="rounded-lg shadow-md" src="{{ $anime->picture }}" alt="{{ $anime->title }}" />
+                        <img onerror="this.onerror=null; this.src='/img/notfound.gif';" class="rounded-lg shadow-md mb-3" src="{{ $anime->picture }}" alt="{{ $anime->title }}" />
                         <p><strong>Type:</strong> {{ $anime->anime_type->type }}</p>
                         <p><strong>Status:</strong> {{ $anime->anime_status->status }}</p>
                         <p><strong>Episodes:</strong> {{ $anime->episodes }}</p>
