@@ -15,7 +15,7 @@ class UserController extends Controller
 
         return DataTables::of($query)
             ->editColumn('created_at', function($user) {
-                return Carbon::parse($user->created_at)->format('M d, Y h:i:s A');
+                return Carbon::parse($user->created_at)->format('M d, Y');
             })
             ->make(true);
     }
