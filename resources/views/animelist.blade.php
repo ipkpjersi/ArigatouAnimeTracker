@@ -45,11 +45,11 @@
                     { data: 'title', name: 'title', render: function(data, type, row) {
                         return `<a href="/anime/${row.id}/${data.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}">${data}</a>`;
                     }},
-                    { data: 'anime_type.type', name: 'type', searchable: 'false' },
+                    { data: 'anime_type.type', name: 'anime_type_id', },
                     { data: 'episodes', name: 'episodes', render: function(data, type, row) {
                         return data === 0 ? 'UNKNOWN' : data;
                     } },
-                    { data: 'anime_status.status', name: 'status', searchable: 'false' },
+                    { data: 'anime_status.status', name: 'anime_status_id' },
                     { data: 'tags', name: 'tags', width:"15%", searchable: 'true' },
                     { data: 'season_display', name: 'season', width: "18%" },
                     { data: 'year', name: 'year', width: "10%", render: function(data, type, row) {
@@ -66,6 +66,30 @@
                 {
                     column_number: 2,
                     filter_type: "text"
+                },
+                {
+                    column_number: 3,
+                    filter_type: "select",
+                    data: [
+                        { value: "1", label: "TV" },
+                        { value: "2", label: "MOVIE" },
+                        { value: "3", label: "OVA" },
+                        { value: "4", label: "ONA" },
+                        { value: "5", label: "SPECIAL" },
+                        { value: "6", label: "UNKNOWN" },
+                    ],
+                    filter_default_label: "All Types"
+                },
+                {
+                    column_number: 5,
+                    filter_type: "select",
+                    data: [
+                        { value: "1", label: "FINISHED" },
+                        { value: "2", label: "ONGOING" },
+                        { value: "3", label: "UPCOMING" },
+                        { value: "4", label: "UNKNOWN" }
+                    ],
+                    filter_default_label: "All Status"
                 },
                 {
                     column_number: 6,
@@ -92,6 +116,16 @@
     <style>
         #yadcf-filter--animeTable-2 {
             max-width: 160px;
+        }
+
+        #yadcf-filter--animeTable-3 {
+            max-width: 138px;
+            padding-right: 1rem;
+        }
+
+        #yadcf-filter--animeTable-5 {
+            max-width: 138px;
+            padding-right: 1rem;
         }
 
         #yadcf-filter--animeTable-6 {
