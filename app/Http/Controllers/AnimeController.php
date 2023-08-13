@@ -8,8 +8,11 @@ use Yajra\DataTables\Facades\DataTables;
 
 class AnimeController extends Controller
 {
-    public function getAnimeData()
+    public function getAnimeData(Request $request)
     {
+        if (!request()->has(['start', 'length'])) {
+            return response()->json(['error' => 'Invalid request'], 400);
+        }
         $query = Anime::with('anime_type', 'anime_status')->selectRaw('*,
             CASE WHEN season = "UNDEFINED" THEN "UNKNOWN" ELSE season END as season_display,
             CASE season
