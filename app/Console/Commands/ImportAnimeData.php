@@ -48,7 +48,7 @@ class ImportAnimeData extends Command
                     ->where('episodes', $animeData['episodes'])
                     ->where('season', $animeData['animeSeason']['season'])
                     ->where('thumbnail', $animeData['thumbnail'])
-                    ->where('relations', implode(', ', $animeData['relations']))
+                    ->where('sources', implode(', ', $animeData['sources']))
                     ->first();
 
                 //Skip the anime if it exists.
@@ -81,6 +81,7 @@ class ImportAnimeData extends Command
                     'thumbnail' => $animeData['thumbnail'],
                     'synonyms' => implode(', ', $animeData['synonyms']),
                     'relations' => implode(', ', $animeData['relations']),
+                    'sources' => implode(', ', $animeData['sources']),
                     'tags' => implode(', ', $animeData['tags']),
                 ]);
                 $count++;

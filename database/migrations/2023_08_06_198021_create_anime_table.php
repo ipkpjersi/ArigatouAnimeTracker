@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('picture');
             $table->string('thumbnail');
             $table->text('synonyms')->nullable();
+            $table->text('sources')->nullable();
             $table->text('relations')->nullable();
             $table->text('tags')->nullable();
             $table->integer('is_deleted')->default(0);

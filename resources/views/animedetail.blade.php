@@ -18,6 +18,13 @@
                         <p><strong>Episodes:</strong> {{ $anime->episodes }}</p>
                         <p><strong>Season:</strong> {{ $anime->season }}</p>
                         <p><strong>Year:</strong> {{ $anime->year }}</p>
+
+                        <h4 class="font-bold mt-4 mb-2">Tags:</h4>
+                        <ul>
+                            @foreach(explode(', ', $anime->tags) as $tag)
+                                <li>{{ $tag }}</li>
+                            @endforeach
+                        </ul>
                     </div>
 
                     <!-- Right Column -->
@@ -25,17 +32,17 @@
                         <h4 class="font-bold mb-2">Also known as:</h4>
                         <p>{{ $anime->synonyms }}</p>
 
-                        <h4 class="font-bold mt-4 mb-2">Related Anime:</h4>
+                        <h4 class="font-bold mt-4 mb-2">More Details:</h4>
                         <ul>
-                            @foreach(explode(', ', $anime->relations) as $relation)
-                                <li><a href="{{ $relation }}">{{ $relation }}</a></li>
+                            @foreach(explode(', ', $anime->sources) as $source)
+                                <li><a href="{{ $source }}" target="_blank" rel="noopener">{{ $source }}</a></li>
                             @endforeach
                         </ul>
 
-                        <h4 class="font-bold mt-4 mb-2">Tags:</h4>
+                        <h4 class="font-bold mt-4 mb-2">Related Anime:</h4>
                         <ul>
-                            @foreach(explode(', ', $anime->tags) as $tag)
-                                <li>{{ $tag }}</li>
+                            @foreach(explode(', ', $anime->relations) as $relation)
+                                <li><a href="{{ $relation }}" target="_blank" rel="noopener">{{ $relation }}</a></li>
                             @endforeach
                         </ul>
                     </div>
