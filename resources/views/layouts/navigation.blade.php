@@ -27,7 +27,8 @@
                 </div>
             </div>
 
-            <div class="flex items-center space-x-4">
+            <!-- Global Searching -->
+            <div class="hidden items-center space-x-4 md:flex">
                 <input id="globalSearch" type="text" class="dark:bg-gray-800 dark:text-gray-100 rounded-md p-2" placeholder="Search...">
                 <select id="searchType" class="rounded-md p-2 dark:bg-gray-800 dark:text-gray-100 no_dropdown_arrow">
                     <option value="anime">Anime</option>
