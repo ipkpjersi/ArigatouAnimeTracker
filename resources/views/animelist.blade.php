@@ -46,7 +46,9 @@
                         return `<a href="/anime/${row.id}/${data.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}">${data}</a>`;
                     }},
                     { data: 'anime_type.type', name: 'type', searchable: 'false' },
-                    { data: 'episodes', name: 'episodes' },
+                    { data: 'episodes', name: 'episodes', render: function(data, type, row) {
+                        return data === 0 ? 'UNKNOWN' : data;
+                    } },
                     { data: 'anime_status.status', name: 'status', searchable: 'false' },
                     { data: 'tags', name: 'tags', width:"15%", searchable: 'true' },
                     { data: 'season_display', name: 'season', width: "18%" },
