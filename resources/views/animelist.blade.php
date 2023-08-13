@@ -50,7 +50,7 @@
                     { data: 'anime_status.status', name: 'status', searchable: 'false' },
                     { data: 'tags', name: 'tags', width:"15%", searchable: 'true' },
                     { data: 'season_display', name: 'season', width: "18%" },
-                    { data: 'year', name: 'year', width: "11%", render: function(data, type, row) {
+                    { data: 'year', name: 'year', width: "10%", render: function(data, type, row) {
                         return data === null ? 'UNKNOWN' : data;
                     }},
                 ],
