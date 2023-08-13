@@ -18,6 +18,7 @@
                                 <th>Type</th>
                                 <th>Episodes</th>
                                 <th>Status</th>
+                                <th>Tags</th>
                                 <th>Season</th>
                                 <th>Year</th>
                             </tr>
@@ -35,7 +36,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route('anime.data') }}',
-                order: [[7, 'desc'], [6, 'desc']],
+                order: [[7, 'desc'], [8, 'desc']],
                 columns: [
                     { data: 'id', name: 'id' },
                     { data: 'thumbnail', name: 'picture', render: function(data, type, row) {
@@ -47,8 +48,9 @@
                     { data: 'anime_type.type', name: 'type', searchable: 'false' },
                     { data: 'episodes', name: 'episodes' },
                     { data: 'anime_status.status', name: 'status', searchable: 'false' },
+                    { data: 'tags', name: 'tags', width:"15%", searchable: 'true' },
                     { data: 'season_display', name: 'season', width: "18%" },
-                    { data: 'year', name: 'year', width: "10%", render: function(data, type, row) {
+                    { data: 'year', name: 'year', width: "11%", render: function(data, type, row) {
                         return data === null ? 'UNKNOWN' : data;
                     }},
                 ],
@@ -65,6 +67,10 @@
                 },
                 {
                     column_number: 6,
+                    filter_type: "text" //TODO: fix searching so any combination of tags can be found
+                },
+                {
+                    column_number: 7,
                     filter_type: "select",
                     data: [
                         { value: "WINTER", label: "Winter" },
@@ -75,7 +81,7 @@
                     filter_default_label: "All Seasons"
                 },
                 {
-                    column_number: 7,
+                    column_number: 8,
                     filter_type: "text"
                 },
             ]);
@@ -83,14 +89,19 @@
     </script>
     <style>
         #yadcf-filter--animeTable-2 {
-            max-width: 200px;
+            max-width: 160px;
         }
 
         #yadcf-filter--animeTable-6 {
-            max-width: 140px;
+            max-width: 100px;
         }
 
         #yadcf-filter--animeTable-7 {
+            max-width: 138px;
+            padding-right: 1rem;
+        }
+
+        #yadcf-filter--animeTable-8 {
             max-width: 62px;
         }
     </style>
