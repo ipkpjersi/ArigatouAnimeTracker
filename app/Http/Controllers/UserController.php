@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function getUserData()
     {
-        if (!request()->has(['start', 'length'])) {
+        if (!request()->has(['start', 'length']) || request()->input('length') > 1000) {
             return response()->json(['error' => 'Invalid request'], 400);
         }
         $query = User::select('id', 'avatar', 'username', 'is_admin', 'created_at');

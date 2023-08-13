@@ -10,7 +10,7 @@ class AnimeController extends Controller
 {
     public function getAnimeData(Request $request)
     {
-        if (!request()->has(['start', 'length'])) {
+        if (!request()->has(['start', 'length']) || request()->input('length') > 1000) {
             return response()->json(['error' => 'Invalid request'], 400);
         }
         $query = Anime::with('anime_type', 'anime_status')->selectRaw('*,
