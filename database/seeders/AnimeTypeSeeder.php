@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AnimeType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +15,7 @@ class AnimeTypeSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('anime_type')->insert([
+        AnimeType::insert([
             ['type' => 'TV'],
             ['type' => 'MOVIE'],
             ['type' => 'OVA'],

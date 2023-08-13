@@ -10,4 +10,6 @@ class AnimeStatus extends Model
     protected $table = 'anime_status';
 
     use HasFactory;
+
+    protected $guarded = [];
 }

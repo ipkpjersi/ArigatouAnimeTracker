@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\WatchStatus;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -14,12 +15,13 @@ class WatchStatusSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('watch_status')->insert([
+        WatchStatus::insert([
             ['status' => 'WATCHING'],
             ['status' => 'COMPLETED'],
             ['status' => 'ON-HOLD'],
             ['status' => 'DROPPED'],
             ['status' => 'PLAN-TO-WATCH'],
         ]);
+
     }
 }

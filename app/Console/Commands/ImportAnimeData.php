@@ -41,8 +41,15 @@ class ImportAnimeData extends Command
             foreach ($data['data'] as $animeData) {
                 $title = str_replace('"', '', $animeData['title']);
                 $existingAnime = Anime::where('title', $title)
-                          ->where('year', $animeData['animeSeason']['year'])
-                          ->first();
+                    ->where('year', $animeData['animeSeason']['year'])
+                    ->whereHas('anime_type', function ($query) use ($animeData) {
+                        $query->where('type', $animeData['type']);
+                    })
+                    ->where('episodes', $animeData['episodes'])
+                    ->where('season', $animeData['animeSeason']['season'])
+                    ->where('thumbnail', $animeData['thumbnail'])
+                    ->where('relations', implode(', ', $animeData['relations']))
+                    ->first();
 
                 //Skip the anime if it exists.
                 if ($existingAnime) {
@@ -51,12 +58,12 @@ class ImportAnimeData extends Command
                 }
 
                 //Find or create related models like anime type, status, etc.
-                $type = AnimeType::firstOrCreate(['type' => $animeData['type']]);
+                $type = AnimeType::where('type', $animeData['type'])->firstOrCreate(['type' => $animeData['type']]);
                 if ($type->wasRecentlyCreated) {
                     $this->info("New anime type created: " . $type->type);
                     \Log::info("New anime type created: " . $type->type);
                 }
-                $status = AnimeStatus::firstOrCreate(['status' => $animeData['status']]);
+                $status = AnimeStatus::where('status', $animeData['status'])->firstOrCreate(['status' => $animeData['status']]);
                 if ($status->wasRecentlyCreated) {
                     $this->info("New anime status created: " . $status->status);
                     \Log::info("New anime status created: " . $status->status);
