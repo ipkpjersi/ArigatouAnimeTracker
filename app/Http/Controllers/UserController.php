@@ -24,9 +24,9 @@ class UserController extends Controller
         return view("userlist");
     }
 
-    public function detail($id)
+    public function detail($username)
     {
-        $user = User::findOrFail($id);
+        $user = User::where(['username' => $username])->firstOrFail();
         return view('userdetail', compact('user'));
     }
 }
