@@ -26,11 +26,13 @@
     </div>
 
     <script type="module">
+        import '/js/jquery.dataTables.yadcf.js';
         $(document).ready(function () {
             let dataTable = $('#userTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route('users.data') }}',
+                order: [4, 'desc'],
                 columns: [
                     { data: 'id', name: 'id' },
                     { data: 'avatar', name: 'avatar', render: function(data, type, row) {
@@ -39,12 +41,33 @@
                     { data: 'username', name: 'username', render: function(data, type, row) {
                         return `<a href="/users/${data}">${data}</a>`;
                     }},
-                    { data: 'is_admin', name: 'admin', render: function(data, type, row) {
+                    { data: 'is_admin', name: 'is_admin', render: function(data, type, row) {
                         return data === 1 ? "Yes" : "No";
                     } },
                     { data: 'created_at', name: 'created_at' },
                 ]
             });
+            yadcf.init(dataTable, [
+                {
+                    column_number: 2,
+                    filter_type: "text"
+                },
+                {
+                    column_number: 3,
+                    filter_type: "select",
+                    data: [
+                        { value: "1", label: "Yes" },
+                        { value: "0", label: "No" },
+                    ],
+                    filter_default_label: "All Users"
+                },
+            ]);
         });
     </script>
+    <style>
+        #yadcf-filter--userTable-3 {
+            max-width: 138px;
+            padding-right: 1rem;
+        }
+    </style>
 </x-app-layout>
