@@ -37,7 +37,9 @@
                         return '<img src="' + data + '" alt="Avatar" style="width:50px; max-height: 70px"  onerror="this.onerror=null; this.src=\'/img/notfound.gif\';" />';
                     }},
                     { data: 'username', name: 'username' },
-                    { data: 'is_admin', name: 'is_admin' },
+                    { data: 'is_admin', name: 'admin', render: function(data, type, row) {
+                        return data === 1 ? "Yes" : "No";
+                    } },
                     { data: 'created_at', name: 'created_at' },
                 ]
             });
