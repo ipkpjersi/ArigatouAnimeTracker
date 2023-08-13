@@ -13,7 +13,6 @@
                     <div class="w-full md:w-56 mb-6 md:mb-0 md:mr-6 flex-none mt-0">
                         <h3 class="font-bold mb-1">{{ $user->username }}</h3>
                         <img onerror="this.onerror=null; this.src='/img/notfound.gif';" class="rounded-lg shadow-md mb-3" src="{{ $user->avatar }}" alt="{{ $user->username }}" />
-                        <p><strong>Email:</strong> {{ $user->email }}</p>
                         <p><strong>Joined:</strong> {{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y') }}</p>
                         <p><strong>Role:</strong> {{ $user->is_admin === 1 ? 'Administrator' : 'Standard User' }}</p>
                     </div>
