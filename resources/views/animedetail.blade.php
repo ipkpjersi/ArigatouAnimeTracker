@@ -10,9 +10,9 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100 flex flex-wrap">
                     <!-- Left Column -->
-                    <div class="w-5/5 md:w-48 pr-8 mb-6 md:mb-0 md:mr-4 flex-none">
-                        <img class="rounded-lg shadow-md w-full" src="{{ $anime->picture }}" alt="{{ $anime->title }}" />
-                        <h3 class="mt-4 font-bold">{{ $anime->title }}</h3>
+                    <div class="w-5/5 md:w-56 mb-6 md:mb-0 md:mr-6 flex-none mt-0">
+                        <h3 class="font-bold mb-1">{{ $anime->title }}</h3>
+                        <img onerror="this.onerror=null; this.src='/img/notfound.gif';" class="rounded-lg shadow-md" src="{{ $anime->picture }}" alt="{{ $anime->title }}" />
                         <p><strong>Type:</strong> {{ $anime->anime_type->type }}</p>
                         <p><strong>Status:</strong> {{ $anime->anime_status->status }}</p>
                         <p><strong>Episodes:</strong> {{ $anime->episodes }}</p>
@@ -21,7 +21,7 @@
                     </div>
 
                     <!-- Right Column -->
-                    <div class="w-5/5 md:w-3/5 md:pl-8 mt-6 md:mt-0">
+                    <div class="w-5/5 md:w-3/5 mt-0">
                         <h4 class="font-bold mb-2">Synonyms:</h4>
                         <p>{{ $anime->synonyms }}</p>
 

@@ -1,9 +1,14 @@
-/*@tailwind base;*/
-/*@tailwind components;*/
-/*@tailwind utilities;*/
-@import 'tailwindcss/base';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/*@import 'tailwindcss/base';
 @import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import 'tailwindcss/utilities';*/
+
+.dark p,
+.dark div {
+    color: #F3F4F6; /* text-gray-100 */
+}
 
 .dataTables_length select {
     -webkit-appearance: none;
@@ -36,11 +41,6 @@
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button.next.disabled,
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button.current {
     color: white !important;
-}
-
-.dark p,
-.dark div {
-    color: #F3F4F6; /* text-gray-100 */
 }
 
 .yadcf-filter {
