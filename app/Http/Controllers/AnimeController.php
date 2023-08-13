@@ -41,4 +41,11 @@ class AnimeController extends Controller
     public function list() {
         return view("animelist");
     }
+
+    public function detail($id, $title = null)
+    {
+        $anime = Anime::with('anime_type', 'anime_status')->findOrFail($id);  // Fetch the anime or fail if not found
+
+        return view('animedetail', compact('anime'));
+    }
 }

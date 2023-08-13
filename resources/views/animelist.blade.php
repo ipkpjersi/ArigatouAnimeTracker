@@ -41,7 +41,9 @@
                     { data: 'thumbnail', name: 'picture', render: function(data, type, row) {
                         return '<img src="' + data + '" alt="Thumbnail" style="width:50px; max-height: 70px"  onerror="this.onerror=null; this.src=\'/img/notfound.gif\';" />';
                     }},
-                    { data: 'title', name: 'title' },
+                    { data: 'title', name: 'title', render: function(data, type, row) {
+                        return `<a href="/anime/${row.id}/${data.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}">${data}</a>`;
+                    }},
                     { data: 'anime_type.type', name: 'type', searchable: 'false' },
                     { data: 'episodes', name: 'episodes' },
                     { data: 'anime_status.status', name: 'status', searchable: 'false' },

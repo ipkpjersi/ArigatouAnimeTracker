@@ -36,6 +36,9 @@ Route::get('/anime/', [AnimeController::class, 'list'])->name("anime.list");
 
 Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->name("anime.data");
 
+Route::get('/anime/{id}/{title}', [AnimeController::class, 'detail'])->name('anime.detail');
+
+
 //Protected routes
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
