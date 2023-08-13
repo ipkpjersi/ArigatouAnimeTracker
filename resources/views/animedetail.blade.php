@@ -29,10 +29,12 @@
 
                     <!-- Right Column -->
                     <div class="w-full md:w-3/5 mt-0">
-                        <h4 class="font-bold mb-2">Also known as:</h4>
-                        <p>{{ $anime->synonyms }}</p>
+                        @if (!empty($anime->synonyms))
+                            <h4 class="font-bold mb-2">Also known as:</h4>
+                            <p>{{ $anime->synonyms }}</p>
+                        @endif
 
-                        <h4 class="font-bold mt-4 mb-2">More Details:</h4>
+                        <h4 class="font-bold @if (!empty($anime->synonyms)) mt-4 @endif mb-2">More Details:</h4>
                         <ul>
                             @foreach(explode(', ', $anime->sources) as $source)
                                 <li><a href="{{ $source }}" target="_blank" rel="noopener">{{ $source }}</a></li>
