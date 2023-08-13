@@ -28,8 +28,8 @@
             </div>
 
             <div class="flex items-center space-x-4">
-                <input id="globalSearch" type="text" class="dark:bg-gray-800 dark:text-gray-400 rounded-md p-2" placeholder="Search...">
-                <select id="searchType" class="rounded-md p-2 dark:bg-gray-800 dark:text-gray-400 no_dropdown_arrow">
+                <input id="globalSearch" type="text" class="dark:bg-gray-800 dark:text-gray-100 rounded-md p-2" placeholder="Search...">
+                <select id="searchType" class="rounded-md p-2 dark:bg-gray-800 dark:text-gray-100 no_dropdown_arrow">
                     <option value="anime">Anime</option>
                     <option value="users">Users</option>
                 </select>
