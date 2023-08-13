@@ -14,7 +14,9 @@
                         <h3 class="font-bold mb-1">{{ $user->username }}</h3>
                         <img onerror="this.onerror=null; this.src='/img/notfound.gif';" class="rounded-lg shadow-md mb-3" src="{{ $user->avatar }}" alt="{{ $user->username }}" />
                         <p><strong>Joined:</strong> {{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y') }}</p>
-                        <p><strong>Role:</strong> {{ $user->is_admin === 1 ? 'Administrator' : 'Standard User' }}</p>
+                        @if ($user->is_admin === 1)
+                            <p><strong>Role:</strong> {{ 'Admin' }}</p>
+                        @endif
                     </div>
 
                     <!-- Right Column -->
