@@ -29,11 +29,13 @@ Route::get('/users/', [UserController::class, 'list'])->name("users.list");
 
 Route::get('/user/getUserData', [UserController::class, 'getUserData'])->name('users.data');
 
+Route::get('/users/{id}/{name?}', [UserController::class, 'detail'])->name("users.detail");
+
 Route::get('/anime/', [AnimeController::class, 'list'])->name("anime.list");
 
 Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->name("anime.data");
 
-Route::get('/anime/{id}/{title}', [AnimeController::class, 'detail'])->name('anime.detail');
+Route::get('/anime/{id}/{title?}', [AnimeController::class, 'detail'])->name('anime.detail');
 
 
 //Protected routes

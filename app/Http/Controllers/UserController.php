@@ -23,4 +23,10 @@ class UserController extends Controller
     public function list() {
         return view("userlist");
     }
+
+    public function detail($id)
+    {
+        $user = User::findOrFail($id);
+        return view('userdetail', compact('user'));
+    }
 }
