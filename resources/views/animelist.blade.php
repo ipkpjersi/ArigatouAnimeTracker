@@ -69,7 +69,7 @@
                 },
                 {
                     column_number: 6,
-                    filter_type: "text" //TODO: fix searching so any combination of tags can be found
+                    filter_type: "text"
                 },
                 {
                     column_number: 7,
