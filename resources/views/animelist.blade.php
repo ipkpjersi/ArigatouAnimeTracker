@@ -45,7 +45,7 @@
                     { data: 'anime_type.type', name: 'type', searchable: 'false' },
                     { data: 'episodes', name: 'episodes' },
                     { data: 'anime_status.status', name: 'status', searchable: 'false' },
-                    { data: 'season_display', name: 'season', width: "15%" },
+                    { data: 'season_display', name: 'season', width: "18%" },
                     { data: 'year', name: 'year', width: "10%", render: function(data, type, row) {
                         return data === null ? 'UNKNOWN' : data;
                     }},
@@ -79,4 +79,17 @@
             ]);
         });
     </script>
+    <style>
+        #yadcf-filter--animeTable-2 {
+            max-width: 200px;
+        }
+
+        #yadcf-filter--animeTable-6 {
+            max-width: 140px;
+        }
+
+        #yadcf-filter--animeTable-7 {
+            max-width: 62px;
+        }
+    </style>
 </x-app-layout>
