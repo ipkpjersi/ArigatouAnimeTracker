@@ -37,6 +37,8 @@ Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->nam
 
 Route::get('/anime/{id}/{title?}', [AnimeController::class, 'detail'])->name('anime.detail');
 
+Route::get('/animelist/{username}', [AnimeController::class, 'userAnimeList'])->name('user.anime.list');
+
 
 //Protected routes
 Route::middleware('auth')->group(function () {
@@ -51,6 +53,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/anime/{id}/add-to-list', [AnimeController::class, 'addToList'])->name('anime.addToList');
 });
 
 require __DIR__.'/auth.php';

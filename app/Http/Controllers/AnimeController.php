@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Anime;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class AnimeController extends Controller
@@ -59,5 +61,28 @@ class AnimeController extends Controller
             $anime->season = "UNKNOWN";
         }
         return view('animedetail', compact('anime'));
+    }
+
+
+    public function userAnimeList($username) {
+        // Fetch the user by username
+        $user = User::where('username', $username)->firstOrFail();
+
+        $userAnime = $user->anime()
+                          ->with(['anime_type', 'anime_status'])
+                          ->orderBy('sort_order', 'asc')
+                          ->get(); // This will display 15 items per page. Adjust as needed.
+
+        return view('userAnimeList', ['userAnime' => $userAnime]);
+    }
+
+    public function addToList($id)
+    {
+        $user = Auth::user();
+        $anime = Anime::findOrFail($id);
+
+        $user->anime()->attach($anime);
+
+        return redirect()->back()->with('message', 'Anime added to your list!');
     }
 }

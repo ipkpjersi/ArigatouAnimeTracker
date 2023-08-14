@@ -18,7 +18,14 @@
                         <p><strong>Episodes:</strong> {{ $anime->episodes }}</p>
                         <p><strong>Season:</strong> {{ $anime->season }}</p>
                         <p><strong>Year:</strong> {{ $anime->year }}</p>
-
+                        @if (auth()->user() && !auth()->user()->anime->contains($anime->id))
+                            <form action="{{ route('anime.addToList', $anime->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    Add to My Anime List
+                                </button>
+                            </form>
+                        @endif
                         <h4 class="font-bold mt-4 mb-2">Tags:</h4>
                         <ul>
                             @foreach(explode(', ', $anime->tags) as $tag)
