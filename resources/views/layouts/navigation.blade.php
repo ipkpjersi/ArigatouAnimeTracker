@@ -34,7 +34,7 @@
                     <option value="anime">Anime</option>
                     <option value="users">Users</option>
                 </select>
-                <button id="searchButton" class="p-2 bg-blue-500 text-white rounded-md">Search</button>
+                <button id="searchButton" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md">Search</button>
             </div>
 
             <!-- Settings Dropdown -->
