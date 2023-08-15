@@ -67,13 +67,13 @@ class AnimeController extends Controller
 
     public function userAnimeList($username) {
         $user = User::where('username', $username)->firstOrFail();
-
+        $show_anime_list_number = $user->show_anime_list_number;
         $userAnime = $user->anime()
                           ->with(['anime_type', 'anime_status'])
                           ->orderBy('sort_order', 'asc')
                           ->paginate($user->anime_list_pagination_size ?? 15);
 
-        return view('userAnimeList', ['userAnime' => $userAnime, 'username' => $username]);
+        return view('userAnimeList', ['userAnime' => $userAnime, 'username' => $username, 'show_anime_list_number' => $show_anime_list_number]);
     }
 
     public function updateUserAnimeList(Request $request, $username) {

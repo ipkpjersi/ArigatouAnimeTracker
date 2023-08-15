@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->integer('is_banned')->default(0);
             $table->integer('anime_list_pagination_size')->default(15);
+            $table->integer('show_anime_list_number')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
