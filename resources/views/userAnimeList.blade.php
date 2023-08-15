@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            User Anime List
+            User Anime List for {{ $username }}
         </h2>
     </x-slot>
 
@@ -21,13 +21,17 @@
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Name</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Type</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Status</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Watch Status</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Score</th>
-                                    @if(auth()->user()->username === $username)
+                                    @if(auth()->user() != null && auth()->user()->username === $username)
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Sort Order</th>
                                     @endif
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Episodes</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Season</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Year</th>
+                                    @if(auth()->user() != null && auth()->user()->username === $username)
+                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Delete</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -40,11 +44,26 @@
                                         <td class="py-2 px-4 border-b border-gray-200">
                                             <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }} thumbnail" width="50" height="50" onerror="this.onerror=null; this.src='{{ asset('img/notfound.gif') }}'">
                                         </td>
-                                        <td class="py-2 px-4 border-b border-gray-200">{{ $anime->title }}</td>
+                                        <td class="py-2 px-4 border-b border-gray-200"><a href="/anime/{{$anime->id}}">{{ $anime->title }}</a></td>
                                         <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_type)->type }}</td>
                                         <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_status)->status }}</td>
                                         <td class="py-2 px-4 border-b border-gray-200">
-                                            @if(auth()->user()->username === $username)
+                                            @if(auth()->user() != null && auth()->user()->username === $username)
+                                                <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">
+                                                    <option value="">Pick a status...</option>
+                                                    @foreach ($watchStatuses as $status)
+                                                        <option value="{{ $status->id }}" @if($anime->pivot->watch_status_id == $status->id) selected @endif>
+                                                            {{ $status->status }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            @else
+                                                {{ $watchStatusMap[$anime->pivot->watch_status_id] ?? 'UNKNOWN' }}
+                                            @endif
+                                        </td>
+
+                                        <td class="py-2 px-4 border-b border-gray-200">
+                                            @if(auth()->user() != null && auth()->user()->username === $username)
                                                 <select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">
                                                     <option value="">Pick an option...</option>
                                                     @for ($i = 1; $i <= 10; $i++)
@@ -52,10 +71,10 @@
                                                     @endfor
                                                 </select>
                                             @else
-                                                {{ $anime->pivot->score ?? '' }}
+                                                {{ $anime->pivot->score ?? 'UNKNOWN' }}
                                             @endif
                                         </td>
-                                        @if(auth()->user()->username === $username)
+                                        @if(auth()->user() != null && auth()->user()->username === $username)
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">
                                             </td>
@@ -63,11 +82,21 @@
                                         <td class="py-2 px-4 border-b border-gray-200">{{ $anime->episodes }}</td>
                                         <td class="py-2 px-4 border-b border-gray-200">{{ $anime->season }}</td>
                                         <td class="py-2 px-4 border-b border-gray-200">{{ $anime->year }}</td>
+                                        <td class="py-2 px-4 border-b border-gray-200">
+                                            @if(auth()->user() != null && auth()->user()->username === $username)
+                                                <button
+                                                    onclick="deleteAnime({{ $anime->id }}, event)"
+                                                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+                                                >
+                                                    Delete
+                                                </button>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
-                        @if(auth()->user()->username === $username)
+                        @if(auth()->user() != null && auth()->user()->username === $username)
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                                 Save Changes
                             </button>
@@ -80,4 +109,21 @@
             </div>
         </div>
     </div>
+    <script>
+        function deleteAnime(animeId, event) {
+            //Prevent update form submission
+            event.preventDefault();
+            axios.post(`/anime/${animeId}/delete-from-list/false`, {
+                _token: '{{ csrf_token() }}',
+                _method: 'DELETE'
+            })
+            .then(function (response) {
+                location.reload();
+            })
+            .catch(function (error) {
+                alert('Error removing anime. Please try again: ' + error);
+                console.log('Error removing anime. Please try again: ' + error);
+            });
+        }
+    </script>
 </x-app-layout>

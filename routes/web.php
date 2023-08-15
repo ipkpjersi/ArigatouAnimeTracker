@@ -54,7 +54,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::post('/anime/{id}/add-to-list', [AnimeController::class, 'addToList'])->name('anime.addToList');
+    Route::post('/anime/{id}/add-to-list/{redirect?}', [AnimeController::class, 'addToList'])->name('anime.addToList');
+
+    Route::delete('/anime/{id}/delete-from-list/{redirect?}', [AnimeController::class, 'removeFromList'])->name('anime.deleteFromList');
 });
 
 require __DIR__.'/auth.php';

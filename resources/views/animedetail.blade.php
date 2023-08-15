@@ -18,13 +18,23 @@
                         <p><strong>Episodes:</strong> {{ $anime->episodes }}</p>
                         <p><strong>Season:</strong> {{ $anime->season }}</p>
                         <p><strong>Year:</strong> {{ $anime->year }}</p>
-                        @if (auth()->user() && !auth()->user()->anime->contains($anime->id))
-                            <form action="{{ route('anime.addToList', $anime->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                    Add to My Anime List
-                                </button>
-                            </form>
+                        @if (auth()->user() )
+                            @if (!auth()->user()->anime->contains($anime->id))
+                                <form action="{{ route('anime.addToList', $anime->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                        Add to My Anime List
+                                    </button>
+                                </form>
+                            @else
+                                 <form action="{{ route('anime.deleteFromList', $anime->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                        Remove from My Anime List
+                                    </button>
+                                </form>
+                            @endif
                         @endif
                         <h4 class="font-bold mt-4 mb-2">Tags:</h4>
                         <ul>

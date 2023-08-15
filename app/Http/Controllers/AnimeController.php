@@ -6,6 +6,7 @@ use App\Models\Anime;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class AnimeController extends Controller
@@ -68,12 +69,14 @@ class AnimeController extends Controller
     public function userAnimeList($username) {
         $user = User::where('username', $username)->firstOrFail();
         $show_anime_list_number = $user->show_anime_list_number;
+        $watchStatuses = DB::table('watch_status')->get();
+        $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
         $userAnime = $user->anime()
                           ->with(['anime_type', 'anime_status'])
-                          ->orderBy('sort_order', 'asc')
+                          ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC')
                           ->paginate($user->anime_list_pagination_size ?? 15);
 
-        return view('userAnimeList', ['userAnime' => $userAnime, 'username' => $username, 'show_anime_list_number' => $show_anime_list_number]);
+        return view('userAnimeList', ['userAnime' => $userAnime, 'username' => $username, 'show_anime_list_number' => $show_anime_list_number, 'watchStatuses' => $watchStatuses, 'watchStatusMap' => $watchStatusMap]);
     }
 
     public function updateUserAnimeList(Request $request, $username) {
@@ -83,29 +86,39 @@ class AnimeController extends Controller
             foreach ($request->anime_ids as $index => $anime_id) {
                 $score = $request->score[$index];
                 $sortOrder = $request->sort_order[$index];
+                $watchStatusId = $request->watch_status_id[$index] ? $request->watch_status_id[$index] : null;
 
                 //Use syncWithoutDetaching to update the pivot data/junction table
                 //without removing the user's other rows in the junction table.
                 $user->anime()->syncWithoutDetaching([
                     $anime_id => [
                         'score' => $score ? $score : null,
-                        'sort_order' => $sortOrder
+                        'sort_order' => $sortOrder,
+                        'watch_status_id' => $watchStatusId
                     ]
                 ]);
             }
         }
-
         return redirect()->route('user.anime.list', ['username' => $username]);
-
     }
 
-    public function addToList($id)
+    public function addToList($id, $redirect = true)
     {
         $user = Auth::user();
         $anime = Anime::findOrFail($id);
 
         $user->anime()->attach($anime);
+        if ($redirect == true) {
+            return redirect()->back()->with('message', 'Anime added to your list!');
+        }
+    }
 
-        return redirect()->back()->with('message', 'Anime added to your list!');
+    public function removeFromList($animeId, $redirect = true)
+    {
+        $user = Auth::user();
+        $user->anime()->detach($animeId);
+        if ($redirect == true) {
+            return redirect()->back()->with('message', 'Anime removed from your list!');
+        }
     }
 }

@@ -18,7 +18,7 @@
                             <p><strong>Role:</strong> {{ 'Admin' }}</p>
                         @endif
                         <a href="/animelist/{{ $user->username }}" class="inline-block">
-                            <button id="animeListButton" class="p-2 bg-blue-500 text-white rounded-md mt-2">Anime List</button>
+                            <button id="animeListButton" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2">Anime List</button>
                         </a>
                     </div>
 
