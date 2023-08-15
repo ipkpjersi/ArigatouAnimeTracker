@@ -62,7 +62,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_adult_content')" />
 
-            <x-input-label class="mt-4" for="anime_list_pagination_size" :value="__('Anime List Pagination Size')" />
+            <x-input-label class="mt-4" for="anime_list_pagination_size" :value="__('Anime List Pagination Size (Default: 15)')" />
             <x-text-input  id="anime_list_pagination_size"  name="anime_list_pagination_size"  type="number"  min="2"  max="250" class="mt-1 block w-full"  :value="old('anime_list_pagination_size', $user->anime_list_pagination_size)"
                 required />
             <x-input-error class="mt-2" :messages="$errors->get('anime_list_pagination_size')" />
