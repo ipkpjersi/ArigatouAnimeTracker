@@ -38,6 +38,11 @@
                             @endforeach
                         </tbody>
                     </table>
+                    @if (config('config.user_anime_list_paginated'))
+                        <div class="mt-4">
+                            {{ $userAnime->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

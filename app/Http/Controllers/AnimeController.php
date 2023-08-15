@@ -41,6 +41,7 @@ class AnimeController extends Controller
                 }
             })
             ->filterColumn('tags', function($query, $keyword) {
+                //We could add a junction table for anime and tags, but this is probably fine.
                 $searchTags = collect(explode(',', $keyword))
                             ->map(fn($tag) => trim(strtolower($tag)));
                 foreach ($searchTags as $tag) {
@@ -65,14 +66,16 @@ class AnimeController extends Controller
 
 
     public function userAnimeList($username) {
-        // Fetch the user by username
         $user = User::where('username', $username)->firstOrFail();
 
-        $userAnime = $user->anime()
+        $query = $user->anime()
                           ->with(['anime_type', 'anime_status'])
-                          ->orderBy('sort_order', 'asc')
-                          ->get(); // This will display 15 items per page. Adjust as needed.
-
+                          ->orderBy('sort_order', 'asc');
+        if (config('config.user_anime_list_paginated')) {
+            $userAnime = $query->paginate('15');
+        } else {
+           $userAnime = $query->get();
+        }
         return view('userAnimeList', ['userAnime' => $userAnime]);
     }
 
