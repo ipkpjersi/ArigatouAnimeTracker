@@ -68,15 +68,35 @@ class AnimeController extends Controller
     public function userAnimeList($username) {
         $user = User::where('username', $username)->firstOrFail();
 
-        $query = $user->anime()
+        $userAnime = $user->anime()
                           ->with(['anime_type', 'anime_status'])
-                          ->orderBy('sort_order', 'asc');
-        if (config('config.user_anime_list_paginated')) {
-            $userAnime = $query->paginate('15');
-        } else {
-           $userAnime = $query->get();
+                          ->orderBy('sort_order', 'asc')
+                          ->paginate($user->anime_list_pagination_size ?? 15);
+
+        return view('userAnimeList', ['userAnime' => $userAnime, 'username' => $username]);
+    }
+
+    public function updateUserAnimeList(Request $request, $username) {
+        $user = User::where('username', $username)->firstOrFail();
+
+        if ($request->has('anime_ids') && is_array($request->anime_ids)) {
+            foreach ($request->anime_ids as $index => $anime_id) {
+                $score = $request->score[$index];
+                $sortOrder = $request->sort_order[$index];
+
+                //Use syncWithoutDetaching to update the pivot data/junction table
+                //without removing the user's other rows in the junction table.
+                $user->anime()->syncWithoutDetaching([
+                    $anime_id => [
+                        'score' => $score ? $score : null,
+                        'sort_order' => $sortOrder
+                    ]
+                ]);
+            }
         }
-        return view('userAnimeList', ['userAnime' => $userAnime]);
+
+        return redirect()->route('user.anime.list', ['username' => $username]);
+
     }
 
     public function addToList($id)

@@ -24,6 +24,7 @@ class User extends Authenticatable
         'dark_mode',
         'show_adult_content',
         'avatar',
+        'anime_list_pagination_size'
     ];
 
     /**

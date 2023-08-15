@@ -28,6 +28,10 @@
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="email" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
+            <x-input-label class="mt-4" for="avatar" :value="__('Avatar')" />
+            <input id="avatar" name="avatar" type="file" class="mt-1 block w-full" value="old('avatar', $user->avatar)" autocomplete="avatar" />
+            <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
+
             <x-input-label class="mt-4" for="dark_mode" :value="__('Dark Mode')" />
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
@@ -58,9 +62,10 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_adult_content')" />
 
-            <x-input-label for="avatar" :value="__('Avatar')" />
-            <input id="avatar" name="avatar" type="file" class="mt-1 block w-full" value="old('avatar', $user->avatar)" required autocomplete="avatar" />
-            <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
+            <x-input-label class="mt-4" for="anime_list_pagination_size" :value="__('Anime List Pagination Size')" />
+            <x-text-input  id="anime_list_pagination_size"  name="anime_list_pagination_size"  type="number"  min="2"  max="250" class="mt-1 block w-full"  :value="old('anime_list_pagination_size', $user->anime_list_pagination_size)"
+                required />
+            <x-input-error class="mt-2" :messages="$errors->get('anime_list_pagination_size')" />
 
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())

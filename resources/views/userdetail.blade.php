@@ -17,7 +17,9 @@
                         @if ($user->is_admin === 1)
                             <p><strong>Role:</strong> {{ 'Admin' }}</p>
                         @endif
-                        <button id="animeListButton" class="p-2 bg-blue-500 text-white rounded-md mt-2">Anime List</button>
+                        <a href="/animelist/{{ $user->username }}" class="inline-block">
+                            <button id="animeListButton" class="p-2 bg-blue-500 text-white rounded-md mt-2">Anime List</button>
+                        </a>
                     </div>
 
                     <!-- Right Column -->

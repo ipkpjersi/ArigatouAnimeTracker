@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('show_adult_content')->default(false);
             $table->string('avatar')->nullable();
             $table->integer('is_banned')->default(0);
+            $table->integer('anime_list_pagination_size')->default(15);
             $table->rememberToken();
             $table->timestamps();
         });
