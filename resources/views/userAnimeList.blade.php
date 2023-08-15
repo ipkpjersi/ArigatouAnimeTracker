@@ -38,7 +38,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}</td>
                                         @endif
                                         <td class="py-2 px-4 border-b border-gray-200">
-                                            <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }} thumbnail" width="50" height="50" onerror="this.onerror=null; this.src='{{ asset('img/not-found.png') }}'">
+                                            <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }} thumbnail" width="50" height="50" onerror="this.onerror=null; this.src='{{ asset('img/notfound.gif') }}'">
                                         </td>
                                         <td class="py-2 px-4 border-b border-gray-200">{{ $anime->title }}</td>
                                         <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_type)->type }}</td>
