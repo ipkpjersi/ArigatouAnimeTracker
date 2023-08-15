@@ -99,7 +99,7 @@ class AnimeController extends Controller
                 ]);
             }
         }
-        return redirect()->route('user.anime.list', ['username' => $username]);
+        return redirect()->route('user.anime.list', ['username' => $username])->with('message', 'Your anime list has been updated!');
     }
 
     public function addToList($id, $redirect = true)
