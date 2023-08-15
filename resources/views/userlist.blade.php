@@ -28,6 +28,7 @@
     <script type="module">
         import '/js/jquery.dataTables.yadcf.js';
         $(document).ready(function () {
+            let initialSearch = new URLSearchParams(window.location.search).get('search') || "";
             let dataTable = $('#userTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -45,7 +46,8 @@
                         return data === 1 ? "Yes" : "No";
                     } },
                     { data: 'created_at', name: 'created_at' },
-                ]
+                ],
+                search: { search: initialSearch },
             });
             yadcf.init(dataTable, [
                 {
