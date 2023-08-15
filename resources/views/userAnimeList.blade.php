@@ -17,6 +17,7 @@
                                     @if ($show_anime_list_number)
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">#</th>
                                     @endif
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Picture</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Name</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Type</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Status</th>
@@ -36,6 +37,9 @@
                                         @if ($show_anime_list_number)
                                             <td class="py-2 px-4 border-b border-gray-200">{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}</td>
                                         @endif
+                                        <td class="py-2 px-4 border-b border-gray-200">
+                                            <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }} thumbnail" width="50" height="50" onerror="this.onerror=null; this.src='{{ asset('img/not-found.png') }}'">
+                                        </td>
                                         <td class="py-2 px-4 border-b border-gray-200">{{ $anime->title }}</td>
                                         <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_type)->type }}</td>
                                         <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_status)->status }}</td>
