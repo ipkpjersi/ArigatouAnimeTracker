@@ -52,7 +52,6 @@
                 data: null,
                 orderable: false,
                 render: function(data, type, row) {
-                    console.log(row);
                     let actions = '';
                     if(row.is_admin != 1) {
                         if(row.is_banned == 1) {
