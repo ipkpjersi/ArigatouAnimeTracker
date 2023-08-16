@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Anime;
 use App\Models\User;
+use App\Models\WatchStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -77,6 +78,37 @@ class AnimeController extends Controller
                           ->paginate($user->anime_list_pagination_size ?? 15);
 
         return view('userAnimeList', ['userAnime' => $userAnime, 'username' => $username, 'show_anime_list_number' => $show_anime_list_number, 'watchStatuses' => $watchStatuses, 'watchStatusMap' => $watchStatusMap]);
+    }
+
+    public function userAnimeListV2($username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+        $watchStatuses = WatchStatus::all();
+        $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
+
+        return view('userAnimeListV2', [
+            'username' => $username,
+            'watchStatuses' => $watchStatuses,
+            'watchStatusMap' => $watchStatusMap,
+        ]);
+    }
+
+    public function getUserAnimeData($username, Request $request)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+        $query = $user->anime()
+                      ->with(['anime_type', 'anime_status'])
+                      ->select('*');
+
+        return DataTables::of($query)
+            ->addColumn('thumbnail', function ($anime) {
+                return '<img src="' . $anime->thumbnail . '" alt="' . $anime->title . ' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'' . asset('img/notfound.gif') . '\'">';
+            })
+            ->addColumn('title', function ($anime) {
+                return '<a href="/anime/' . $anime->id . '">' . $anime->title . '</a>';
+            })
+            ->rawColumns(['thumbnail', 'title'])
+            ->make(true);
     }
 
     public function updateUserAnimeList(Request $request, $username) {

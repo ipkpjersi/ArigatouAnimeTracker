@@ -40,6 +40,9 @@ Route::get('/anime/{id}/{title?}', [AnimeController::class, 'detail'])->name('an
 Route::get('/animelist/{username}', [AnimeController::class, 'userAnimeList'])->name('user.anime.list');
 Route::post('/animelist/{username}/update', [AnimeController::class, 'updateUserAnimeList'])->name('user.anime.update');
 
+Route::get('/user/{username}/anime-list-v2/data', 'AnimeController@getUserAnimeData');
+Route::get('/user/{username}/anime-list-v2', 'AnimeController@userAnimeListV2');
+
 //Protected routes
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
