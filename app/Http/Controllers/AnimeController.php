@@ -85,11 +85,15 @@ class AnimeController extends Controller
         $user = User::where('username', $username)->firstOrFail();
         $watchStatuses = WatchStatus::all();
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
-
+        $userAnime = $user->anime()
+                          ->with(['anime_type', 'anime_status'])
+                          ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC')
+                          ->paginate($user->anime_list_pagination_size ?? 15);
         return view('userAnimeListV2', [
             'username' => $username,
             'watchStatuses' => $watchStatuses,
             'watchStatusMap' => $watchStatusMap,
+            'userAnime' => $userAnime
         ]);
     }
 
@@ -97,17 +101,9 @@ class AnimeController extends Controller
     {
         $user = User::where('username', $username)->firstOrFail();
         $query = $user->anime()
-                      ->with(['anime_type', 'anime_status'])
-                      ->select('*');
+                      ->with(['anime_type', 'anime_status']);
 
         return DataTables::of($query)
-            ->addColumn('thumbnail', function ($anime) {
-                return '<img src="' . $anime->thumbnail . '" alt="' . $anime->title . ' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'' . asset('img/notfound.gif') . '\'">';
-            })
-            ->addColumn('title', function ($anime) {
-                return '<a href="/anime/' . $anime->id . '">' . $anime->title . '</a>';
-            })
-            ->rawColumns(['thumbnail', 'title'])
             ->make(true);
     }
 

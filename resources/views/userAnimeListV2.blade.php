@@ -41,13 +41,14 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import '/js/jquery.dataTables.yadcf.js';
         $(document).ready(function() {
             var watchStatusMap = @json($watchStatusMap);
             $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('anime.getUserAnimeData', ['username' => $username]) }}',
+                ajax: '{{ route('user.anime.list.data.v2', ['username' => $username]) }}',
                 columns: [
                     { data: 'thumbnail', name: 'thumbnail', render: function(data, type, row) {
                         return '<img src="'+data+'" alt="'+row.title+' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'{{ asset('img/notfound.gif') }}\'">';
