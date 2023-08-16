@@ -61,6 +61,7 @@
                             actions += `<button data-user-id="${data.id}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded banUser">Ban</button>`;
                         }
                         actions += `<button data-user-id="${data.id}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded ml-2 removeAvatar">Remove Avatar</button>`;
+
                     }
                     return actions;
                 }
