@@ -29,7 +29,9 @@
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
             <x-input-label class="mt-4" for="avatar" :value="__('Avatar (Resized to 150x150)')" />
-            <img id="current-avatar" src="{{ $user->avatar }}" alt="Current Avatar" class="rounded-lg w-24 h-24 mb-3" style="width:150px; height: 150px;">
+            @if ($user->avatar)
+                <img id="current-avatar" src="{{ $user->avatar }}" alt="Current Avatar" class="rounded-lg w-24 h-24 mb-3" style="width:150px; height: 150px;">
+            @endif
             <input id="avatar" name="avatar" type="file" class="mt-1 block w-full" value="old('avatar', $user->avatar)" accept="image/*" autocomplete="avatar" />
             <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
 
