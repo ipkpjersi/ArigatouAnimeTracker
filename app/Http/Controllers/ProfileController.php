@@ -41,7 +41,7 @@ class ProfileController extends Controller
             $uniqueName = Str::uuid() . "." . $extension;
 
             $path = $file->move(public_path('img/avatars'), $uniqueName);
-            $request->user()->update(['avatar' => 'img/avatars/' . $uniqueName]);
+            $request->user()->update(['avatar' => '/img/avatars/' . $uniqueName]);
         }
 
         $request->user()->save();
