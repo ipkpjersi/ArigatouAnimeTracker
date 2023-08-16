@@ -17,4 +17,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+public/img/avatars/**
 !storage/app/imports/anime-offline-database.json

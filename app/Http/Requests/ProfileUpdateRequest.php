@@ -20,9 +20,9 @@ class ProfileUpdateRequest extends FormRequest
             'email' => ['email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
             'dark_mode' => ['nullable', 'in:1,0'],
             'show_adult_content' => ['nullable', 'in:1,0'],
-            'avatar' => ['nullable', 'image', 'max:1024'],
+            'avatar' => ['nullable', 'image', 'max:2048'],
             'anime_list_pagination_size' => ['integer', 'min:2', 'max:250'],
-            'show_anime_list_number' => ['nullable', 'in:1,0']
+            'show_anime_list_number' => ['nullable', 'in:1,0'],
         ];
     }
 }
