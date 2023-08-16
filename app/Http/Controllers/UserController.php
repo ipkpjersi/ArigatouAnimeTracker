@@ -52,13 +52,13 @@ class UserController extends Controller
         return response()->json(['message' => 'User banned successfully']);
     }
 
-    public function unbanUIser(Request $request, $userId)
+    public function unbanUser(Request $request, $userId)
     {
         if (auth()->user() == null || !auth()->user()->isAdmin()) {
             return response()->json([], 404);
         }
         $user = User::findOrFail($userId);
-        $user->is_banned = true;
+        $user->is_banned = false;
         $user->save();
 
         StaffActionLog::create([
@@ -67,7 +67,7 @@ class UserController extends Controller
             'action' => 'unban'
         ]);
 
-        return response()->json(['message' => 'User banned successfully']);
+        return response()->json(['message' => 'User unbanned successfully']);
     }
 
     public function removeAvatar(Request $request, $userId)
