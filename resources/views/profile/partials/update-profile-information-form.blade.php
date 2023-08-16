@@ -29,9 +29,7 @@
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
             <x-input-label class="mt-4" for="avatar" :value="__('Avatar (Resized to 150x150)')" />
-            @if ($user->avatar)
-                <img id="current-avatar" src="{{ $user->avatar }}" alt="Current Avatar" class="rounded-lg w-24 h-24 mb-3" style="width:150px; height: 150px;">
-            @endif
+            <img id="current-avatar" src="{{ $user->avatar }}" alt="Current Avatar" @if (!$user->avatar) style="display:none; width:150px; height:150px" @endif class="rounded-lg w-24 h-24 mb-3" style="width:150px; height: 150px;">
             <input id="avatar" name="avatar" type="file" class="mt-1 block w-full" value="old('avatar', $user->avatar)" accept="image/*" autocomplete="avatar" />
             <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
 
@@ -125,6 +123,7 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    document.getElementById('current-avatar').style.display = '';
                     document.getElementById('current-avatar').src = e.target.result;
                 }
                 reader.readAsDataURL(file);
