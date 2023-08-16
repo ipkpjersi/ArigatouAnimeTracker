@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id'); // ID of the user who is performing the action
             $table->unsignedBigInteger('target_id'); // ID of the user being acted upon
             $table->string('action'); // e.g., 'ban', 'remove_avatar'
-            $table->string('action'); // e.g., 'removed avatar 456845967.png for user username (ID: 398)'
+            $table->string('message'); // e.g., 'removed avatar 456845967.png for user username (ID: 398)'
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
