@@ -56,3 +56,17 @@
 .yadcf-filter-reset-button {
     margin-left: 10px;
 }
+
+.avatar-container {
+    display: grid;
+    width: 200px;
+    height: 200px;
+    place-items: center;
+    overflow: hidden;
+}
+
+.avatar-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}

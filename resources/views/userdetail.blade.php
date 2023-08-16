@@ -12,7 +12,7 @@
                     <!-- Left Column -->
                     <div class="w-full md:w-56 mb-6 md:mb-0 md:mr-6 flex-none mt-0">
                         <h3 class="font-bold mb-1">{{ $user->username }}</h3>
-                        <img onerror="this.onerror=null; this.src='/img/notfound.gif';" class="rounded-lg shadow-md mb-3" src="{{ $user->avatar }}" alt="{{ $user->username }}" />
+                        <img onerror="this.onerror=null; this.src='/img/notfound.gif';" class="rounded-lg shadow-md mb-3" style="width:150px; height: 150px;" src="{{ $user->avatar }}" alt="{{ $user->username }}" />
                         <p><strong>Joined:</strong> {{ \Carbon\Carbon::parse($user->created_at)->format('M d, Y') }}</p>
                         @if ($user->is_admin === 1)
                             <p><strong>Role:</strong> {{ 'Admin' }}</p>
