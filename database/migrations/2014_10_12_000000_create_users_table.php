@@ -18,12 +18,13 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_admin')->default(false);
+            $table->boolean('is_moderator')->default(false);
             $table->boolean('dark_mode')->default(true);
             $table->boolean('show_adult_content')->default(false);
             $table->string('avatar')->nullable();
-            $table->integer('is_banned')->default(0);
+            $table->boolean('is_banned')->default(false);
             $table->integer('anime_list_pagination_size')->default(15);
-            $table->integer('show_anime_list_number')->default(0);
+            $table->boolean('show_anime_list_number')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

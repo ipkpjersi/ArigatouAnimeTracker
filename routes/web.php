@@ -57,6 +57,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/anime/{id}/add-to-list/{redirect?}', [AnimeController::class, 'addToList'])->name('anime.addToList');
 
     Route::delete('/anime/{id}/delete-from-list/{redirect?}', [AnimeController::class, 'removeFromList'])->name('anime.deleteFromList');
+
+    Route::post('/users/{userId}/ban', [UserController::class, 'banUser'])->name('users.ban');
+    Route::post('/users/{userId}/unban', [UserController::class, 'unbanUser'])->name('users.unban');
+    Route::post('/users/{userId}/remove-avatar', [UserController::class, 'removeAvatar'])->name('users.removeAvatar');
+
 });
 
 require __DIR__.'/auth.php';

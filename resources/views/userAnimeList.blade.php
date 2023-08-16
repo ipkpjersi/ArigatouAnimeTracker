@@ -96,7 +96,7 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        @if(auth()->user() != null && auth()->user()->username === $username)
+                        @if(auth()->user() != null && auth()->user()->username === $username && $userAnime->isNotEmpty())
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                                 Save Changes
                             </button>

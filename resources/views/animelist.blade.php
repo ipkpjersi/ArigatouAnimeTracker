@@ -60,7 +60,8 @@
                 initComplete: function() {
                     let resetBtn = $('<button id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="window.location.href = \'/anime\'">Reset Filters</button>');
                     $('#animeTable_filter').prepend(resetBtn);
-                }
+                },
+                responsive: true
             });
             yadcf.init(dataTable, [
                 {

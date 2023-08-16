@@ -52,6 +52,10 @@ class User extends Authenticatable
         return $this->is_admin;
     }
 
+    public function isModerator() {
+        return $this->isAdmin() || $this->is_moderator;
+    }
+
     public function anime() {
         return $this->belongsToMany(Anime::class)
                     ->withPivot('score', 'sort_order', 'progress', 'watch_status_id')
