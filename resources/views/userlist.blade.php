@@ -17,7 +17,7 @@
                                 <th>Username</th>
                                 <th>Admin</th>
                                 <th>Joined</th>
-                                @if(auth()->user()->isModerator())
+                                @if(auth()->user() != null && auth()->user()->isModerator())
                                     <th>Actions</th>
                                 @endif
                             </tr>
@@ -47,7 +47,7 @@
                 { data: 'created_at', name: 'created_at' },
             ];
 
-            @if(auth()->user()->isModerator())
+            @if(auth()->user() != null && auth()->user()->isModerator())
                 columns.push({
                 data: null,
                 orderable: false,
