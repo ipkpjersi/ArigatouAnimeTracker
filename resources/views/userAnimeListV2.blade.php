@@ -9,12 +9,13 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form action="{{ route('user.anime.update', ['username' => $username]) }}" method="POST">
+                    <form action="{{ route('user.anime.update.v2', ['username' => $username]) }}" method="POST">
                         @csrf
                         <table id="userAnimeTable" class="min-w-full">
                             <thead>
                                 <tr>
                                     <!-- Adjust your table headers accordingly -->
+                                    <th style="display:none">Anime ID</th>
                                     <th>Picture</th>
                                     <th>Name</th>
                                     <th>Type</th>
@@ -71,7 +72,7 @@
             var watchStatusMap = @json($watchStatusMap);
             let columns = [
                 { data: 'thumbnail', name: 'thumbnail', render: function(data, type, row) {
-                    return '<img src="'+data+'" alt="'+row.title+' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'{{ asset('img/notfound.gif') }}\'">';
+                    return '<span style="display:none">' + row.id  + '</span>' + '<img src="'+data+'" alt="'+row.title+' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'{{ asset('img/notfound.gif') }}\'">' + '<input type="hidden" name="anime_id[]" value="'+row.anime_id+'">';
                 }},
                 { data: 'title', name: 'title', render: function(data, type, row) {
                     return '<a href="/anime/' + row.anime_id + '">' + data + '</a>';
@@ -80,7 +81,9 @@
                 { data: 'anime_status.status', name: 'anime_status.status' }, // Adjust based on actual returned data structure
                 { data: 'pivot.watch_status_id', name: 'pivot.watch_status_id', render: function(data, type, row) {
                     if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
-                        var options = '@foreach ($watchStatuses as $status) <option value="{{ $status->id }}" ' + (data === "{{ $status->id }}" ? 'selected' : '') + '>{{ $status->status }}</option> @endforeach';
+                        var options = '';
+                        options += options += '<option value="">Pick an option...</option>';
+                        options += '@foreach ($watchStatuses as $status) <option value="{{ $status->id }}" ' + (data === "{{ $status->id }}" ? 'selected' : '') + '>{{ $status->status }}</option> @endforeach';
                         return '<select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
                     } else {
                         return watchStatusMap[data] || 'UNKNOWN';

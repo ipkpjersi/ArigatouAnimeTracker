@@ -118,7 +118,6 @@ class AnimeController extends Controller
                 $score = $request->score[$index];
                 $sortOrder = $request->sort_order[$index];
                 $watchStatusId = $request->watch_status_id[$index] ? $request->watch_status_id[$index] : null;
-
                 //Use syncWithoutDetaching to update the pivot data/junction table
                 //without removing the user's other rows in the junction table.
                 $user->anime()->syncWithoutDetaching([
@@ -131,6 +130,25 @@ class AnimeController extends Controller
             }
         }
         return redirect()->route('user.anime.list', ['username' => $username])->with('message', 'Your anime list has been updated!');
+    }
+
+    public function updateUserAnimeListV2(Request $request, $username) {
+        $anime_ids = $request->input('anime_id');
+        $count = count($anime_ids);
+        $watch_status_ids = $request->input('watch_status_id');
+        $scores = $request->input('score');
+        $sort_orders = $request->input('sort_order');
+
+        for ($i = 0; $i < $count; $i++) {
+            DB::table('anime_user')->where('user_id', auth()->user()->id)
+            ->where('anime_id', $anime_ids[$i])
+            ->update([
+                'watch_status_id' => $watch_status_ids[$i],
+                'score' => $scores[$i] ?? null,
+                'sort_order' => $sort_orders[$i] ?? null
+            ]);
+        }
+        return redirect()->back()->with('message', 'Changes saved successfully!');
     }
 
     public function addToList($id, $redirect = true)

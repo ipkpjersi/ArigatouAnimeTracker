@@ -38,7 +38,6 @@ Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->nam
 Route::get('/anime/{id}/{title?}', [AnimeController::class, 'detail'])->name('anime.detail');
 
 Route::get('/animelist/{username}', [AnimeController::class, 'userAnimeList'])->name('user.anime.list');
-Route::post('/animelist/{username}/update', [AnimeController::class, 'updateUserAnimeList'])->name('user.anime.update');
 
 Route::get('/animelist-v2/{username}',  [AnimeController::class, 'userAnimeListV2'])->name('user.anime.list.v2');
 Route::get('/animelist-v2/data/{username}', [AnimeController::class, 'getUserAnimeData'])->name('user.anime.list.data.v2');
@@ -65,6 +64,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/{userId}/unban', [UserController::class, 'unbanUser'])->name('users.unban');
     Route::post('/users/{userId}/remove-avatar', [UserController::class, 'removeAvatar'])->name('users.removeAvatar');
 
+    Route::post('/animelist/{username}/update', [AnimeController::class, 'updateUserAnimeList'])->name('user.anime.update');
+
+    Route::post('/animelist-v2/{username}/update', [AnimeController::class, 'updateUserAnimeListV2'])->name('user.anime.update.v2');
 });
 
 require __DIR__.'/auth.php';
