@@ -24,6 +24,12 @@
                                     @if(auth()->user() != null && auth()->user()->username === $username)
                                         <th>Sort Order</th>
                                     @endif
+                                        <th>Episodes</th>
+                                        <th>Season</th>
+                                        <th>Year</th>
+                                    @if(auth()->user() != null && auth()->user()->username === $username)
+                                        <th>Delete</th>
+                                    @endif
                                     <!-- ... additional headers ... -->
                                 </tr>
                             </thead>
@@ -91,9 +97,35 @@
                     }
                 });
             }
+            columns.push(
+                {
+                    data: 'episodes',
+                    name: 'episodes'
+                },
+                {
+                    data: 'season',
+                    name: 'season'
+                },
+                {
+                    data: 'year',
+                    name: 'year'
+                },
+            );
+
+            if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
+                columns.push({
+                    data: 'id',
+                    name: 'delete',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<button onclick="deleteAnime(' + data + ', event)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded">Delete</button>';
+                    }
+                });
+            }
             $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
+                order: [1, 'desc'],
                 ajax: '{{ route('user.anime.list.data.v2', ['username' => $username]) }}',
                 columns: columns
             });
