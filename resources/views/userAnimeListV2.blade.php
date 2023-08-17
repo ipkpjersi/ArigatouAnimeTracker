@@ -20,6 +20,10 @@
                                     <th>Type</th>
                                     <th>Status</th>
                                     <th>Watch Status</th>
+                                    <th>Score</th>
+                                    @if(auth()->user() != null && auth()->user()->username === $username)
+                                        <th>Sort Order</th>
+                                    @endif
                                     <!-- ... additional headers ... -->
                                 </tr>
                             </thead>
@@ -45,29 +49,53 @@
         import '/js/jquery.dataTables.yadcf.js';
         $(document).ready(function() {
             var watchStatusMap = @json($watchStatusMap);
+            let columns = [
+                { data: 'thumbnail', name: 'thumbnail', render: function(data, type, row) {
+                    return '<img src="'+data+'" alt="'+row.title+' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'{{ asset('img/notfound.gif') }}\'">';
+                }},
+                { data: 'title', name: 'title', render: function(data, type, row) {
+                    return '<a href="/anime/' + row.id + '">' + data + '</a>';
+                }},
+                { data: 'anime_type.type', name: 'anime_type.type' },  // Adjust based on actual returned data structure
+                { data: 'anime_status.status', name: 'anime_status.status' }, // Adjust based on actual returned data structure
+                { data: 'pivot.watch_status_id', name: 'pivot.watch_status_id', render: function(data, type, row) {
+                    if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
+                        var options = '@foreach ($watchStatuses as $status) <option value="{{ $status->id }}" ' + (data === "{{ $status->id }}" ? 'selected' : '') + '>{{ $status->status }}</option> @endforeach';
+                        return '<select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
+                    } else {
+                        return watchStatusMap[data] || 'UNKNOWN';
+                    }
+                }},
+                {
+                    data: 'pivot.score',
+                    name: 'pivot.score',
+                    render: function(data, type, row) {
+                        if('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
+                            var options = '';
+                            for(var i = 1; i <= 10; i++) {
+                                options += '<option value="'+i+'" '+(data == i ? 'selected' : '')+'>'+i+'</option>';
+                            }
+                            return '<select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
+                        } else {
+                            return data || 'UNKNOWN';
+                        }
+                    }
+                }
+            ];
+            if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
+                columns.push({
+                    data: 'pivot.sort_order',
+                    name: 'pivot.sort_order',
+                    render: function(data, type, row) {
+                        return '<input type="number" min="1" name="sort_order[]" value="'+data+'" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">';
+                    }
+                });
+            }
             $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route('user.anime.list.data.v2', ['username' => $username]) }}',
-                columns: [
-                    { data: 'thumbnail', name: 'thumbnail', render: function(data, type, row) {
-                        return '<img src="'+data+'" alt="'+row.title+' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'{{ asset('img/notfound.gif') }}\'">';
-                    }},
-                    { data: 'title', name: 'title', render: function(data, type, row) {
-                        return '<a href="/anime/' + row.id + '">' + data + '</a>';
-                    }},
-                    { data: 'anime_type.type', name: 'anime_type.type' },  // Adjust based on actual returned data structure
-                    { data: 'anime_status.status', name: 'anime_status.status' }, // Adjust based on actual returned data structure
-                    { data: 'pivot.watch_status_id', name: 'pivot.watch_status_id', render: function(data, type, row) {
-                        if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
-                            var options = '@foreach ($watchStatuses as $status) <option value="{{ $status->id }}" ' + (data === "{{ $status->id }}" ? 'selected' : '') + '>{{ $status->status }}</option> @endforeach';
-                            return '<select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
-                        } else {
-                            return watchStatusMap[data] || 'UNKNOWN';
-                        }
-                    }}
-                    // ... Add other columns data as needed ...
-                ]
+                columns: columns
             });
         });
         function deleteAnime(animeId, event) {
