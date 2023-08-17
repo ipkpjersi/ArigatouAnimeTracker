@@ -92,6 +92,7 @@
                     render: function(data, type, row) {
                         if('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
                             var options = '';
+                            options += '<option value="">Pick an option...</option>';
                             for(var i = 1; i <= 10; i++) {
                                 options += '<option value="'+i+'" '+(data == i ? 'selected' : '')+'>'+i+'</option>';
                             }
