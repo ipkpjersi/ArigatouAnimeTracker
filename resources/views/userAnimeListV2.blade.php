@@ -144,7 +144,7 @@
             $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
-                order: [[7, 'asc'], [1, 'asc']],
+                order: [[7, 'asc'], [6, 'asc'], [1, 'asc']],
                 ajax: '{{ route('user.anime.list.data.v2', ['username' => $username]) }}',
                 columns: columns
             });
