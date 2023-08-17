@@ -104,6 +104,9 @@ class AnimeController extends Controller
                       ->with(['anime_type', 'anime_status']);
 
         return DataTables::of($query)
+            ->addColumn('anime_id', function ($row) {
+                return $row->anime_id;
+            })
             ->make(true);
     }
 
@@ -137,8 +140,9 @@ class AnimeController extends Controller
 
         $user->anime()->attach($anime);
         if ($redirect == true) {
-            return redirect()->back()->with('message', 'Anime added to your list!');
+            return redirect()->back()->with('message', 'Anime added to your list.');
         }
+        return response()->json(['message' => 'Anime added to your list.'], 200);
     }
 
     public function removeFromList($animeId, $redirect = true)
@@ -146,7 +150,8 @@ class AnimeController extends Controller
         $user = Auth::user();
         $user->anime()->detach($animeId);
         if ($redirect == true) {
-            return redirect()->back()->with('message', 'Anime removed from your list!');
+            return redirect()->back()->with('message', 'Anime removed from your list.');
         }
+        return response()->json(['message' => 'Anime removed from your list.'], 200);
     }
 }

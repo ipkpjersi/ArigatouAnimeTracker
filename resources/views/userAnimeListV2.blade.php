@@ -50,7 +50,21 @@
             </div>
         </div>
     </div>
-
+    <script>
+        function deleteAnime(animeId, event) {
+            axios.post(`/anime/${animeId}/delete-from-list/false`, {
+                _token: '{{ csrf_token() }}',
+                _method: 'DELETE'
+            })
+            .then(function (response) {
+                location.reload();
+            })
+            .catch(function (error) {
+                alert('Error removing anime. Please try again: ' + error);
+                console.log('Error removing anime. Please try again: ' + error);
+            });
+        }
+    </script>
     <script type="module">
         import '/js/jquery.dataTables.yadcf.js';
         $(document).ready(function() {
@@ -60,7 +74,7 @@
                     return '<img src="'+data+'" alt="'+row.title+' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'{{ asset('img/notfound.gif') }}\'">';
                 }},
                 { data: 'title', name: 'title', render: function(data, type, row) {
-                    return '<a href="/anime/' + row.id + '">' + data + '</a>';
+                    return '<a href="/anime/' + row.anime_id + '">' + data + '</a>';
                 }},
                 { data: 'anime_type.type', name: 'anime_type.type' },  // Adjust based on actual returned data structure
                 { data: 'anime_status.status', name: 'anime_status.status' }, // Adjust based on actual returned data structure
@@ -114,11 +128,11 @@
 
             if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
                 columns.push({
-                    data: 'id',
+                    data: 'anime_id',
                     name: 'delete',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<button onclick="deleteAnime(' + data + ', event)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded">Delete</button>';
+                        return '<button type="button" onclick="deleteAnime(' + data + ', event)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">Delete</button>';
                     }
                 });
             }
@@ -130,20 +144,5 @@
                 columns: columns
             });
         });
-        function deleteAnime(animeId, event) {
-            //Prevent update form submission
-            event.preventDefault();
-            axios.post(`/anime/${animeId}/delete-from-list/false`, {
-                _token: '{{ csrf_token() }}',
-                _method: 'DELETE'
-            })
-            .then(function (response) {
-                location.reload();
-            })
-            .catch(function (error) {
-                alert('Error removing anime. Please try again: ' + error);
-                console.log('Error removing anime. Please try again: ' + error);
-            });
-        }
     </script>
 </x-app-layout>
