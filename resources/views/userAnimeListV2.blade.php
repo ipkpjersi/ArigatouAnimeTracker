@@ -71,15 +71,15 @@
         $(document).ready(function() {
             var watchStatusMap = @json($watchStatusMap);
             let columns = [
-                { data: 'thumbnail', name: 'thumbnail', render: function(data, type, row) {
+                { data: 'thumbnail', name: 'thumbnail', searchable: false, render: function(data, type, row) {
                     return '<span style="display:none">' + row.id  + '</span>' + '<img src="'+data+'" alt="'+row.title+' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'{{ asset('img/notfound.gif') }}\'">' + '<input type="hidden" name="anime_id[]" value="'+row.anime_id+'">';
                 }},
                 { data: 'title', name: 'title', render: function(data, type, row) {
                     return '<a href="/anime/' + row.anime_id + '">' + data + '</a>';
                 }},
-                { data: 'anime_type.type', name: 'anime_type.type' },  // Adjust based on actual returned data structure
-                { data: 'anime_status.status', name: 'anime_status.status' }, // Adjust based on actual returned data structure
-                { data: 'watch_status_id', name: 'watch_status_id', render: function(data, type, row) {
+                { data: 'anime_type.type', name: 'anime_type.type', searchable: 'false' },  // Adjust based on actual returned data structure
+                { data: 'anime_status.status', name: 'anime_status.status', searchable: 'false' }, // Adjust based on actual returned data structure
+                { data: 'watch_status_id', name: 'watch_status_id', searchable: 'false', render: function(data, type, row) {
                     console.log("watch_status_id data" + data);
                     if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
                         var options = '';
@@ -93,6 +93,7 @@
                 {
                     data: 'score',
                     name: 'score',
+                    searchable: false,
                     render: function(data, type, row) {
                         if('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
                             var options = '';
@@ -111,6 +112,7 @@
                 columns.push({
                     data: 'sort_order',
                     name: 'sort_order',
+                    searchable: false,
                     render: function(data, type, row) {
                         return '<input type="number" min="1" name="sort_order[]" value="'+data+'" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">';
                     }
@@ -119,15 +121,18 @@
             columns.push(
                 {
                     data: 'episodes',
-                    name: 'episodes'
+                    name: 'episodes',
+                    searchable: false
                 },
                 {
                     data: 'season',
-                    name: 'season'
+                    name: 'season',
+                    searchable: false
                 },
                 {
                     data: 'year',
-                    name: 'year'
+                    name: 'year',
+                    searchable: false
                 },
             );
 
@@ -136,6 +141,7 @@
                     data: 'anime_id',
                     name: 'delete',
                     orderable: false,
+                    searchable: false,
                     render: function (data, type, row) {
                         return '<button type="button" onclick="deleteAnime(' + data + ', event)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">Delete</button>';
                     }
@@ -146,7 +152,11 @@
                 serverSide: true,
                 order: [[7, 'asc'], [6, 'asc'], [1, 'asc']],
                 ajax: '{{ route('user.anime.list.data.v2', ['username' => $username]) }}',
-                columns: columns
+                columns: columns,
+                initComplete: function() {
+                    let resetBtn = $('<button id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="window.reload()">Reset Filters</button>');
+                    $('#userAnimeTable_filter').prepend(resetBtn);
+                },
             });
         });
     </script>
