@@ -147,6 +147,7 @@
                     }
                 });
             }
+            //TODO: add YADCF per-column searching
             $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
