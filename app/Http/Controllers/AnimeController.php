@@ -101,7 +101,7 @@ class AnimeController extends Controller
         $user = User::where('username', $username)->firstOrFail();
         $query = $user->anime()
                       ->with(['anime_type', 'anime_status']);
-                      //->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC'); TODO: fix datatables pre-sorting
+                      //->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC'); //TODO: fix datatables pre-sorting
 
         return DataTables::of($query)
             ->addColumn('anime_id', function ($row) {
