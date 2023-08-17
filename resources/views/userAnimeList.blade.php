@@ -15,22 +15,22 @@
                             <thead>
                                 <tr>
                                     @if ($show_anime_list_number)
-                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">#</th>
+                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">#</th>
                                     @endif
-                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Picture</th>
-                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Name</th>
-                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Type</th>
-                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Status</th>
-                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Watch Status</th>
-                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Score</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Picture</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Name</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Type</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Status</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Watch Status</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Score</th>
                                     @if(auth()->user() != null && auth()->user()->username === $username)
-                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Sort Order</th>
+                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Sort Order</th>
                                     @endif
-                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Episodes</th>
-                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Season</th>
-                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Year</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Episodes</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Season</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Year</th>
                                     @if(auth()->user() != null && auth()->user()->username === $username)
-                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-600">Delete</th>
+                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Delete</th>
                                     @endif
                                 </tr>
                             </thead>
