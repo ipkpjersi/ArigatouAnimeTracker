@@ -85,23 +85,23 @@ class AnimeController extends Controller
         $user = User::where('username', $username)->firstOrFail();
         $watchStatuses = WatchStatus::all();
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
-        $userAnime = $user->anime()
-                          ->with(['anime_type', 'anime_status', 'watch_status'])
-                          ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC')
-                          ->paginate($user->anime_list_pagination_size ?? 15);
+        $userAnimeCount = $user->anime()
+                          ->with(['anime_type', 'anime_status', 'watch_status'])->count();
+
         return view('userAnimeListV2', [
             'username' => $username,
             'watchStatuses' => $watchStatuses,
             'watchStatusMap' => $watchStatusMap,
-            'userAnime' => $userAnime
+            'userAnimeCount' => $userAnimeCount
         ]);
     }
 
-    public function getUserAnimeData($username, Request $request)
+    public function getUserAnimeDataV2($username, Request $request)
     {
         $user = User::where('username', $username)->firstOrFail();
         $query = $user->anime()
                       ->with(['anime_type', 'anime_status']);
+                      //->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC'); TODO: fix datatables pre-sorting
 
         return DataTables::of($query)
             ->addColumn('anime_id', function ($row) {

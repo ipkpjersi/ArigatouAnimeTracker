@@ -40,7 +40,7 @@ Route::get('/anime/{id}/{title?}', [AnimeController::class, 'detail'])->name('an
 Route::get('/animelist/{username}', [AnimeController::class, 'userAnimeList'])->name('user.anime.list');
 
 Route::get('/animelist-v2/{username}',  [AnimeController::class, 'userAnimeListV2'])->name('user.anime.list.v2');
-Route::get('/animelist-v2/data/{username}', [AnimeController::class, 'getUserAnimeData'])->name('user.anime.list.data.v2');
+Route::get('/animelist-v2/data/{username}', [AnimeController::class, 'getUserAnimeDataV2'])->name('user.anime.list.data.v2');
 
 //Protected routes
 Route::middleware('auth')->group(function () {
