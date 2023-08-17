@@ -86,7 +86,7 @@ class AnimeController extends Controller
         $watchStatuses = WatchStatus::all();
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
         $userAnime = $user->anime()
-                          ->with(['anime_type', 'anime_status'])
+                          ->with(['anime_type', 'anime_status', 'watch_status'])
                           ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC')
                           ->paginate($user->anime_list_pagination_size ?? 15);
         return view('userAnimeListV2', [

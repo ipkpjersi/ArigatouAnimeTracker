@@ -36,4 +36,8 @@ class Anime extends Model
         return $this->belongsTo(AnimeStatus::class, 'anime_status_id');
     }
 
+    public function watch_status()
+    {
+        return $this->belongsTo(WatchStatus::class, 'watch_status_id');
+    }
 }
