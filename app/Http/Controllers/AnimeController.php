@@ -74,7 +74,7 @@ class AnimeController extends Controller
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
         $userAnime = $user->anime()
                           ->with(['anime_type', 'anime_status'])
-                          ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC')
+                          ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC')
                           ->paginate($user->anime_list_pagination_size ?? 15);
 
         return view('userAnimeList', ['userAnime' => $userAnime, 'username' => $username, 'show_anime_list_number' => $show_anime_list_number, 'watchStatuses' => $watchStatuses, 'watchStatusMap' => $watchStatusMap]);
@@ -102,7 +102,7 @@ class AnimeController extends Controller
         $query = $user->anime()
               ->selectRaw('anime.*, anime_user.sort_order, anime_user.score, anime_user.progress, anime_user.watch_status_id')
               ->with(['anime_type', 'anime_status', 'watch_status'])
-              ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC');
+              ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC');
 
         return DataTables::of($query)
             ->addColumn('anime_id', function ($row) {
