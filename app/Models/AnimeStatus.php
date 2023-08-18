@@ -12,6 +12,4 @@ class AnimeStatus extends Model
     use HasFactory;
 
     protected $guarded = [];
-
-    protected $id = "status_id";
 }
