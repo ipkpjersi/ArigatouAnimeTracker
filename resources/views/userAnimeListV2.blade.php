@@ -77,8 +77,8 @@
                 { data: 'title', name: 'title', render: function(data, type, row) {
                     return '<a href="/anime/' + row.anime_id + '">' + data + '</a>';
                 }},
-                { data: 'anime_type.type', name: 'anime_type.type', searchable: 'false' },  // Adjust based on actual returned data structure
-                { data: 'anime_status.status', name: 'anime_status.status', searchable: 'false' }, // Adjust based on actual returned data structure
+                { data: 'anime_type.type', name: 'anime_type.type' },  // Adjust based on actual returned data structure
+                { data: 'anime_status.status', name: 'anime_status.status' }, // Adjust based on actual returned data structure
                 { data: 'watch_status_id', name: 'watch_status_id', searchable: 'false', render: function(data, type, row) {
                     console.log("watch_status_id data" + data);
                     if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
@@ -147,8 +147,7 @@
                     }
                 });
             }
-            //TODO: add YADCF per-column searching
-            $('#userAnimeTable').DataTable({
+            let userAnimeDataTable = $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
                 order: [[7, 'asc'], [6, 'asc'], [1, 'asc']],
@@ -159,6 +158,39 @@
                     $('#userAnimeTable_filter').prepend(resetBtn);
                 },
             });
+            yadcf.init(userAnimeDataTable, [
+                {
+                    column_number: 2,
+                    filter_type: "text"
+                },
+                {
+                    column_number: 3,
+                    filter_type: "select",
+                    data: [
+                        { value: "1", label: "TV" },
+                        { value: "2", label: "MOVIE" },
+                        { value: "3", label: "OVA" },
+                        { value: "4", label: "ONA" },
+                        { value: "5", label: "SPECIAL" },
+                        { value: "6", label: "UNKNOWN" },
+                    ],
+                    filter_default_label: "All Types"
+                },
+                {
+                    column_number: 4,
+                    filter_type: "select",
+                    data: [
+                        { value: "1", label: "FINISHED" },
+                        { value: "2", label: "ONGOING" },
+                        { value: "3", label: "UPCOMING" },
+                        { value: "4", label: "UNKNOWN" }
+                    ],
+                    filter_default_label: "All Status"
+                },
+            ]);
         });
     </script>
+    <style>
+
+    </style>
 </x-app-layout>

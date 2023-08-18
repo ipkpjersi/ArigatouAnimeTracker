@@ -12,4 +12,6 @@ class AnimeType extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    protected $id = "type_id";
 }

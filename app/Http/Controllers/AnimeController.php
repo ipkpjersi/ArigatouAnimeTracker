@@ -100,7 +100,6 @@ class AnimeController extends Controller
     {
         $user = User::where('username', $username)->firstOrFail();
         $query = $user->anime()
-              ->selectRaw('anime.*, anime_user.sort_order, anime_user.score, anime_user.progress, anime_user.watch_status_id')
               ->with(['anime_type', 'anime_status', 'watch_status'])
               ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC');
 
