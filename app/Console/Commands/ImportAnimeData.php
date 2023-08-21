@@ -15,7 +15,7 @@ class ImportAnimeData extends Command
      *
      * @var string
      */
-    protected $signature = 'app:import-anime-data';
+    protected $signature = 'app:import-anime-data {filePath?}';
 
     /**
      * The console command description.
@@ -26,18 +26,21 @@ class ImportAnimeData extends Command
 
     /**
      * Execute the console command.
+     *
+     * @param AnimeImportService $animeImportService
+     * @return void
      */
     public function handle(AnimeImportService $animeImportService)
     {
         $this->info("Starting anime data import...");
 
-        try {
-            $filePath = storage_path('app/imports/anime-offline-database.json');
+        $filePath = $this->argument('filePath') ?? storage_path('app/imports/anime-offline-database.json');
 
+        try {
             $logger = function($message) {
                 $this->info($message);
             };
-            
+
             $result = $animeImportService->importFromJsonFile($filePath, $logger);
             $duration = round($result['duration'], 2);
 
