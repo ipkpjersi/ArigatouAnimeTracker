@@ -21,7 +21,7 @@ class MyAnimeListImportService
 
         $count = 0;
         $startTime = microtime(true);
-
+        $total = count($xml->anime);
         foreach ($xml->anime as $animeData) {
             $title = (string)$animeData->series_title;
             $type = (string)$animeData->series_type;
@@ -29,16 +29,17 @@ class MyAnimeListImportService
             $watchStatus = strtoupper(str_replace(" ", "-", (string)$animeData->my_status));
             $score = (int)$animeData->my_score;
             $progress = (int)$animeData->my_watched_episodes;
-
+            $animeType = AnimeType::firstOrCreate(['type' => $type]);
             // Check for existing anime
             $existingAnime = Anime::where('title', $title)
-                ->where('anime_type_id', AnimeType::firstOrCreate(['type' => $type])->id)
+                ->where('anime_type_id', $animeType->id)
                 ->where('episodes', $episodes)
                 ->first();
 
             $animeId = $existingAnime->id ?? null;
 
             if (!$animeId) {
+                \Log::info("Could not find match for anime $title with type {$animeType->type} and $episodes episodes");
                 continue;
             }
 
@@ -67,6 +68,6 @@ class MyAnimeListImportService
         }
 
         $duration = microtime(true) - $startTime;
-        return ["count" => $count, "duration" => $duration];
+        return ["count" => $count, "duration" => $duration, "total" => $total];
     }
 }

@@ -16,6 +16,9 @@
                             <input type="file" name="myanimelist_xml" accept=".xml">
                             <button type="submit" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2">Upload and Import</button>
                         </form>
+                        @if(session()->has('message'))
+                            <span>{{ session()->get('message') }}</span>
+                        @endif
                     </div>
                 </div>
             </div>

@@ -185,8 +185,8 @@ class AnimeController extends Controller
         $xmlContent = file_get_contents($request->file('myanimelist_xml')->path());
         $userId = Auth::id();
         $result = $importer->import($xmlContent, $userId);
-
-        return redirect()->back()->with('status', "Imported {$result['count']} anime records successfully in {$result['duration']} seconds");
+        $duration = round($result['duration'], 2);
+        return redirect()->back()->with('message', "Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
     }
 
     public function importMyAnimeListView() {
