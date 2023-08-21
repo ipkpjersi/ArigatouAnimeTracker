@@ -175,9 +175,8 @@ class AnimeController extends Controller
         return response()->json(['message' => 'Anime removed from your list.'], 200);
     }
 
-    public function importMyAnimeList(Request $request)
+    public function importMyAnimeList(Request $request, MyAnimeListImportService $importer)
     {
-        $importer = new MyAnimeListImportService();
         $request->validate([
             'myanimelist_xml' => 'required|mimes:xml'
         ]);
