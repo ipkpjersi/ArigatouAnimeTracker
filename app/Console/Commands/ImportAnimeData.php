@@ -33,7 +33,12 @@ class ImportAnimeData extends Command
 
         try {
             $filePath = storage_path('app/imports/anime-offline-database.json');
-            $result = $animeImportService->importFromJsonFile($filePath);
+
+            $logger = function($message) {
+                $this->info($message);
+            };
+            
+            $result = $animeImportService->importFromJsonFile($filePath, $logger);
             $duration = round($result['duration'], 2);
 
             $this->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");

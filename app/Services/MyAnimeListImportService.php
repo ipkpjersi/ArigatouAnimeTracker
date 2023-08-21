@@ -11,7 +11,7 @@ use SimpleXMLElement;
 
 class MyAnimeListImportService
 {
-    public function import(string $xmlContent, $userId)
+    public function import(string $xmlContent, $userId, $logger = null)
     {
         try {
             $xml = new SimpleXMLElement($xmlContent);
@@ -40,6 +40,7 @@ class MyAnimeListImportService
 
             if (!$animeId) {
                 \Log::info("Could not find match for anime $title with type {$animeType->type} and $episodes episodes");
+                $logger && $logger("Could not find match for anime $title with type {$animeType->type} and $episodes episodes");
                 continue;
             }
 
@@ -49,6 +50,7 @@ class MyAnimeListImportService
                 ->first();
 
             if ($existingEntry) {
+                $logger && $logger("Skipping existing anime $title with type {$animeType->type} and $episodes episodes");
                 continue;
             }
 

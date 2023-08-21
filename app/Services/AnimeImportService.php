@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class AnimeImportService
 {
-    public function importFromJsonFile($filePath)
+    public function importFromJsonFile($filePath, $logger = null)
     {
         $count = 0;
         $json = file_get_contents($filePath);
@@ -31,11 +31,18 @@ class AnimeImportService
                 ->first();
 
             if ($existingAnime) {
+                $logger && $logger("Skipping existing anime: " . $title);
                 continue;
             }
 
             $type = AnimeType::where('type', $animeData['type'])->firstOrCreate(['type' => $animeData['type']]);
+            if ($type->wasRecentlyCreated) {
+                $logger && $logger("New anime type created: " . $type->type);
+            }
             $status = AnimeStatus::where('status', $animeData['status'])->firstOrCreate(['status' => $animeData['status']]);
+            if ($status->wasRecentlyCreated) {
+                $logger && $logger("New anime status created: " . $status->status);
+            }
 
             Anime::create([
                 'title' => $title,

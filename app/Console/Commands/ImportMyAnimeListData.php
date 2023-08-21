@@ -1,6 +1,7 @@
 <?php
 namespace App\Console\Commands;
 
+use App\Models\User;
 use Illuminate\Console\Command;
 use App\Services\MyAnimeListImportService;
 
@@ -11,7 +12,7 @@ class ImportMyAnimeListData extends Command
      *
      * @var string
      */
-    protected $signature = 'app:import-myanimelist-data {userId} {filePath}';
+    protected $signature = 'app:import-myanimelist-data {username} {filePath}';
 
     /**
      * The console command description.
@@ -28,14 +29,24 @@ class ImportMyAnimeListData extends Command
      */
     public function handle(MyAnimeListImportService $importer)
     {
-        $userId = $this->argument('userId');
+        $username = $this->argument('username');
         $filePath = $this->argument('filePath');
-
-        $this->info("Starting MyAnimeList data import for user ID $userId...");
+        $user = User::where('username', '=', $username)->first();
+        if ($user === null) {
+            $this->error("User $username not found!");
+            return;
+        }
+        $userId = $user->id;
+        $this->info("Starting MyAnimeList data import for user $username (ID $userId)...");
 
         try {
             $xmlContent = file_get_contents($filePath);
-            $result = $importer->import($xmlContent, $userId);
+
+            $logger = function($message) {
+                $this->info($message);
+            };
+
+            $result = $importer->import($xmlContent, $userId, $logger);
             $duration = round($result['duration'], 2);
 
             $this->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
