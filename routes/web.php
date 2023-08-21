@@ -67,6 +67,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/animelist/{username}/update', [AnimeController::class, 'updateUserAnimeList'])->name('user.anime.update');
 
     Route::post('/animelist-v2/{username}/update', [AnimeController::class, 'updateUserAnimeListV2'])->name('user.anime.update.v2');
+
+    Route::get('/import/myanimelist', [AnimeController::class, 'importMyAnimeListView'])->name('import.myanimelist');
+
+    Route::post('/import/myanimelist', [AnimeController::class, 'importMyAnimeList'])->name('import.myanimelistdata');
+
 });
 
 require __DIR__.'/auth.php';

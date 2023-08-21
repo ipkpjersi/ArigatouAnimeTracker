@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Anime;
 use App\Models\User;
 use App\Models\WatchStatus;
+use App\Services\MyAnimeListImportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -172,5 +173,23 @@ class AnimeController extends Controller
             return redirect()->back()->with('message', 'Anime removed from your list.');
         }
         return response()->json(['message' => 'Anime removed from your list.'], 200);
+    }
+
+    public function importMyAnimeList(Request $request)
+    {
+        $importer = new MyAnimeListImportService();
+        $request->validate([
+            'myanimelist_xml' => 'required|mimes:xml'
+        ]);
+
+        $xmlContent = file_get_contents($request->file('myanimelist_xml')->path());
+        $userId = Auth::id();
+        $result = $importer->import($xmlContent, $userId);
+
+        return redirect()->back()->with('status', "Imported {$result['count']} anime records successfully in {$result['duration']} seconds");
+    }
+
+    public function importMyAnimeListView() {
+        return view('importmyanimelist');
     }
 }
