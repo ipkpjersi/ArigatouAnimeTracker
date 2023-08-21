@@ -23,7 +23,7 @@ class MyAnimeListImportService
         $startTime = microtime(true);
         $total = count($xml->anime);
         foreach ($xml->anime as $animeData) {
-            $title = (string)$animeData->series_title;
+            $title = str_replace('"', '', (string)$animeData->series_title);
             $type = (string)$animeData->series_type;
             $episodes = (int)$animeData->series_episodes;
             $watchStatus = strtoupper(str_replace(" ", "-", (string)$animeData->my_status));
