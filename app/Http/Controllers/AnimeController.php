@@ -121,9 +121,31 @@ class AnimeController extends Controller
     {
         $user = User::where('username', $username)->firstOrFail();
         $query = $user->anime()
-              ->selectRaw('anime.*, anime_user.sort_order, anime_user.score, anime_user.progress, anime_user.watch_status_id')
               ->with(['anime_type', 'anime_status', 'watch_status'])
-              ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC');
+              ->selectRaw('anime.*, anime_user.sort_order, anime_user.score, anime_user.progress, anime_user.watch_status_id');
+        $defaultOrder = [
+            ['column' => 7, 'dir' => 'asc'],
+            ['column' => 6, 'dir' => 'asc'],
+            ['column' => 1, 'dir' => 'asc']
+        ];
+
+        $orderData = $request->input('order');
+        //Check if order count matches.
+        $sortingMatchesDefault = count($defaultOrder) === count($orderData);
+
+        //Check if all provided order conditions match the default
+        foreach ($defaultOrder as $index => $default) {
+            if (!isset($orderData[$index]) ||
+                $orderData[$index]['column'] != $default['column'] ||
+                $orderData[$index]['dir'] != $default['dir']) {
+                $sortingMatchesDefault = false;
+                break;
+            }
+        }
+        //TODO: fix non-default sorting, for example sorting by episodes doesn't work
+        if ($sortingMatchesDefault) {
+            $query->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC');
+        }
 
         return DataTables::of($query)
             ->addColumn('anime_id', function ($row) {
