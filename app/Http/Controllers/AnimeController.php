@@ -117,16 +117,19 @@ class AnimeController extends Controller
 
         if ($request->has('anime_ids') && is_array($request->anime_ids)) {
             foreach ($request->anime_ids as $index => $anime_id) {
+                $anime = Anime::find($anime_id);
                 $score = $request->score[$index];
                 $sortOrder = $request->sort_order[$index];
                 $watchStatusId = $request->watch_status_id[$index] ? $request->watch_status_id[$index] : null;
+                $progress = $watchStatusId == WatchStatus::where('status', 'COMPLETED')->first()->id ? $anime->episodes : 0;
                 //Use syncWithoutDetaching to update the pivot data/junction table
                 //without removing the user's other rows in the junction table.
                 $user->anime()->syncWithoutDetaching([
                     $anime_id => [
                         'score' => $score ? $score : null,
                         'sort_order' => $sortOrder,
-                        'watch_status_id' => $watchStatusId
+                        'watch_status_id' => $watchStatusId,
+                        'progress' => $progress
                     ]
                 ]);
             }
@@ -142,12 +145,16 @@ class AnimeController extends Controller
         $sort_orders = $request->input('sort_order');
 
         for ($i = 0; $i < $count; $i++) {
+            $anime = Anime::find($anime_ids[$i]);
+            $progress = $watch_status_ids[$i] == WatchStatus::where('status', 'COMPLETED')->first()->id ? $anime->episodes : 0;
+
             DB::table('anime_user')->where('user_id', auth()->user()->id)
             ->where('anime_id', $anime_ids[$i])
             ->update([
                 'watch_status_id' => $watch_status_ids[$i],
                 'score' => $scores[$i] ?? null,
-                'sort_order' => $sort_orders[$i] ?? null
+                'sort_order' => $sort_orders[$i] ?? null,
+                'progress' => $progress
             ]);
         }
         return redirect()->back()->with('message', 'Changes saved successfully!');

@@ -61,4 +61,29 @@ class User extends Authenticatable
                     ->withPivot('score', 'sort_order', 'progress', 'watch_status_id')
                     ->withTimestamps();
     }
+
+    public function animeStatistics() {
+        $anime = $this->anime()->withPivot('score', 'watch_status_id', 'progress')->get();
+
+        $totalCompleted = $anime->where('pivot.watch_status_id', WatchStatus::where('status', 'COMPLETED')->first()->id)->count();
+
+        $totalEpisodes = $anime->sum('pivot.progress');
+        $averageScore = $anime->where('pivot.score', '>', 0)->avg('pivot.score');
+
+        $statuses = WatchStatus::pluck('status', 'id')->all();
+        $animeStatusCounts = collect($statuses)->mapWithKeys(function ($status, $id) {
+            return [$status => 0];
+        });
+
+        $animeCounts = $anime->groupBy('pivot.watch_status_id')->map->count();
+        foreach ($animeCounts as $statusId => $count) {
+            if (array_key_exists($statusId, $statuses)) {
+                $animeStatusCounts[$statuses[$statusId]] = $count;
+            }
+        }
+
+         $totalDaysWatched = ($totalEpisodes * 24) / (60 * 24);
+
+        return compact('totalCompleted', 'totalEpisodes', 'averageScore', 'animeStatusCounts', 'totalDaysWatched');
+    }
 }

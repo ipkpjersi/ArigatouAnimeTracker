@@ -31,7 +31,8 @@ class UserController extends Controller
     public function detail($username)
     {
         $user = User::where(['username' => $username])->firstOrFail();
-        return view('userdetail', compact('user'));
+        $stats = $user->animeStatistics();
+        return view('userdetail', compact('user', 'stats'));
     }
 
     public function banUser(Request $request, $userId)
