@@ -26,9 +26,29 @@ class AnimeController extends Controller
                 WHEN "FALL" THEN 3
                 WHEN "WINTER" THEN 4
                 ELSE 0
-            END as season_sort')
-        ->orderBy('year', 'desc')
-        ->orderBy('season_sort', 'desc');
+            END as season_sort');
+        $defaultOrder = [
+            ['column' => 7, 'dir' => 'desc'],
+            ['column' => 8, 'dir' => 'desc']
+        ];
+
+        $orderData = $request->input('order');
+        //Check if order count matches.
+        $sortingMatchesDefault = count($defaultOrder) === count($orderData);
+
+        //Check if all provided order conditions match the default
+        foreach ($defaultOrder as $index => $default) {
+            if (!isset($orderData[$index]) ||
+                $orderData[$index]['column'] != $default['column'] ||
+                $orderData[$index]['dir'] != $default['dir']) {
+                $sortingMatchesDefault = false;
+                break;
+            }
+        }
+
+        if ($sortingMatchesDefault) {
+            $query->orderBy('year', 'desc')->orderBy('season_sort', 'desc');
+        }
 
         if (auth()->user() == null || auth()->user()->show_adult_content == false) {
             //No need for this to be plain-text, so we'll use rot13.
