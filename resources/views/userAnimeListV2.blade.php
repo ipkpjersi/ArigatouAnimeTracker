@@ -147,7 +147,6 @@
                     }
                 });
             }
-            //TODO: add YADCF per-column searching
             $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -155,7 +154,7 @@
                 ajax: '{{ route('user.anime.list.data.v2', ['username' => $username]) }}',
                 columns: columns,
                 initComplete: function() {
-                    let resetBtn = $('<button id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="window.reload()">Reset Filters</button>');
+                    let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
                     $('#userAnimeTable_filter').prepend(resetBtn);
                 },
             });
