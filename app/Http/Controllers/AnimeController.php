@@ -142,7 +142,7 @@ class AnimeController extends Controller
                 break;
             }
         }
-        //TODO: fix non-default sorting, for example sorting by episodes doesn't work
+        //TODO: fix non-default sorting, for example sorting by episodes doesn't work. Maybe add in sorting manually?
         if ($sortingMatchesDefault) {
             $query->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC');
         }
