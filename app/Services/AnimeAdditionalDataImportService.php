@@ -1,9 +1,7 @@
 <?php
+
 namespace App\Services;
 
-use App\Models\Anime;
-use App\Models\AnimeStatus;
-use App\Models\AnimeType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -24,43 +22,77 @@ class AnimeAdditionalDataImportService
 
         foreach ($animes as $anime) {
             $malId = null;
+            $notifyMoeId = null;
+            $kitsuId = null;
             if (isset($anime->sources)) {
                 $sources = explode(',', $anime->sources);
                 foreach ($sources as $source) {
                     if (strpos($source, 'myanimelist.net/anime/') !== false) {
                         $malId = explode('/', rtrim($source, '/'))[4];
-                        break;
+                    }
+                    if (strpos($source, 'notify.moe/anime/') !== false) {
+                        $notifyMoeId = explode('/', rtrim($source, '/'))[4];
+                    }
+                    if (strpos($source, 'kitsu.io/anime/') !== false) {
+                        $kitsuId = explode('/', rtrim($source, '/'))[4];
                     }
                 }
             }
 
-            $response = null;
+            $description = null;
+            $genres = null;
+
+            // Try MAL first
             if ($malId) {
                 $response = Http::withHeaders([
                     'X-MAL-CLIENT-ID' => env('MAL_CLIENT_ID')
                 ])->get('https://api.myanimelist.net/v2/anime/' . $malId . '?fields=id,title,synopsis,genres');
+
+                if ($response && $response->successful()) {
+                    $data = $response->json();
+                    $description = $data['synopsis'] ?? null;
+                    $genres = array_map(function ($genre) {
+                        return str_replace('"', "", $genre['name']);
+                    }, $data['genres'] ?? []);
+                    $genres = $genres ? implode(',', $genres) : null;
+                    $logger && $logger("Update description and genres for anime: " . $anime->title . " from MAL");
+                }
             }
 
-            if ($response && $response->successful()) {
-                $data = $response->json();
-                $description = $data['synopsis'] ?? null;
-                $genres = array_map(function ($genre) {
-                    return str_replace('"', "", $genre['name']);
-                }, $data['genres'] ?? []);
-                $genres = $genres ? implode(',', $genres) : null;
+            // Then try notify.moe if MAL fails
+            if (!$description && $notifyMoeId) {
+                $response = Http::get('https://notify.moe/api/anime/' . $notifyMoeId);
+                if ($response && $response->successful()) {
+                    $data = $response->json();
+                    $description = $data['summary'] ?? null;
+                    $genres = $data['genres'] ? implode(',', $data['genres']) : null;
+                    $logger && $logger("Update description and genres for anime: " . $anime->title . " from notify.moe");
+                }
+            }
+
+            // Finally, try kitsu.io if both MAL and notify.moe fail
+            if (!$description && $kitsuId) {
+                $response = Http::get('https://kitsu.io/api/edge/anime/' . $kitsuId);
+                if ($response && $response->successful()) {
+                    $data = $response->json();
+                    $description = $data['data']['attributes']['synopsis'] ?? null;
+
+                    $genresResponse = Http::get('https://kitsu.io/api/edge/anime/' . $kitsuId . '/genres');
+                    $genresData = $genresResponse->json();
+                    $genres = array_map(function ($genre) {
+                        return $genre['attributes']['name'];
+                    }, $genresData['data'] ?? []);
+                    $genres = $genres ? implode(',', $genres) : null;
+                    $logger && $logger("Update description and genres for anime: " . $anime->title . " from kitsu.io");
+                }
+            }
+
+            if ($description) {
                 $this->updateAnimeData($anime, $description, $genres, $sqlFile, $logger);
                 $count++;
             } else {
-                //TODO: implement alternate API, likely notify.moe (has desc/summary + genres in one endpoint) then kitsu (only has desc/synopsis in one endpoint with genres as api/edge/anime/{id}/genres as second endpoint)
-                //$alternateResponse = Http::get('ALTERNATE_API_URL_HERE');
-                $alternateResponse = false;
-                if ($alternateResponse && $alternateResponse->successful()) {
-                    $this->updateAnimeData($anime, null, null, $sqlFile, $logger);
-                    $count++;
-                } else {
-                    $logger && $logger("Failed to update description and genres for anime: " . $anime->title);
-                    Log::error('Failed to fetch data for anime: ' . $anime->title);
-                }
+                $logger && $logger("Failed to update description and genres for anime: " . $anime->title);
+                Log::error('Failed to fetch additional data for anime: ' . $anime->title);
             }
             sleep(15);
         }
@@ -79,7 +111,6 @@ class AnimeAdditionalDataImportService
 
     private function updateAnimeData($anime, $description, $genres, $sqlFile, $logger)
     {
-
         DB::table('anime')
             ->where('id', $anime->id)
             ->update([
@@ -93,7 +124,5 @@ class AnimeAdditionalDataImportService
             $updateQuery = "UPDATE anime SET description = '$escapedDescription', genres = '$escapedGenres' WHERE title = '$anime->title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = '$anime->season' AND year = $anime->year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
-
-        $logger && $logger("Updated description and genres for anime: " . $anime->title);
     }
 }
