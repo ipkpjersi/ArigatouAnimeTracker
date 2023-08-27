@@ -47,11 +47,11 @@ class AnimeAdditionalDataImportService
                 $genres = array_map(function ($genre) {
                     return str_replace('"', "", $genre['name']);
                 }, $data['genres'] ?? []);
-                $genres = $genres ? implode(',', $genres) : "";
+                $genres = $genres ? implode(',', $genres) : null;
                 $themes = array_map(function ($theme) {
                     return str_replace('"', "", $theme['name']);
                 }, $data['themes'] ?? []);
-                $themes = $themes ? implode(',', $themes) : "";
+                $themes = $themes ? implode(',', $themes) : null;
                 $this->updateAnimeData($anime, $description, $genres, $themes, $sqlFile, $logger);
                 $count++;
             } else {
@@ -59,7 +59,7 @@ class AnimeAdditionalDataImportService
                 //$alternateResponse = Http::get('ALTERNATE_API_URL_HERE');
                 $alternateResponse = false;
                 if ($alternateResponse && $alternateResponse->successful()) {
-                    $this->updateAnimeData($anime, "", "", "", $sqlFile, $logger);
+                    $this->updateAnimeData($anime, null, null, null, $sqlFile, $logger);
                     $count++;
                 } else {
                     $logger && $logger("Failed to update description and genres for anime: " . $anime->title);
