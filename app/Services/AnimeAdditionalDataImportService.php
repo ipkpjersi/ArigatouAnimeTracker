@@ -39,10 +39,15 @@ class AnimeAdditionalDataImportService
                 // Extract and prepare the data
                 $description = $data['synopsis'] ?? null;
 
+                // Optionally, remove extra text from the description and remove the trailing lines.
+                //$description = trim(str_replace("[Written by MAL Rewrite]", "(Source: Funimation)", ''));
+
                 $genres = array_map(function ($genre) {
                     return $genre['name'];
                 }, $data['genres'] ?? []);
-                $genres = json_encode($genres);
+
+                // Convert the array to a comma-separated string.
+                $genres = implode(',', $genres);
 
                 // Update the anime table
                 DB::table('anime')
@@ -61,7 +66,9 @@ class AnimeAdditionalDataImportService
                 $logger && $logger("Updated description and genres for anime: " . $anime->title);
                 $count++;
             } else {
-                $logger && $logger("Updated description and genres for anime: " . $anime->title);
+                $logger && $logger("Failed to update description and genres for anime: " . $anime->title);
+                \Log::error('Failed to fetch data for anime: ' . $anime->title . ': ' . $response->body());
+                //Optionally, we could try an additional API to fetch more descriptions and genres.
             }
 
             // Pause for 15 seconds to avoid rate-limiting
