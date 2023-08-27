@@ -54,7 +54,7 @@ class AnimeAdditionalDataImportService
                 $this->updateAnimeData($anime, $description, $genres, $themes, $sqlFile, $logger);
                 $count++;
             } else {
-                //TODO: implement alternate API
+                //TODO: implement alternate API, likely kitsu
                 //$alternateResponse = Http::get('ALTERNATE_API_URL_HERE');
                 $alternateResponse = false;
                 if ($alternateResponse && $alternateResponse->successful()) {
