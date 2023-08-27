@@ -32,6 +32,7 @@ return new class extends Migration
             $table->text('tags')->nullable();
             $table->text('description')->nullable();
             $table->text('genres')->nullable();
+            $table->text('themes')->nullable();
             $table->integer('is_deleted')->default(0);
             $table->timestamps();
         });

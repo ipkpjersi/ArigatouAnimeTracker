@@ -47,15 +47,18 @@ class AnimeAdditionalDataImportService
                 $genres = array_map(function ($genre) {
                     return $genre['name'];
                 }, $data['genres'] ?? []);
+                $themes = array_map(function ($theme) {
+                    return $theme['name'];
+                }, $data['themes'] ?? []);
                 $genres = implode(',', $genres);
-                $this->updateAnimeData($anime, $description, $genres, $sqlFile, $logger);
+                $this->updateAnimeData($anime, $description, $genres, $themes, $sqlFile, $logger);
                 $count++;
             } else {
                 //TODO: implement alternate API
                 //$alternateResponse = Http::get('ALTERNATE_API_URL_HERE');
                 $alternateResponse = false;
                 if ($alternateResponse && $alternateResponse->successful()) {
-                    $this->updateAnimeData($anime, "", "", $sqlFile, $logger);
+                    $this->updateAnimeData($anime, "", "", "", $sqlFile, $logger);
                     $count++;
                 } else {
                     $logger && $logger("Failed to update description and genres for anime: " . $anime->title);
@@ -77,20 +80,22 @@ class AnimeAdditionalDataImportService
         ];
     }
 
-    private function updateAnimeData($anime, $description, $genres, $sqlFile, $logger)
+    private function updateAnimeData($anime, $description, $genres, $themes, $sqlFile, $logger)
     {
 
         DB::table('anime')
             ->where('id', $anime->id)
             ->update([
                 'description' => $description,
-                'genres' => $genres
+                'genres' => $genres,
+                'themes' => $themes
             ]);
 
         if ($sqlFile) {
             $escapedDescription = addslashes($description);
             $escapedGenres = addslashes($genres);
-            $updateQuery = "UPDATE anime SET description = '$escapedDescription', genres = '$escapedGenres' WHERE title = '$anime->title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = '$anime->season' AND year = $anime->year AND episodes = $anime->episodes;\n";
+            $escapedThemes = addslashes($themes);
+            $updateQuery = "UPDATE anime SET description = '$escapedDescription', genres = '$escapedGenres', themes = '$escapedThemes' WHERE title = '$anime->title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = '$anime->season' AND year = $anime->year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
 
