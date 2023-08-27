@@ -38,16 +38,25 @@ class AnimeImageDownloadService
     private function downloadImageFromUrl($url, $type, $logger = null)
     {
         $filePath = $this->getFilePathFromUrl($url, $type);
-        if (!Storage::exists($filePath)) {
+        $fullPath = public_path($filePath);
+
+        // Create the directories if they don't exist
+        $directory = dirname($fullPath);
+        if (!file_exists($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        // Check if the file already exists
+        if (!file_exists($fullPath)) {
             $response = Http::get($url);
             if ($response->successful()) {
-                Storage::put($filePath, $response->body());
-                $logger && $logger("Image $type downloaded successfully to: " . $filePath);
+                file_put_contents($fullPath, $response->body());
+                $logger && $logger("Image $type downloaded successfully to: " . $fullPath);
             } else {
                 $logger && $logger("Failed to download $type image from: " . $url);
             }
         } else {
-            $logger && $logger("Image $type already exists at: " . $filePath);
+            $logger && $logger("Image $type already exists at: " . $fullPath);
         }
     }
 
@@ -55,6 +64,6 @@ class AnimeImageDownloadService
     {
         $parsedUrl = parse_url($url);
         $path = $parsedUrl['path'];
-        return "public/$type" . $path;
+        return "$type" . $path;
     }
 }
