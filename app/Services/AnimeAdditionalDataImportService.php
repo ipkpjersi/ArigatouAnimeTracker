@@ -12,20 +12,20 @@ class AnimeAdditionalDataImportService
     {
         $startTime = microtime(true);
         $count = 0;
-        $animes = DB::table('anime')
+        $anime = DB::table('anime')
                     ->whereNull('description')
                     ->whereNull('genres')
                     ->get();
-        $total = count($animes);
+        $total = count($anime);
 
         $sqlFile = $generateSqlFile ? fopen(('database/seeders/anime_additional_data.sql'), 'a') : null;
 
-        foreach ($animes as $anime) {
+        foreach ($anime as $row) {
             $malId = null;
             $notifyMoeId = null;
             $kitsuId = null;
-            if (isset($anime->sources)) {
-                $sources = explode(',', $anime->sources);
+            if (isset($row->sources)) {
+                $sources = explode(',', $row->sources);
                 foreach ($sources as $source) {
                     if (strpos($source, 'myanimelist.net/anime/') !== false) {
                         $malId = explode('/', rtrim($source, '/'))[4];
@@ -55,7 +55,7 @@ class AnimeAdditionalDataImportService
                         return str_replace('"', "", $genre['name']);
                     }, $data['genres'] ?? []);
                     $genres = $genres ? implode(',', $genres) : null;
-                    $logger && $logger("Update description and genres for anime: " . $anime->title . " from MAL");
+                    $logger && $logger("Update description and genres for anime: " . $row->title . " from MAL");
                 }
             }
 
@@ -66,7 +66,7 @@ class AnimeAdditionalDataImportService
                     $data = $response->json();
                     $description = $data['summary'] ?? null;
                     $genres = $data['genres'] ? implode(',', $data['genres']) : null;
-                    $logger && $logger("Update description and genres for anime: " . $anime->title . " from notify.moe");
+                    $logger && $logger("Update description and genres for anime: " . $row->title . " from notify.moe");
                 }
             }
 
@@ -83,16 +83,16 @@ class AnimeAdditionalDataImportService
                         return $genre['attributes']['name'];
                     }, $genresData['data'] ?? []);
                     $genres = $genres ? implode(',', $genres) : null;
-                    $logger && $logger("Update description and genres for anime: " . $anime->title . " from kitsu.io");
+                    $logger && $logger("Update description and genres for anime: " . $row->title . " from kitsu.io");
                 }
             }
 
             if ($description) {
-                $this->updateAnimeData($anime, $description, $genres, $sqlFile, $logger);
+                $this->updateAnimeData($row, $description, $genres, $sqlFile, $logger);
                 $count++;
             } else {
-                $logger && $logger("Failed to update description and genres for anime: " . $anime->title);
-                Log::error('Failed to fetch additional data for anime: ' . $anime->title);
+                $logger && $logger("Failed to update description and genres for anime: " . $row->title);
+                Log::error('Failed to fetch additional data for anime: ' . $row->title);
             }
             sleep(15);
         }
