@@ -50,7 +50,7 @@ class AnimeAdditionalDataImportService
                 $themes = array_map(function ($theme) {
                     return $theme['name'];
                 }, $data['themes'] ?? []);
-                $genres = implode(',', $genres);
+                $themes = implode(',', $themes);
                 $this->updateAnimeData($anime, $description, $genres, $themes, $sqlFile, $logger);
                 $count++;
             } else {
