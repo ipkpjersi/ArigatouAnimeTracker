@@ -51,7 +51,7 @@ class AnimeAdditionalDataImportService
                 $this->updateAnimeData($anime, $description, $genres, $sqlFile, $logger);
                 $count++;
             } else {
-                //TODO: implement alternate API, likely kitsu
+                //TODO: implement alternate API, likely notify.moe (has desc/summary + genres in one endpoint) then kitsu (only has desc/synopsis in one endpoint with genres as api/edge/anime/{id}/genres as second endpoint)
                 //$alternateResponse = Http::get('ALTERNATE_API_URL_HERE');
                 $alternateResponse = false;
                 if ($alternateResponse && $alternateResponse->successful()) {
