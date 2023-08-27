@@ -38,7 +38,7 @@ class AnimeAdditionalDataImportService
             if ($malId) {
                 $response = Http::withHeaders([
                     'X-MAL-CLIENT-ID' => env('MAL_CLIENT_ID')
-                ])->get('https://api.myanimelist.net/v2/anime/' . $malId . '?fields=id,title,synopsis,genres,themes');
+                ])->get('https://api.myanimelist.net/v2/anime/' . $malId . '?fields=id,title,synopsis,genres');
             }
 
             if ($response && $response->successful()) {
@@ -48,18 +48,14 @@ class AnimeAdditionalDataImportService
                     return str_replace('"', "", $genre['name']);
                 }, $data['genres'] ?? []);
                 $genres = $genres ? implode(',', $genres) : null;
-                $themes = array_map(function ($theme) {
-                    return str_replace('"', "", $theme['name']);
-                }, $data['themes'] ?? []);
-                $themes = $themes ? implode(',', $themes) : null;
-                $this->updateAnimeData($anime, $description, $genres, $themes, $sqlFile, $logger);
+                $this->updateAnimeData($anime, $description, $genres, $sqlFile, $logger);
                 $count++;
             } else {
                 //TODO: implement alternate API, likely kitsu
                 //$alternateResponse = Http::get('ALTERNATE_API_URL_HERE');
                 $alternateResponse = false;
                 if ($alternateResponse && $alternateResponse->successful()) {
-                    $this->updateAnimeData($anime, null, null, null, $sqlFile, $logger);
+                    $this->updateAnimeData($anime, null, null, $sqlFile, $logger);
                     $count++;
                 } else {
                     $logger && $logger("Failed to update description and genres for anime: " . $anime->title);
@@ -81,22 +77,20 @@ class AnimeAdditionalDataImportService
         ];
     }
 
-    private function updateAnimeData($anime, $description, $genres, $themes, $sqlFile, $logger)
+    private function updateAnimeData($anime, $description, $genres, $sqlFile, $logger)
     {
 
         DB::table('anime')
             ->where('id', $anime->id)
             ->update([
                 'description' => $description,
-                'genres' => $genres,
-                'themes' => $themes
+                'genres' => $genres
             ]);
 
         if ($sqlFile) {
             $escapedDescription = addslashes($description);
             $escapedGenres = addslashes($genres);
-            $escapedThemes = addslashes($themes);
-            $updateQuery = "UPDATE anime SET description = '$escapedDescription', genres = '$escapedGenres', themes = '$escapedThemes' WHERE title = '$anime->title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = '$anime->season' AND year = $anime->year AND episodes = $anime->episodes;\n";
+            $updateQuery = "UPDATE anime SET description = '$escapedDescription', genres = '$escapedGenres' WHERE title = '$anime->title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = '$anime->season' AND year = $anime->year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
 
