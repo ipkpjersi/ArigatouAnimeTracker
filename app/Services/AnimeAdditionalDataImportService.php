@@ -14,7 +14,7 @@ class AnimeAdditionalDataImportService
         $count = 0;
         $animes = DB::table('anime')
                     ->whereNull('description')
-                    ->orWhereNull('genres')
+                    ->whereNull('genres')
                     ->get();
         $total = count($animes);
 
