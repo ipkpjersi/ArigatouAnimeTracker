@@ -3,12 +3,13 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class AnimeAdditionalDataImportService
 {
-    public function fetchAdditionalAnimeData($logger = null, $generateSqlFile = false)
+    public function downloadAdditionalAnimeData($logger = null, $generateSqlFile = false)
     {
         $startTime = microtime(true);
         $count = 0;
@@ -109,6 +110,27 @@ class AnimeAdditionalDataImportService
         ];
     }
 
+    public function importAdditionalAnimeData($logger = null) {
+        $startTime = microtime(true);
+        $count = 0;
+        $sqlPath = database_path('seeders/anime_additional_data.sql');
+        $anime = DB::table('anime')->get();
+        $total = count($anime);
+        if (File::exists($sqlPath)) {
+            $sql = File::get($sqlPath);
+            DB::unprepared($sql);
+            $logger && $logger('Imported additional anime data successfully.');
+        } else {
+            $logger && $logger('SQL file does not exist.');
+        }
+        $duration = microtime(true) - $startTime;
+        return [
+            'count' => $count,
+            'total' => $total,
+            'duration' => $duration,
+        ];
+    }
+
     private function updateAnimeData($anime, $description, $genres, $sqlFile, $logger)
     {
         DB::table('anime')
@@ -125,4 +147,6 @@ class AnimeAdditionalDataImportService
             fwrite($sqlFile, $updateQuery);
         }
     }
+
+
 }

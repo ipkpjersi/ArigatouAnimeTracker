@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Services\AnimeAdditionalDataImportService;
 use Illuminate\Console\Command;
 
-class FetchAdditionalAnimeData extends Command
+class DownloadAdditionalAnimeData extends Command
 {
     /**
      * The name and signature of the console command.
@@ -38,7 +38,7 @@ class FetchAdditionalAnimeData extends Command
                 $this->info($message);
             };
 
-            $result = $animeAdditionalDataImportService->fetchAdditionalAnimeData($logger, $generateSqlFile);
+            $result = $animeAdditionalDataImportService->downloadAdditionalAnimeData($logger, $generateSqlFile);
             $duration = round($result['duration'], 2);
 
             $this->info("Fetched additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");

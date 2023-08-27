@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Services\AnimeAdditionalDataImportService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 
 class ImportAdditionalAnimeData extends Command
 {
@@ -25,22 +24,24 @@ class ImportAdditionalAnimeData extends Command
     /**
      * Execute the console command.
      *
-     * @return int
+     * @param AnimeAdditionalDataImportService $animeAdditionalDataImportService
+     * @return void
      */
-    public function handle()
+    public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService)
     {
         $this->info('Starting to import additional anime data from SQL file...');
 
-        $sqlPath = database_path('seeders/anime_additional_data.sql');
+        try {
+            $logger = function($message) {
+                $this->info($message);
+            };
 
-        if (File::exists($sqlPath)) {
-            $sql = File::get($sqlPath);
-            DB::unprepared($sql);
-            $this->info('Imported additional anime data successfully.');
-            return 0; // Success
-        } else {
-            $this->error('SQL file does not exist.');
-            return 1; // Error
+            $result = $animeAdditionalDataImportService->importAdditionalAnimeData($logger);
+            $duration = round($result['duration'], 2);
+
+            $this->info("Imported additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
+        } catch (\Exception $e) {
+            $this->error('An error occurred during the data fetch: ' . $e->getMessage());
         }
     }
 }
