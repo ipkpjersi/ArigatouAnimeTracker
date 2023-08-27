@@ -117,9 +117,15 @@ class AnimeAdditionalDataImportService
         $anime = DB::table('anime')->get();
         $total = count($anime);
         if (File::exists($sqlPath)) {
-            $sql = File::get($sqlPath);
-            DB::unprepared($sql);
-            $logger && $logger('Imported additional anime data successfully.');
+            $sqlContent = File::get($sqlPath);
+            $sqlQueries = explode(";\n", $sqlContent);
+            foreach ($sqlQueries as $query) {
+                if (trim($query) !== '') {
+                    DB::unprepared($query . ';');
+                    $count++;
+                }
+            }
+            $logger && $logger("Imported {$count} SQL queries successfully.");
         } else {
             $logger && $logger('SQL file does not exist.');
         }
@@ -131,7 +137,7 @@ class AnimeAdditionalDataImportService
         ];
     }
 
-    private function updateAnimeData($anime, $description, $genres, $sqlFile, $logger)
+    private function updateAnimeData($anime, $description, $genres, $sqlFile, $logger = null)
     {
         DB::table('anime')
             ->where('id', $anime->id)
@@ -141,9 +147,12 @@ class AnimeAdditionalDataImportService
             ]);
 
         if ($sqlFile) {
-            $escapedDescription = addslashes($description);
-            $escapedGenres = addslashes($genres);
-            $updateQuery = "UPDATE anime SET description = '$escapedDescription', genres = '$escapedGenres' WHERE title = '$anime->title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = '$anime->season' AND year = $anime->year AND episodes = $anime->episodes;\n";
+            $description = addslashes($description);
+            $genres = addslashes($genres);
+            $year = empty($anime->year) ? 'NULL' : $anime->year;
+            $season = empty($anime->season) ? 'NULL' : "'$anime->season'";
+            $title = addslashes(str_replace('"', '', $anime->title));
+            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres' WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
     }

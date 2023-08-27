@@ -12,7 +12,7 @@ class DownloadAdditionalAnimeData extends Command
      *
      * @var string
      */
-    protected $signature = 'app:fetch-anime-additional-data {generateSqlFile?}';
+    protected $signature = 'app:download-anime-additional-data {generateSqlFile?}';
 
     /**
      * The console command description.
@@ -29,10 +29,9 @@ class DownloadAdditionalAnimeData extends Command
      */
     public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService)
     {
-        $this->info("Starting to fetch additional anime data...");
-
         $generateSqlFile = $this->argument('generateSqlFile') ?? false;
 
+        $this->info("Starting to fetch additional anime data " . ($generateSqlFile ? "with generating an SQL file" : "without generating an SQL file") . "...");
         try {
             $logger = function($message) {
                 $this->info($message);
