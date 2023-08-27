@@ -38,19 +38,20 @@ class AnimeAdditionalDataImportService
             if ($malId) {
                 $response = Http::withHeaders([
                     'X-MAL-CLIENT-ID' => env('MAL_CLIENT_ID')
-                ])->get('https://api.myanimelist.net/v2/anime/' . $malId . '?fields=id,title,synopsis,genres');
+                ])->get('https://api.myanimelist.net/v2/anime/' . $malId . '?fields=id,title,synopsis,genres,themes');
             }
 
             if ($response && $response->successful()) {
                 $data = $response->json();
                 $description = $data['synopsis'] ?? null;
                 $genres = array_map(function ($genre) {
-                    return $genre['name'];
+                    return str_replace('"', "", $genre['name']);
                 }, $data['genres'] ?? []);
+                $genres = $genres ? implode(',', $genres) : "";
                 $themes = array_map(function ($theme) {
-                    return $theme['name'];
+                    return str_replace('"', "", $theme['name']);
                 }, $data['themes'] ?? []);
-                $themes = implode(',', $themes);
+                $themes = $themes ? implode(',', $themes) : "";
                 $this->updateAnimeData($anime, $description, $genres, $themes, $sqlFile, $logger);
                 $count++;
             } else {
