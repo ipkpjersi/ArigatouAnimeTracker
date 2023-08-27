@@ -60,7 +60,7 @@ class AnimeAdditionalDataImportService
             }
 
             // Then try notify.moe if MAL fails
-            if (!$description && $notifyMoeId) {
+            if ((!$description || !$genres) && $notifyMoeId) {
                 $response = Http::get('https://notify.moe/api/anime/' . $notifyMoeId);
                 if ($response && $response->successful()) {
                     $data = $response->json();
@@ -71,7 +71,7 @@ class AnimeAdditionalDataImportService
             }
 
             // Finally, try kitsu.io if both MAL and notify.moe fail
-            if (!$description && $kitsuId) {
+            if ((!$description || !$genres) && $kitsuId) {
                 $response = Http::get('https://kitsu.io/api/edge/anime/' . $kitsuId);
                 if ($response && $response->successful()) {
                     $data = $response->json();
