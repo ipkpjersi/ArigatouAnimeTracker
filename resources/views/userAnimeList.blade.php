@@ -109,9 +109,9 @@
                         </div>
                     </form>
                     @if(auth()->user() != null && auth()->user()->username === $username)
-                        <a href="{{ route('import.myanimelist') }}">
+                        <a href="{{ route('import.animelist') }}">
                             <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-                                Import from MyAnimeList
+                                Import from MyAnimeList and More
                             </button>
                         </a>
                     @endif

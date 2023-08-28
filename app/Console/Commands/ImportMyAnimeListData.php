@@ -3,7 +3,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use Illuminate\Console\Command;
-use App\Services\MyAnimeListImportService;
+use App\Services\AnimeListImportService;
 
 class ImportMyAnimeListData extends Command
 {
@@ -24,10 +24,10 @@ class ImportMyAnimeListData extends Command
     /**
      * Execute the console command.
      *
-     * @param MyAnimeListImportService $importer
+     * @param AnimeListImportService $importer
      * @return void
      */
-    public function handle(MyAnimeListImportService $importer)
+    public function handle(AnimeListImportService $importer)
     {
         $username = $this->argument('username');
         $filePath = $this->argument('filePath');

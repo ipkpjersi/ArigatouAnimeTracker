@@ -9,7 +9,7 @@ use App\Models\WatchStatus;
 use Illuminate\Support\Facades\Auth;
 use SimpleXMLElement;
 
-class MyAnimeListImportService
+class AnimeListImportService
 {
     public function import(string $xmlContent, $userId, $logger = null)
     {
