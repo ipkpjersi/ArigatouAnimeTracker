@@ -63,7 +63,12 @@ class AnimeListExportService
             $anime->addChild('update_on_import', 0);
         }
         $duration = microtime(true) - $startTime;
-        return ["total" => $total, "duration" => $duration, "output" => $xml->asXML()];
+        $dom = new \DOMDocument("1.0");
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML()); // this line loads your existing XML string
+        $formattedXml = $dom->saveXML();
+        return ["total" => $total, "duration" => $duration, "output" => $formattedXml];
     }
 
     private function exportToArigatou($userId, $logger = null)
