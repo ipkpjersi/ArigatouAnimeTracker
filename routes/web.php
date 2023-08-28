@@ -72,6 +72,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/import/animelist', [AnimeController::class, 'importAnimeList'])->name('import.animelistdata');
 
+    Route::get('/export/animelist', [AnimeController::class, 'exportAnimeListView'])->name('export.animelist');
+
+    Route::post('/export/animelist', [AnimeController::class, 'exportAnimeList'])->name('export.animelistdata');
+
 });
 
 require __DIR__.'/auth.php';

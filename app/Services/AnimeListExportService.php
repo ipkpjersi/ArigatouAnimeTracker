@@ -31,8 +31,8 @@ class AnimeListExportService
         $myinfo = $xml->addChild('myinfo');
         //$myinfo->addChild('user_id', $userId);
         //$myinfo->addChild('user_name', Auth::user()->username);
-        $myinfo->addChild('user_id', "");
-        $myinfo->addChild('user_name', "");
+        $myinfo->addChild('user_id', ""); //TODO: maybe fill these in from some user profile settings?
+        $myinfo->addChild('user_name', ""); //TODO: maybe fill these in from some user profile settings?
         $myinfo->addChild('user_export_type', '1');
         $myinfo->addChild('user_total_anime', $animeList->count());
 
@@ -40,7 +40,7 @@ class AnimeListExportService
             $anime = $xml->addChild('anime');
             $anime->addChild('series_animedb_id', '');
             $anime->addChild('series_title', htmlspecialchars($animeUser->anime->title));
-            $anime->addChild('series_type', $animeUser->anime->animeType->type);
+            $anime->addChild('series_type', $animeUser->anime->anime_type->type);
             $anime->addChild('series_episodes', $animeUser->anime->episodes);
             $anime->addChild('my_id', 0);
             $anime->addChild('my_watched_episodes', $animeUser->progress);

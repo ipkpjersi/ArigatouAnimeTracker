@@ -114,6 +114,11 @@
                                 Import from MyAnimeList and More
                             </button>
                         </a>
+                        <a href="{{ route('export.animelist') }}">
+                            <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                                Export to MyAnimeList and More
+                            </button>
+                        </a>
                     @endif
                 </div>
             </div>

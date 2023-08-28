@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Anime;
 use App\Models\User;
 use App\Models\WatchStatus;
+use App\Services\AnimeListExportService;
 use App\Services\AnimeListImportService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class AnimeController extends Controller
@@ -252,5 +255,39 @@ class AnimeController extends Controller
 
     public function importAnimeListView() {
         return view('importanimelist');
+    }
+
+    public function exportAnimeList(Request $request, AnimeListExportService $exporter)
+    {
+        $exportType = $request->input('export_type');
+
+        // Validation
+        $request->validate([
+            'export_type' => 'required|in:myanimelist,arigatou',
+        ]);
+
+        $userId = Auth::id();
+        $result = $exporter->export($exportType, $userId);
+
+        // Generate filename with date
+        $currentDateTime = Carbon::now()->format('Y-m-d_H-i-s');
+        $fileNameBase = "AnimeList_{$currentDateTime}";
+
+        if ($exportType === 'myanimelist') {
+            $fileName = "{$fileNameBase}.xml";
+            Storage::put('exports/'.$fileName, $result['output']);
+        } elseif ($exportType === 'arigatou') {
+            $fileName = "{$fileNameBase}.json";
+            Storage::put('exports/'.$fileName, $result);
+        } else {
+            return redirect()->back()->with('message', 'Export failed due to unknown file type.');
+        }
+
+        return response()->download(storage_path("app/exports/{$fileName}"));
+    }
+
+    public function exportAnimeListView()
+    {
+        return view('exportanimelist');
     }
 }
