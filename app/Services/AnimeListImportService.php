@@ -19,6 +19,7 @@ class AnimeListImportService
             return $this->importFromArigatou($fileContent, $userId, $logger);
         } else {
             //Unknown file type
+            return "";
         }
     }
     private function importFromMyAnimeList(string $xmlContent, $userId, $logger = null)
