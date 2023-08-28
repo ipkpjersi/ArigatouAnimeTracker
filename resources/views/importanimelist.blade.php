@@ -13,7 +13,14 @@
                         <h4 class="font-bold mb-2">Import Anime Export:</h4>
                         <form action="{{ route('import.animelistdata') }}" method="post" enctype="multipart/form-data">
                             @csrf
-                            <input type="file" name="myanimelist_xml" accept=".xml">
+                            <label class="block text-sm font-bold mb-2" for="import_type">
+                                Import Type
+                            </label>
+                            <select class="shadow appearance-none border rounded py-2 px-8 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="import_type" id="import_type">
+                                <option value="myanimelist">MyAnimeList</option>
+                                <option value="arigatou">ArigatouAnimeTracker</option>
+                            </select>
+                            <input type="file" name="anime_data_file" accept=".xml,.json">
                             <button type="submit" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2">Upload and Import</button>
                         </form>
                         @if(session()->has('message'))

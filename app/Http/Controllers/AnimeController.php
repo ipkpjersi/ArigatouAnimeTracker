@@ -226,13 +226,26 @@ class AnimeController extends Controller
 
     public function importAnimeList(Request $request, AnimeListImportService $importer)
     {
-        $request->validate([
-            'myanimelist_xml' => 'required|mimes:xml'
-        ]);
+        $importType = $request->input('import_type');
+        $fileKey = 'anime_data_file';
 
-        $xmlContent = file_get_contents($request->file('myanimelist_xml')->path());
+        $commonRules = [
+            $fileKey => 'required',
+            'import_type' => 'required|in:myanimelist,arigatou',
+        ];
+
+        if ($importType === 'myanimelist') {
+            $commonRules[$fileKey] = 'required|mimes:xml';
+        } elseif ($importType === 'arigatou') {
+            $commonRules[$fileKey] = 'required|mimes:json';
+        }
+
+        $request->validate($commonRules);
+
+        $fileContent = file_get_contents($request->file($fileKey)->path());
         $userId = Auth::id();
-        $result = $importer->import($xmlContent, $userId);
+        $result = $importer->import($fileContent, $importType, $userId);
+
         $duration = round($result['duration'], 2);
         return redirect()->back()->with('message', "Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
     }

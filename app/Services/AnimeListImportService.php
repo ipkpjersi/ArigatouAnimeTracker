@@ -11,16 +11,25 @@ use SimpleXMLElement;
 
 class AnimeListImportService
 {
-    public function import(string $xmlContent, $userId, $logger = null)
+    public function import(string $fileContent, $fileType, $userId, $logger = null)
     {
-        try {
+        if ($fileType === 'myanimelist') {
+            return $this->importFromMyAnimeList($fileContent, $userId, $logger);
+        } elseif ($fileType === 'arigatou') {
+            return $this->importFromArigatou($fileContent, $userId, $logger);
+        } else {
+            //Unknown file type
+        }
+    }
+    private function importFromMyAnimeList(string $xmlContent, $userId, $logger = null)
+    {
+        $count = 0;
+        $startTime = microtime(true);
+         try {
             $xml = new SimpleXMLElement($xmlContent);
         } catch (\Exception $e) {
             \Log::error("An exception has occurred importing a MyAnimeList export: "  . $e->getMessage());
         }
-
-        $count = 0;
-        $startTime = microtime(true);
         $total = count($xml->anime);
         foreach ($xml->anime as $animeData) {
             $title = str_replace('"', '', (string)$animeData->series_title);
@@ -70,6 +79,11 @@ class AnimeListImportService
         }
 
         $duration = microtime(true) - $startTime;
-        return ["count" => $count, "duration" => $duration, "total" => $total];
+        return ["count" => $count, "total" => $total, "duration" => $duration];
+    }
+
+    private function importFromArigatou(string $jsonContent, $userId, $logger = null)
+    {
+        // New JSON parsing logic here
     }
 }

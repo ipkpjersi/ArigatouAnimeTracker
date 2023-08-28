@@ -37,6 +37,7 @@ class ImportMyAnimeListData extends Command
             return;
         }
         $userId = $user->id;
+        $importType = "myanimelist";
         $this->info("Starting MyAnimeList data import for user $username (ID $userId)...");
 
         try {
@@ -46,7 +47,7 @@ class ImportMyAnimeListData extends Command
                 $this->info($message);
             };
 
-            $result = $importer->import($xmlContent, $userId, $logger);
+            $result = $importer->import($xmlContent, $importType, $userId, $logger);
             $duration = round($result['duration'], 2);
 
             $this->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
