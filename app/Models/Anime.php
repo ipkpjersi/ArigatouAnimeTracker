@@ -40,4 +40,12 @@ class Anime extends Model
     {
         return $this->belongsTo(WatchStatus::class, 'watch_status_id');
     }
+
+    public function getMalScoringUsers() {
+        return $this->mal_users;
+    }
+
+    public function getMalListMembers() {
+        return $this->mal_members;
+    }
 }
