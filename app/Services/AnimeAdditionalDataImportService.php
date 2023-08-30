@@ -100,6 +100,7 @@ class AnimeAdditionalDataImportService
 
             if ($description) {
                 $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $sqlFile, $logger);
+                $logger && $logger("Successfully updated description and genres for anime: " . $row->title);
                 $count++;
             } else {
                 $logger && $logger("Failed to update description and genres for anime: " . $row->title);
