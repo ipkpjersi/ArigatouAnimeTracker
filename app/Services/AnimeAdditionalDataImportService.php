@@ -42,12 +42,15 @@ class AnimeAdditionalDataImportService
 
             $description = null;
             $genres = null;
+            $malRank = null;
+            $malMean = null;
+            $malPopularity = null;
 
             // Try MAL first
             if ($malId) {
                 $response = Http::withHeaders([
                     'X-MAL-CLIENT-ID' => env('MAL_CLIENT_ID')
-                ])->get('https://api.myanimelist.net/v2/anime/' . $malId . '?fields=id,title,synopsis,genres');
+                ])->get('https://api.myanimelist.net/v2/anime/' . $malId . '?fields=id,title,synopsis,genres,mean,rank,popularity');
 
                 if ($response && $response->successful()) {
                     $data = $response->json();
@@ -56,7 +59,12 @@ class AnimeAdditionalDataImportService
                         return str_replace('"', "", $genre['name']);
                     }, $data['genres'] ?? []);
                     $genres = $genres ? implode(',', $genres) : null;
-                    $logger && $logger("Update description and genres for anime: " . $row->title . " from MAL");
+
+                    $malRank = $data['rank'] ?? null;
+                    $malMean = $data['mean'] ?? null;
+                    $malPopularity = $data['popularity'] ?? null;
+
+                    $logger && $logger("Update data for anime: " . $row->title . " from MAL");
                 }
             }
 
@@ -89,7 +97,7 @@ class AnimeAdditionalDataImportService
             }
 
             if ($description) {
-                $this->updateAnimeData($row, $description, $genres, $sqlFile, $logger);
+                $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $sqlFile, $logger);
                 $count++;
             } else {
                 $logger && $logger("Failed to update description and genres for anime: " . $row->title);
@@ -137,22 +145,32 @@ class AnimeAdditionalDataImportService
         ];
     }
 
-    private function updateAnimeData($anime, $description, $genres, $sqlFile, $logger = null)
+    private function updateAnimeData($anime, $description, $genres, $malRank, $malMean, $malPopularity, $sqlFile, $logger = null)
     {
-        DB::table('anime')
-            ->where('id', $anime->id)
-            ->update([
-                'description' => $description,
-                'genres' => $genres
-            ]);
+        $updateData = [];
+
+        if ($description !== null) $updateData['description'] = $description;
+        if ($genres !== null) $updateData['genres'] = $genres;
+        if ($malRank !== null) $updateData['mal_rank'] = $malRank;
+        if ($malMean !== null) $updateData['mal_mean'] = $malMean;
+        if ($malPopularity !== null) $updateData['mal_popularity'] = $malPopularity;
+
+        if (!empty($updateData)) {
+            DB::table('anime')
+                ->where('id', $anime->id)
+                ->update($updateData);
+        }
 
         if ($sqlFile) {
-            $description = addslashes($description);
-            $genres = addslashes($genres);
             $year = empty($anime->year) ? 'NULL' : $anime->year;
             $season = empty($anime->season) ? 'NULL' : "'$anime->season'";
             $title = addslashes(str_replace('"', '', $anime->title));
-            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres' WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
+            $malMean = !empty($malMean) ? $malMean : $anime->mal_mean ?? 'NULL';
+            $malRank = !empty($malRank) ? $malRank : $anime->mal_rank ?? 'NULL';
+            $malPopularity = !empty($malPopularity) ? $malPopularity : $anime->mal_popularity ?? 'NULL';
+            $description = !empty($description) ? addslashes($description) : $anime->description ?? 'NULL';
+            $genres = !empty($genres) ? addslashes($genres) : $anime->genres ?? 'NULL';
+            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
     }
