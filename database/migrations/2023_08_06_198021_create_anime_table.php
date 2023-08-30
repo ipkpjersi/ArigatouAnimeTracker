@@ -32,8 +32,8 @@ return new class extends Migration
             $table->text('tags')->nullable();
             $table->text('description')->nullable();
             $table->text('genres')->nullable();
-            $table->integer('mal_rank')->nullable();
             $table->decimal('mal_mean', 4, 2)->nullable();
+            $table->integer('mal_rank')->nullable();
             $table->integer('mal_popularity')->nullable();
             $table->integer('is_deleted')->default(0);
             $table->timestamps();
