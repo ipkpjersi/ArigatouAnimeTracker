@@ -278,7 +278,7 @@ class AnimeController extends Controller
             Storage::put('exports/'.$fileName, $result['output']);
         } elseif ($exportType === 'arigatou') {
             $fileName = "{$fileNameBase}.json";
-            Storage::put('exports/'.$fileName, $result);
+            Storage::put('exports/'.$fileName, $result['output']);
         } else {
             return redirect()->back()->with('message', 'Export failed due to unknown file type.');
         }

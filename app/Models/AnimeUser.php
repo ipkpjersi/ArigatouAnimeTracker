@@ -31,7 +31,7 @@ class AnimeUser extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function watchStatus()
+    public function watch_status()
     {
         return $this->belongsTo(WatchStatus::class);
     }

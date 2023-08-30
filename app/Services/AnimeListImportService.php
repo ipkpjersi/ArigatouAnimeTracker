@@ -85,6 +85,61 @@ class AnimeListImportService
 
     private function importFromArigatou(string $jsonContent, $userId, $logger = null)
     {
-        // New JSON parsing logic here
+        $count = 0;
+        $startTime = microtime(true);
+        $animeDataArray = json_decode($jsonContent, true)['animeList'] ?? [];
+
+        $total = count($animeDataArray);
+
+        foreach ($animeDataArray as $animeData) {
+            $title = str_replace('"', '', $animeData['title']);
+            $type = $animeData['type'];
+            $episodes = $animeData['episodes'];
+            $watchStatus = strtoupper($animeData['watch_status']);
+            $score = $animeData['score'];
+            $progress = $animeData['progress'];
+
+            $animeType = AnimeType::firstOrCreate(['type' => $type]);
+
+            // Check for existing anime
+            $existingAnime = Anime::where('title', $title)
+                ->where('anime_type_id', $animeType->id)
+                ->where('episodes', $episodes)
+                ->first();
+
+            $animeId = $existingAnime->id ?? null;
+
+            if (!$animeId) {
+                $logger && $logger("Could not find match for anime $title with type {$animeType->type} and $episodes episodes");
+                continue;
+            }
+
+            // Check for duplicate anime_user entry
+            $existingEntry = AnimeUser::where('anime_id', $animeId)
+                ->where('user_id', $userId)
+                ->first();
+
+            if ($existingEntry) {
+                $logger && $logger("Skipping existing anime $title with type {$animeType->type} and $episodes episodes");
+                continue;
+            }
+
+            // Handle watch status
+            $watchStatusModel = WatchStatus::firstOrCreate(['status' => $watchStatus]);
+
+            // Insert into the anime_user table
+            AnimeUser::create([
+                'anime_id' => $animeId,
+                'user_id' => $userId,
+                'watch_status_id' => $watchStatusModel->id,
+                'score' => $score,
+                'progress' => $progress,
+            ]);
+
+            $count++;
+        }
+
+        $duration = microtime(true) - $startTime;
+        return ["count" => $count, "total" => $total, "duration" => $duration];
     }
 }

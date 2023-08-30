@@ -23,7 +23,7 @@ class AnimeListExportService
     private function exportToMyAnimeList($userId, $logger = null)
     {
         $startTime = microtime(true);
-        $animeList = AnimeUser::with('anime', 'watchStatus')
+        $animeList = AnimeUser::with('anime', 'watch_status')
             ->where('user_id', $userId)
             ->get();
         $total = count($animeList);
@@ -50,7 +50,7 @@ class AnimeListExportService
             $anime->addChild('my_score', $animeUser->score);
             $anime->addChild('my_storage', '');
             $anime->addChild('my_storage_value', '0.00');
-            $anime->addChild('my_status', str_replace("-", " ", strtolower($animeUser->watchStatus->status)));
+            $anime->addChild('my_status', str_replace("-", " ", strtolower($animeUser->watch_status->status)));
             $anime->addChild('my_comments', '');
             $anime->addChild('my_times_watched', 0);
             $anime->addChild('my_rewatch_value', '');
@@ -62,34 +62,37 @@ class AnimeListExportService
             $anime->addChild('my_sns', 'default');
             $anime->addChild('update_on_import', 0);
         }
-        $duration = microtime(true) - $startTime;
         $dom = new \DOMDocument("1.0");
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $dom->loadXML($xml->asXML()); // this line loads your existing XML string
         $formattedXml = $dom->saveXML();
+        $duration = microtime(true) - $startTime;
         return ["total" => $total, "duration" => $duration, "output" => $formattedXml];
     }
 
     private function exportToArigatou($userId, $logger = null)
     {
-        $animeList = AnimeUser::with('anime', 'watchStatus')
+        $startTime = microtime(true);
+        $animeList = AnimeUser::with('anime', 'watch_status')
             ->where('user_id', $userId)
             ->get();
-
+        $total = count($animeList);
         $animeArray = [];
 
         foreach ($animeList as $animeUser) {
             $animeArray[] = [
                 'title' => $animeUser->anime->title,
-                'type' => $animeUser->anime->animeType->type,
+                'type' => $animeUser->anime->anime_type->type,
                 'episodes' => $animeUser->anime->episodes,
-                'watch_status' => $animeUser->watchStatus->status,
+                'watch_status' => $animeUser->watch_status->status,
                 'score' => $animeUser->score,
                 'progress' => $animeUser->progress
             ];
         }
 
-        return json_encode(['animeList' => $animeArray]);
+        $formattedJson = json_encode(['animeList' => $animeArray], JSON_PRETTY_PRINT);
+        $duration = microtime(true) - $startTime;
+        return ["total" => $total, "duration" => $duration, "output" => $formattedJson];
     }
 }
