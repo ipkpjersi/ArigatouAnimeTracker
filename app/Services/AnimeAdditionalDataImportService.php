@@ -61,7 +61,6 @@ class AnimeAdditionalDataImportService
                         return str_replace('"', "", $genre['name']);
                     }, $data['genres'] ?? []);
                     $genres = $genres ? implode(',', $genres) : null;
-
                     $malRank = $data['rank'] ?? null;
                     $malMean = $data['mean'] ?? null;
                     $malPopularity = $data['popularity'] ?? null;
@@ -89,7 +88,6 @@ class AnimeAdditionalDataImportService
                 if ($response && $response->successful()) {
                     $data = $response->json();
                     $description = $data['data']['attributes']['synopsis'] ?? null;
-
                     $genresResponse = Http::get('https://kitsu.io/api/edge/anime/' . $kitsuId . '/genres');
                     $genresData = $genresResponse->json();
                     $genres = array_map(function ($genre) {
