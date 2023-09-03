@@ -25,7 +25,7 @@ class AnimeImageDownloadService
             if ($current->picture) {
                 $this->downloadImageFromUrl($current->picture, 'picture', $logger);
             }
-            sleep(5);
+            sleep(rand(5, 22));
         }
         $duration = microtime(true) - $startTime;
         return [
