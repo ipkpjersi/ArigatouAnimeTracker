@@ -35,8 +35,8 @@ return new class extends Migration
             $table->decimal('mal_mean', 4, 2)->nullable();
             $table->integer('mal_rank')->nullable();
             $table->integer('mal_popularity')->nullable();
-            $table->integer('mal_users')->nullable();
-            $table->integer('mal_members')->nullable();
+            $table->integer('mal_scoring_users')->nullable();
+            $table->integer('mal_list_members')->nullable();
             $table->integer('is_deleted')->default(0);
             $table->timestamps();
         });

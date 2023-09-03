@@ -148,7 +148,7 @@ class AnimeAdditionalDataImportService
         ];
     }
 
-    private function updateAnimeData($anime, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $sqlFile, $logger = null)
+    private function updateAnimeData($anime, $description, $genres, $malRank, $malMean, $malPopularity, $malScoringUsers, $malListMembers, $sqlFile, $logger = null)
     {
         $updateData = [];
 
@@ -157,8 +157,8 @@ class AnimeAdditionalDataImportService
         if ($malRank !== null) $updateData['mal_rank'] = $malRank;
         if ($malMean !== null) $updateData['mal_mean'] = $malMean;
         if ($malPopularity !== null) $updateData['mal_popularity'] = $malPopularity;
-        if ($malUsers !== null) $updateData['mal_users'] = $malUsers;
-        if ($malMembers !== null) $updateData['mal_members'] = $malMembers;
+        if ($malScoringUsers !== null) $updateData['mal_users'] = $malScoringUsers;
+        if ($malListMembers !== null) $updateData['mal_members'] = $malListMembers;
 
         if (!empty($updateData)) {
             DB::table('anime')
@@ -173,11 +173,11 @@ class AnimeAdditionalDataImportService
             $malMean = !empty($malMean) ? $malMean : $anime->mal_mean ?? 'NULL';
             $malRank = !empty($malRank) ? $malRank : $anime->mal_rank ?? 'NULL';
             $malPopularity = !empty($malPopularity) ? $malPopularity : $anime->mal_popularity ?? 'NULL';
-            $malUsers = !empty($malUsers) ? $malUsers : $anime->mal_users ?? 'NULL';
-            $malMembers = !empty($malMembers) ? $malMembers : $anime->mal_members ?? 'NULL';
+            $malScoringUsers = !empty($malScoringUsers) ? $malScoringUsers : $anime->mal_scoring_users ?? 'NULL';
+            $malListMembers = !empty($malListMembers) ? $malListMembers : $anime->mal_list_members ?? 'NULL';
             $description = !empty($description) ? addslashes($description) : $anime->description ?? 'NULL';
             $genres = !empty($genres) ? addslashes($genres) : $anime->genres ?? 'NULL';
-            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_users = $malUsers, mal_members = $malMembers WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
+            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
     }
