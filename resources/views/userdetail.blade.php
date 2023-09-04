@@ -31,7 +31,21 @@
                             <h5 class="font-bold mb-2">Status Counts:</h5>
                             <ul>
                                 @foreach($stats['animeStatusCounts'] as $status => $count)
-                                    <li>{{ $status }}: {{ $count }}</li>
+                                    <li>
+                                        <span class="inline-block rounded-full h-4 w-4 mr-2"
+                                              style="
+                                                background-color: {{ match($status) {
+                                                    'WATCHING' => '#4CAF50',
+                                                    'COMPLETED' => '#2196F3',
+                                                    'ON-HOLD' => '#FFC107',
+                                                    'DROPPED' => '#F44336',
+                                                    'PLAN-TO-WATCH' => '#9C27B0',
+                                                    default => '#000'
+                                                } }};
+                                              ">
+                                        </span>
+                                        {{ $status }}: {{ $count }}
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>
