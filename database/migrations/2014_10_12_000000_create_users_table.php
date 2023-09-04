@@ -25,6 +25,8 @@ return new class extends Migration
             $table->boolean('is_banned')->default(false);
             $table->integer('anime_list_pagination_size')->default(15);
             $table->boolean('show_anime_list_number')->default(false);
+            $table->string('registration_ip')->nullable();
+            $table->string('login_ip')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
