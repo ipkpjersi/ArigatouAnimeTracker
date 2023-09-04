@@ -24,11 +24,12 @@
                     <x-nav-link href="{{ route('users.list') }}" :active="request()->routeIs('users.list')">
                         {{ __('Users') }}
                     </x-nav-link>
+
                 </div>
             </div>
 
             <!-- Global Searching -->
-            <div class="hidden items-center space-x-4 md:flex">
+            <div class="hidden items-center space-x-4 xl:flex">
                 <input id="globalSearch" type="text" class="dark:bg-gray-800 dark:text-gray-100 rounded-md p-2" placeholder="Search...">
                 <select id="searchType" class="rounded-md p-2 dark:bg-gray-800 dark:text-gray-100 no_dropdown_arrow">
                     <option value="anime">Anime</option>
@@ -64,7 +65,6 @@
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-
                                 <x-dropdown-link :href="route('logout')"
                                         onclick="event.preventDefault();
                                                     this.closest('form').submit();">
@@ -73,6 +73,15 @@
                             </form>
                         </x-slot>
                     </x-dropdown>
+                </div>
+            @else
+                <div class="hidden absolute sm:flex sm:items-center" style="right: 1rem; top: 1.25rem;">
+                    <a href="{{ route('login') }}" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
+                        Login
+                    </a>
+                    <a href="{{ route('register') }}" class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">
+                        Register
+                    </a>
                 </div>
             @endif
 
@@ -100,12 +109,24 @@
             <x-responsive-nav-link href="{{ route('users.list') }}" :active="request()->routeIs('users.list')">
                 {{ __('Users') }}
             </x-responsive-nav-link>
+            <!-- Login and Register Links for Mobile -->
+            @if (Auth::user() == null)
+                <div class="border-t border-gray-200 dark:border-gray-700"></div>
+            <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">
+                    {{ __('Login') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('register')" :active="request()->routeIs('register')">
+                    {{ __('Register') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
+
         @if (Auth::user() != null)
-            <!-- Responsive Settings Options -->
-            <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
-                <div class="px-4">
-                    <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->username ?? ""}}</div>
+            <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center px-4">
+                    <div class="ml-3">
+                        <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->username }}</div>
+                    </div>
                 </div>
 
                 <div class="mt-3 space-y-1">
@@ -121,8 +142,8 @@
                         @csrf
 
                         <x-responsive-nav-link :href="route('logout')"
-                                onclick="event.preventDefault();
-                                            this.closest('form').submit();">
+                            onclick="event.preventDefault();
+                            this.closest('form').submit();">
                             {{ __('Log Out') }}
                         </x-responsive-nav-link>
                     </form>
