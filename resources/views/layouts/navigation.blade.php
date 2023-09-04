@@ -133,7 +133,6 @@
                             <img onerror="this.onerror=null; this.src='/img/notfound.gif';" class="rounded-lg shadow-md h-8 w-8 mr-2" src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->username }}" />
                             <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->username }}</div>
                         </div>
-
                     </div>
                 </div>
 
