@@ -5,9 +5,8 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';*/
 
-.dark p,
-.dark div {
-    color: #F3F4F6; /* text-gray-100 */
+.dark p:not(.no-dark), .dark div:not(.no-dark) {
+    color: #f3f4f6; /* text-gray-100 */
 }
 
 .dataTables_length select {

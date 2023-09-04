@@ -5,6 +5,13 @@
         <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
         <h2 class="text-xl text-gray-700 dark:text-gray-300">Arigatou Anime Tracker</h2>
     </div>
+
+    <!-- Custom Error Message -->
+    @if (session('error'))
+        <div class="mb-4 no-dark text-red-600">
+            {{ session('error') }}
+        </div>
+    @endif
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
