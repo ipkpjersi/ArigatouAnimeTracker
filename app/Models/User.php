@@ -25,7 +25,8 @@ class User extends Authenticatable
         'show_adult_content',
         'avatar',
         'anime_list_pagination_size',
-        'show_anime_list_number'
+        'show_anime_list_number',
+        'registration_ip'
     ];
 
     /**
