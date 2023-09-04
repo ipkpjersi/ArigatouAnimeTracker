@@ -48,5 +48,12 @@
                 {{ __('Register') }}
             </x-primary-button>
         </div>
+
+        <!-- Custom Error Message -->
+        @if (session('error'))
+            <div class="mt-4 mb-4 no-dark text-red-600">
+                {{ session('error') }}
+            </div>
+        @endif
     </form>
 </x-guest-layout>
