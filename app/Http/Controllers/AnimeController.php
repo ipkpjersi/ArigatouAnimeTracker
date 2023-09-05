@@ -107,6 +107,7 @@ class AnimeController extends Controller
     public function userAnimeListV2($username)
     {
         $user = User::where('username', $username)->firstOrFail();
+        $show_anime_list_number = $user->show_anime_list_number;
         $watchStatuses = WatchStatus::all();
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
         $userAnimeCount = $user->anime()
@@ -116,7 +117,8 @@ class AnimeController extends Controller
             'username' => $username,
             'watchStatuses' => $watchStatuses,
             'watchStatusMap' => $watchStatusMap,
-            'userAnimeCount' => $userAnimeCount
+            'userAnimeCount' => $userAnimeCount,
+            'show_anime_list_number' => $show_anime_list_number
         ]);
     }
 

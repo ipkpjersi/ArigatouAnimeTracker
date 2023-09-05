@@ -14,8 +14,9 @@
                         <table id="userAnimeTable" class="min-w-full">
                             <thead>
                                 <tr>
-                                    <!-- Adjust your table headers accordingly -->
-                                    <th style="display:none">Anime ID</th>
+                                    @if ($show_anime_list_number)
+                                        <th>#</th>
+                                    @endif
                                     <th>Picture</th>
                                     <th>Name</th>
                                     <th>Type</th>
@@ -80,14 +81,20 @@
         }
     </script>
     <script type="module">
+        import '/js/jquery.doubleScroll.js';
         import '/js/jquery.dataTables.yadcf.js';
         $(document).ready(function() {
+            $('.double-scroll').doubleScroll();
             var watchStatusMap = @json($watchStatusMap);
-            let columns = [
-                { data: 'thumbnail', name: 'thumbnail', searchable: false, render: function(data, type, row) {
+            let columns = [];
+            if ("{{ $show_anime_list_number }}" == "1") {
+                columns.push({ data: null, searchable: false, orderable: false, defaultContent: '', targets: 0 });
+            }
+            columns.push(
+                { data: 'thumbnail', name: 'thumbnail', searchable: false, responsivePriority: 1, render: function(data, type, row) {
                     return '<span style="display:none">' + row.id  + '</span>' + '<img src="'+data+'" alt="'+row.title+' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'{{ asset('img/notfound.gif') }}\'">' + '<input type="hidden" name="anime_id[]" value="'+row.anime_id+'">';
                 }},
-                { data: 'title', name: 'title', render: function(data, type, row) {
+                { data: 'title', name: 'title', responsivePriority: 2,  render: function(data, type, row) {
                     return '<a href="/anime/' + row.anime_id + '">' + data + '</a>';
                 }},
                 { data: 'anime_type.type', name: 'anime_type.type', searchable: 'false' },  // Adjust based on actual returned data structure
@@ -124,6 +131,7 @@
                     data: 'score',
                     name: 'score',
                     searchable: false,
+                    responsivePriority: 3,
                     render: function(data, type, row) {
                         if('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
                             var options = '';
@@ -137,7 +145,7 @@
                         }
                     }
                 }
-            ];
+            );
             //if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
                 columns.push({
                     data: 'sort_order',
@@ -162,6 +170,7 @@
                 {
                     data: 'year',
                     name: 'year',
+                    responsivePriority: 4,
                     searchable: false
                 },
             );
@@ -177,6 +186,16 @@
                     }
                 });
             }
+            let rowCallback = "";
+            if ("{{ $show_anime_list_number }}" == "1") {
+                rowCallback = function(row, data, index) {
+                    var info = $(this).DataTable().page.info();
+                    var pageNo = info.page;
+                    var length = info.length;
+                    var realIndex = pageNo * length + index + 1;
+                    $('td:eq(0)', row).html(realIndex);
+                };
+            }
             $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -187,6 +206,8 @@
                     let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
                     $('#userAnimeTable_filter').prepend(resetBtn);
                 },
+                responsive: true,
+                rowCallback: rowCallback
             });
         });
     </script>
