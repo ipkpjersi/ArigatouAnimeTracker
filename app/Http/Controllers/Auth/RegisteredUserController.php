@@ -36,6 +36,7 @@ class RegisteredUserController extends Controller
 
         $recentRegistrations = User::where('registration_ip', $ipAddress)
         ->where('created_at', '>=', now()->subDay())
+        ->where('registration_ip', '<>', '127.0.0.1')
         ->count();
 
         if ($recentRegistrations >= config("global.recent_registrations_limit_daily")) {
