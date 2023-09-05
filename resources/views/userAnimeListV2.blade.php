@@ -100,7 +100,7 @@
                 { data: 'anime_type.type', name: 'anime_type.type', searchable: 'false' },  // Adjust based on actual returned data structure
                 { data: 'anime_status.status', name: 'anime_status.status', searchable: 'false' }, // Adjust based on actual returned data structure
                 { data: 'watch_status_id', name: 'watch_status_id', searchable: 'false', render: function(data, type, row) {
-                    console.log("watch_status_id data" + data);
+                    //console.log("watch_status_id data" + data);
                     if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
                         var options = '';
                         options += options += '<option value="">Pick an option...</option>';
