@@ -193,11 +193,16 @@ class AnimeController extends Controller
         $watch_status_ids = $request->input('watch_status_id');
         $scores = $request->input('score');
         $sort_orders = $request->input('sort_order');
+        $progresses = $request->input('progress');
 
         for ($i = 0; $i < $count; $i++) {
             $anime = Anime::find($anime_ids[$i]);
-            $progress = $watch_status_ids[$i] == WatchStatus::where('status', 'COMPLETED')->first()->id ? $anime->episodes : 0;
-
+            $progress = $progresses[$i] ?? 0;
+            if ($watch_status_ids[$i] == WatchStatus::where('status', 'COMPLETED')->first()->id) {
+                $progress = $anime->episodes;
+            } else if ($watch_status_ids[$i] == WatchStatus::where('status', 'PLAN-TO-WATCH')->first()->id) {
+                $progress = 0;
+            }
             DB::table('anime_user')->where('user_id', auth()->user()->id)
             ->where('anime_id', $anime_ids[$i])
             ->update([

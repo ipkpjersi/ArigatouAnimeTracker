@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-[1650px] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form action="{{ route('user.anime.update.v2', ['username' => $username]) }}" method="POST">
@@ -21,6 +21,7 @@
                                     <th>Type</th>
                                     <th>Status</th>
                                     <th>Watch Status</th>
+                                    <th>Progress</th>
                                     <th>Score</th>
                                     {{-- @if(auth()->user() != null && auth()->user()->username === $username) --}}
                                         <th>Sort Order</th>
@@ -102,6 +103,23 @@
                         return watchStatusMap[data] || 'UNKNOWN';
                     }
                 }},
+                {
+                    data: 'progress',
+                    name: 'progress',
+                    searchable: false,
+                    render: function(data, type, row) {
+                        if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
+                            var options = '';
+                            options += '<option value="">Pick an option...</option>';
+                            for(var i = 1; i <= row.episodes; i++) {
+                                options += '<option value="'+i+'" '+(data == i ? 'selected' : '')+'>'+i+'</option>';
+                            }
+                            return '<select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
+                        } else {
+                            return data || '0';
+                        }
+                    }
+                },
                 {
                     data: 'score',
                     name: 'score',
