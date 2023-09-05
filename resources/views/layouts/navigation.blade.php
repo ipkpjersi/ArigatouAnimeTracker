@@ -116,7 +116,7 @@
             <!-- Login and Register Links for Mobile -->
             @if (Auth::user() == null)
                 <div class="border-t border-gray-200 dark:border-gray-700"></div>
-            <x-responsive-nav-link :href="route('login')">
+                <x-responsive-nav-link :href="route('login')">
                     {{ __('Login') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('register')">
