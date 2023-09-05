@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-[1650px] mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-[1550px] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form action="{{ route('user.anime.update', ['username' => $username]) }}" method="POST">
@@ -23,7 +23,7 @@
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Name</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Type</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 sm:">Status</th>
-                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Watch Status</th>
+                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 min-w-[165px]">Watch Status</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Progress</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 min-w-[70px]">Score</th>
                                         @if(auth()->user() != null && auth()->user()->username === $username)
@@ -49,7 +49,7 @@
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Year</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Type</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 sm:">Status</th>
-                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 min-w-[150px]">Watch Status</th>
+                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 min-w-[165px]">Watch Status</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Progress</th>
                                         @if(auth()->user() != null && auth()->user()->username === $username)
                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Sort Order</th>
@@ -75,7 +75,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_status)->status }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if(auth()->user() != null && auth()->user()->username === $username)
-                                                    <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">
+                                                    <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800  min-w-[100px]" style="padding-right: 36px">
                                                         <option value="">Pick a status...</option>
                                                         @foreach ($watchStatuses as $status)
                                                             <option value="{{ $status->id }}" @if($anime->pivot->watch_status_id == $status->id) selected @endif>

@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-[1650px] mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-[1550px] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form action="{{ route('user.anime.update.v2', ['username' => $username]) }}" method="POST">
@@ -21,7 +21,7 @@
                                     <th>Name</th>
                                     <th>Type</th>
                                     <th>Status</th>
-                                    <th>Watch Status</th>
+                                    <th class="md:min-w-[90px]">Watch Status</th>
                                     <th>Progress</th>
                                     <th>Score</th>
                                     {{-- @if(auth()->user() != null && auth()->user()->username === $username) --}}
