@@ -126,6 +126,7 @@
         </div>
 
         @if (Auth::user() != null)
+            <!-- Responsive Settings Options -->
             <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center px-4">
                     <div class="ml-3">
