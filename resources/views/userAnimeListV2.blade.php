@@ -21,7 +21,7 @@
                                     <th>Name</th>
                                     <th>Type</th>
                                     <th>Status</th>
-                                    <th class="md:min-w-[90px]">Watch Status</th>
+                                    <th>Watch Status</th>
                                     <th>Progress</th>
                                     <th>Score</th>
                                     {{-- @if(auth()->user() != null && auth()->user()->username === $username) --}}
@@ -83,6 +83,7 @@
     <script type="module">
         import '/js/jquery.doubleScroll.js';
         import '/js/jquery.dataTables.yadcf.js';
+        import '/js/dataTables.colReorder.min.js';
         $(document).ready(function() {
             $('.double-scroll').doubleScroll();
             var watchStatusMap = @json($watchStatusMap);
@@ -91,10 +92,10 @@
                 columns.push({ data: null, searchable: false, orderable: false, defaultContent: '', targets: 0 });
             }
             columns.push(
-                { data: 'thumbnail', name: 'thumbnail', searchable: false, responsivePriority: 1, render: function(data, type, row) {
+                { data: 'thumbnail', name: 'thumbnail', searchable: false, render: function(data, type, row) {
                     return '<span style="display:none">' + row.id  + '</span>' + '<img src="'+data+'" alt="'+row.title+' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'{{ asset('img/notfound.gif') }}\'">' + '<input type="hidden" name="anime_id[]" value="'+row.anime_id+'">';
                 }},
-                { data: 'title', name: 'title', responsivePriority: 2,  render: function(data, type, row) {
+                { data: 'title', name: 'title', render: function(data, type, row) {
                     return '<a href="/anime/' + row.anime_id + '">' + data + '</a>';
                 }},
                 { data: 'anime_type.type', name: 'anime_type.type', searchable: 'false' },  // Adjust based on actual returned data structure
@@ -105,7 +106,7 @@
                         var options = '';
                         options += options += '<option value="">Pick an option...</option>';
                         options += '@foreach ($watchStatuses as $status) <option value="{{ $status->id }}" ' + (data === {{ $status->id }} ? 'selected' : '') + '>{{ $status->status }}</option> @endforeach';
-                        return '<select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
+                        return '<select name="watch_status_id[]" class="border rounded w-[151px] py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
                     } else {
                         return watchStatusMap[data] || 'UNKNOWN';
                     }
@@ -131,7 +132,6 @@
                     data: 'score',
                     name: 'score',
                     searchable: false,
-                    responsivePriority: 3,
                     render: function(data, type, row) {
                         if('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
                             var options = '';
@@ -139,7 +139,7 @@
                             for(var i = 1; i <= 10; i++) {
                                 options += '<option value="'+i+'" '+(data == i ? 'selected' : '')+'>'+i+'</option>';
                             }
-                            return '<select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
+                            return '<select name="score[]" class="border rounded w-[70px] py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
                         } else {
                             return data || 'UNKNOWN';
                         }
@@ -170,7 +170,6 @@
                 {
                     data: 'year',
                     name: 'year',
-                    responsivePriority: 4,
                     searchable: false
                 },
             );
@@ -196,6 +195,15 @@
                     $('td:eq(0)', row).html(realIndex);
                 };
             }
+            let colReorder = [];
+            if ($(window).width() <= 640) {
+                if ("{{ $show_anime_list_number }}" == "1") {
+                    colReorder = [0, 1, 2, 7, 11, 10, 3, 4, 5, 6, 8, 9, 12];
+                } else {
+                    colReorder = [0, 1, 6, 10, 9, 2, 3, 4, 5, 7, 8, 11];
+                }
+            }
+            //We cannot use datatables responsive for this because it injects additional rows which breaks updating our user anime list.
             $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -206,8 +214,12 @@
                     let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
                     $('#userAnimeTable_filter').prepend(resetBtn);
                 },
-                responsive: true,
-                rowCallback: rowCallback
+                rowCallback: rowCallback,
+                "sScrollX": "100%",
+                "bScrollCollapse": true,
+                colReorder: {
+                    order: colReorder
+                }
             });
         });
     </script>
