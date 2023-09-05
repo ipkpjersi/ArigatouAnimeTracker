@@ -35,11 +35,11 @@
                                         <span class="inline-block rounded-full h-4 w-4 mr-2"
                                               style="
                                                 background-color: {{ match($status) {
-                                                    'WATCHING' => '#4CAF50',
-                                                    'COMPLETED' => '#2196F3',
-                                                    'ON-HOLD' => '#FFC107',
-                                                    'DROPPED' => '#F44336',
-                                                    'PLAN-TO-WATCH' => '#9C27B0',
+                                                    'WATCHING' => '#3A8E40',
+                                                    'COMPLETED' => '#1D77C3',
+                                                    'ON-HOLD' => '#DAA005',
+                                                    'DROPPED' => '#A93226',
+                                                    'PLAN-TO-WATCH' => '#7D1F8F',
                                                     default => '#000'
                                                 } }};
                                               ">
