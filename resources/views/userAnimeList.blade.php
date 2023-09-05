@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-[1650px] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form action="{{ route('user.anime.update', ['username' => $username]) }}" method="POST">
@@ -22,6 +22,7 @@
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Type</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Status</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Watch Status</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Progress</th>
                                     <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Score</th>
                                     @if(auth()->user() != null && auth()->user()->username === $username)
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Sort Order</th>
@@ -61,7 +62,20 @@
                                                 {{ $watchStatusMap[$anime->pivot->watch_status_id] ?? 'UNKNOWN' }}
                                             @endif
                                         </td>
-
+                                        <td class="py-2 px-4 border-b border-gray-200">
+                                            @if(auth()->user() != null && auth()->user()->username === $username)
+                                                <select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">
+                                                    <option value="">Pick an option...</option>
+                                                    @for ($i = 1; $i <= $anime->episodes; $i++)
+                                                        <option value="{{ $i }}" @if($anime->pivot->progress == $i) selected @endif>
+                                                            {{ $i }}
+                                                        </option>
+                                                    @endfor
+                                                </select>
+                                            @else
+                                                {{ $anime->progress ?? '0' }}
+                                            @endif
+                                        </td>
                                         <td class="py-2 px-4 border-b border-gray-200">
                                             @if(auth()->user() != null && auth()->user()->username === $username)
                                                 <select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">

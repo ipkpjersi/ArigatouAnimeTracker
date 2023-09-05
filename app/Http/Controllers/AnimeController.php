@@ -166,7 +166,12 @@ class AnimeController extends Controller
                 $score = $request->score[$index];
                 $sortOrder = $request->sort_order[$index];
                 $watchStatusId = $request->watch_status_id[$index] ? $request->watch_status_id[$index] : null;
-                $progress = $watchStatusId == WatchStatus::where('status', 'COMPLETED')->first()->id ? $anime->episodes : 0;
+                $progress = $request->progress[$index] ?? 0;
+                if ($watchStatusId == WatchStatus::where('status', 'COMPLETED')->first()->id) {
+                    $progress = $anime->episodes;
+                } else if ($watchStatusId == WatchStatus::where('status', 'PLAN-TO-WATCH')->first()->id) {
+                    $progress = 0;
+                }
                 //Use syncWithoutDetaching to update the pivot data/junction table
                 //without removing the user's other rows in the junction table.
                 $user->anime()->syncWithoutDetaching([
