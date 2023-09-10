@@ -50,7 +50,9 @@
                         return data === 0 ? 'UNKNOWN' : data;
                     } },
                     { data: 'anime_status.status', name: 'anime_status_id' },
-                    { data: 'tags', name: 'tags', width:"15%", searchable: 'true' },
+                    { data: 'tags', name: 'tags', width:"15%", searchable: 'true', render: function(data, type, row) {
+                        return `<div class="tag-scroll">${data}</div>`;
+                    }},
                     { data: 'season_display', name: 'season', width: "18%" },
                     { data: 'year', name: 'year', width: "10%", render: function(data, type, row) {
                         return data === null ? 'UNKNOWN' : data;
