@@ -25,7 +25,6 @@
                                     Anime
                                 </button>
                             </x-slot>
-
                             <x-slot name="content">
                                 <x-dropdown-link href="{{ route('anime.list') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-600">
                                     {{ __('Anime Search') }}
