@@ -101,7 +101,6 @@ class AnimeController extends Controller
         $topAnime = $query->paginate(50);
         $userScores = [];
         if (Auth::check()) {
-            // Fetch the anime_user relationship for the logged-in user
             $userScores = Auth::user()->anime->pluck('pivot.score', 'pivot.anime_id');
         }
 
