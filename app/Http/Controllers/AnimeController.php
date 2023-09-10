@@ -91,6 +91,24 @@ class AnimeController extends Controller
     }
 
 
+    public function topAnime()
+    {
+        $query = Anime::orderBy('mal_mean', 'desc');
+        if (auth()->user() == null || auth()->user()->show_adult_content == false) {
+            //No need for this to be plain-text, so we'll use rot13.
+            $query = $query->where('tags', 'NOT LIKE', '%' . str_rot13('uragnv') . '%');
+        }
+        $topAnime = $query->paginate(50);
+        $userScores = [];
+        if (Auth::check()) {
+            // Fetch the anime_user relationship for the logged-in user
+            $userScores = Auth::user()->anime->pluck('pivot.score', 'pivot.anime_id');
+        }
+
+        return view('topanime', ['topAnime' => $topAnime, 'userScores' => $userScores]);
+    }
+
+
     public function userAnimeList($username) {
         $user = User::where('username', $username)->firstOrFail();
         $show_anime_list_number = $user->show_anime_list_number;
