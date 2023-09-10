@@ -157,8 +157,8 @@ class AnimeAdditionalDataImportService
         if ($malRank !== null) $updateData['mal_rank'] = $malRank;
         if ($malMean !== null) $updateData['mal_mean'] = $malMean;
         if ($malPopularity !== null) $updateData['mal_popularity'] = $malPopularity;
-        if ($malScoringUsers !== null) $updateData['mal_users'] = $malScoringUsers;
-        if ($malListMembers !== null) $updateData['mal_members'] = $malListMembers;
+        if ($malScoringUsers !== null) $updateData['mal_scoring_users'] = $malScoringUsers;
+        if ($malListMembers !== null) $updateData['mal_list_members'] = $malListMembers;
 
         if (!empty($updateData)) {
             DB::table('anime')
