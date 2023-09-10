@@ -30,7 +30,7 @@
 
                             <h5 class="font-bold mb-2">Status Counts:</h5>
                             <ul>
-                                @foreach($stats['animeStatusCounts'] as $status => $count)
+                                @foreach ($stats['animeStatusCounts'] as $status => $count)
                                     <li>
                                         <span class="inline-block rounded-full h-4 w-4 mr-2"
                                               style="

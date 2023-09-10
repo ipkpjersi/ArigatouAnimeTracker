@@ -37,12 +37,12 @@
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
                     <input id="dark_mode" type="radio" name="dark_mode" value="1" class="form-radio"
-                           @if(old('dark_mode', $user->dark_mode) === 1) checked @endif>
+                           @if (old('dark_mode', $user->dark_mode) === 1) checked @endif>
                     <span class="ml-2">Yes</span>
                 </label>
                 <label class="inline-flex items-center ml-6">
                     <input id="dark_mode" type="radio" name="dark_mode" value="0" class="form-radio"
-                           @if(old('dark_mode', $user->dark_mode) !== 1) checked @endif>
+                           @if (old('dark_mode', $user->dark_mode) !== 1) checked @endif>
                     <span class="ml-2">No</span>
                 </label>
             </div>
@@ -52,12 +52,12 @@
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
                     <input id="show_adult_content" type="radio" name="show_adult_content" value="1" class="form-radio"
-                           @if(old('show_adult_content', $user->show_adult_content) === 1) checked @endif>
+                           @if (old('show_adult_content', $user->show_adult_content) === 1) checked @endif>
                     <span class="ml-2">Yes</span>
                 </label>
                 <label class="inline-flex items-center ml-6">
                     <input id="show_adult_content" type="radio" name="show_adult_content" value="0" class="form-radio"
-                           @if(old('show_adult_content', $user->show_adult_content) !== 1) checked @endif>
+                           @if (old('show_adult_content', $user->show_adult_content) !== 1) checked @endif>
                     <span class="ml-2">No</span>
                 </label>
             </div>
@@ -72,12 +72,12 @@
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
                     <input id="show_anime_list_number" type="radio" name="show_anime_list_number" value="1" class="form-radio"
-                           @if(old('show_anime_list_number', $user->show_anime_list_number) === 1) checked @endif>
+                           @if (old('show_anime_list_number', $user->show_anime_list_number) === 1) checked @endif>
                     <span class="ml-2">Yes</span>
                 </label>
                 <label class="inline-flex items-center ml-6">
                     <input id="show_anime_list_number" type="radio" name="show_anime_list_number" value="0" class="form-radio"
-                           @if(old('show_anime_list_number', $user->show_anime_list_number) !== 1) checked @endif>
+                           @if (old('show_anime_list_number', $user->show_anime_list_number) !== 1) checked @endif>
                     <span class="ml-2">No</span>
                 </label>
             </div>

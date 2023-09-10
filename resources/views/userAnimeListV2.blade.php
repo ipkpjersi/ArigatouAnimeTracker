@@ -24,13 +24,13 @@
                                     <th>Watch Status</th>
                                     <th>Progress</th>
                                     <th>Score</th>
-                                    {{-- @if(auth()->user() != null && auth()->user()->username === $username) --}}
+                                    {{-- @if (auth()->user() != null && auth()->user()->username === $username) --}}
                                         <th>Sort Order</th>
                                     {{-- @endif --}}
                                     <th>Episodes</th>
                                     <th>Season</th>
                                     <th>Year</th>
-                                    @if(auth()->user() != null && auth()->user()->username === $username)
+                                    @if (auth()->user() != null && auth()->user()->username === $username)
                                         <th>Delete</th>
                                     @endif
                                     <!-- ... additional headers ... -->
@@ -40,16 +40,16 @@
                                 <!-- DataTables will auto-populate this section based on the data returned from the server -->
                             </tbody>
                         </table>
-                        @if(auth()->user() != null && auth()->user()->username === $username && $userAnimeCount > 0)
+                        @if (auth()->user() != null && auth()->user()->username === $username && $userAnimeCount > 0)
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                                 Save Changes
                             </button>
-                            @if(session()->has('message'))
+                            @if (session()->has('message'))
                                 <span class="ml-2">{{ session()->get('message') }}</span>
                             @endif
                         @endif
                     </form>
-                    @if(auth()->user() != null && auth()->user()->username === $username)
+                    @if (auth()->user() != null && auth()->user()->username === $username)
                         <a href="{{ route('import.animelist') }}">
                             <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                                 Import from MyAnimeList and More

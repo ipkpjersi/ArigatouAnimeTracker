@@ -38,7 +38,7 @@
                         @endif
                         <h4 class="font-bold mt-4 mb-2">Tags:</h4>
                         <ul>
-                            @foreach(explode(', ', $anime->tags) as $tag)
+                            @foreach (explode(', ', $anime->tags) as $tag)
                                 <li>{{ $tag }}</li>
                             @endforeach
                         </ul>
@@ -53,14 +53,14 @@
 
                         <h4 class="font-bold @if (!empty($anime->synonyms)) mt-4 @endif mb-2">More Details:</h4>
                         <ul>
-                            @foreach(explode(', ', $anime->sources) as $source)
+                            @foreach (explode(', ', $anime->sources) as $source)
                                 <li><a href="{{ $source }}" target="_blank" rel="noopener">{{ $source }}</a></li>
                             @endforeach
                         </ul>
 
                         <h4 class="font-bold mt-4 mb-2">Related Anime:</h4>
                         <ul>
-                            @foreach(explode(', ', $anime->relations) as $relation)
+                            @foreach (explode(', ', $anime->relations) as $relation)
                                 <li><a href="{{ $relation }}" target="_blank" rel="noopener">{{ $relation }}</a></li>
                             @endforeach
                         </ul>
