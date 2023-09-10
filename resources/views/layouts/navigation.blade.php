@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+<nav x-data="{ open: false, showAnimeDropdown: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -125,16 +125,17 @@
                 {{ __('Home') }}
             </x-responsive-nav-link>
             <!-- Anime Dropdown for Mobile -->
-            <button @click="showAnimeDropdown = !showAnimeDropdown" class="flex items-center">
-                <x-responsive-nav-link href="#" :active="false">
-                    {{ __('Anime') }}
-                </x-responsive-nav-link>
-            </button>
+            <x-responsive-nav-link @click="showAnimeDropdown = !showAnimeDropdown" href="#" :active="false">
+                {{ __('Anime') }}
+            </x-responsive-nav-link>
             <div x-show="showAnimeDropdown" class="ml-4 space-y-1">
-                <x-responsive-nav-link :href="route('anime.categories')" :active="request()->routeIs('anime.categories')">
-                    {{ __('Categories') }}
+                <x-responsive-nav-link :href="route('anime.list')">
+                    {{ __('Anime Search') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('anime.top')" :active="request()->routeIs('anime.top')">
+                <x-responsive-nav-link :href="route('anime.categories')">
+                    {{ __('Anime Categories') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('anime.top')">
                     {{ __('Top Anime') }}
                 </x-responsive-nav-link>
             </div>
