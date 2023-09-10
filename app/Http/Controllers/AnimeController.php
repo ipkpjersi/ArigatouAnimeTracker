@@ -187,11 +187,18 @@ class AnimeController extends Controller
         $category = strtolower($category);
 
         // Query the database
-        $animes = Anime::where(function($query) use ($category) {
+        $query = Anime::where(function($query) use ($category) {
             $query->whereRaw('LOWER(tags) LIKE ?', ["%$category%"]);
-        })->orderBy('mal_mean', 'desc')->paginate(50);
+        })->orderBy('mal_mean', 'desc');
 
-        return view('category', ['animes' => $animes, 'category' => ucfirst($category), 'viewType' => $view]);
+        if (auth()->user() == null || auth()->user()->show_adult_content == false) {
+            //No need for this to be plain-text, so we'll use rot13.
+            $query = $query->where('tags', 'NOT LIKE', '%' . str_rot13('uragnv') . '%');
+        }
+
+        $categoryAnime = $query->paginate(50);
+
+        return view('category', ['categoryAnime' => $categoryAnime, 'category' => ucfirst($category), 'viewType' => $view]);
     }
 
 

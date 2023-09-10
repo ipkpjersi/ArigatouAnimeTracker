@@ -15,11 +15,11 @@
                         <!-- Table View Here -->
                     @else
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                            @foreach ($animes as $anime)
+                            @foreach ($categoryAnime as $anime)
                                 <div class="m-2 p-4 rounded-lg shadow-lg bg-gray-100 dark:bg-gray-700 min-h-[300px]">
                                     <div class="flex flex-col">
                                         <h3 class="text-xl font-semibold mb-2">{{ $anime->title }}</h3>
-                                        <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }}" width="100" height="140" class="rounded mb-4">
+                                        <img src="{{ $anime->picture }}" alt="{{ $anime->title }}" width="100" height="140" class="rounded mb-4">
                                         <div>
                                             <p class="text-sm text-gray-600">{{ Str::limit($anime->description, 300) }}</p>
                                             <div class="mt-2">
@@ -34,7 +34,7 @@
                 </div>
             </div>
             <div id="paginationDiv" class="mt-4">
-                {{ $animes->links() }}
+                {{ $categoryAnime->links() }}
             </div>
         </div>
     </div>
