@@ -18,13 +18,30 @@
                     <x-nav-link href="{{ route('welcome') }}" :active="request()->routeIs('welcome') || request()->routeIs('home')">
                         {{ __('Home') }}
                     </x-nav-link>
-                    <x-nav-link href="{{ route('anime.list') }}" :active="request()->routeIs('anime.list')">
-                        {{ __('Anime') }}
-                    </x-nav-link>
+                    <div class="hidden sm:flex sm:items-center sm:ml-6">
+                        <x-dropdown align="left" width="48">
+                            <x-slot name="trigger" class="hover:border-gray-300 dark:hover:border-gray-700 focus:outline-none focus:text-gray-700 dark:focus:text-gray-300 focus:border-gray-300 dark:focus:border-gray-700">
+                                <button class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition duration-150 ease-in-out">
+                                    Anime
+                                </button>
+                            </x-slot>
+
+                            <x-slot name="content">
+                                <x-dropdown-link href="{{ route('anime.list') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-600">
+                                    {{ __('Anime Search') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link href="{{ route('anime.categories') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-600">
+                                    {{ __('Anime Categories') }}
+                                </x-dropdown-link>
+                                <x-dropdown-link href="{{ route('anime.top') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-600">
+                                    {{ __('Top Anime') }}
+                                </x-dropdown-link>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
                     <x-nav-link href="{{ route('users.list') }}" :active="request()->routeIs('users.list')">
                         {{ __('Users') }}
                     </x-nav-link>
-
                 </div>
             </div>
 
@@ -107,9 +124,20 @@
             <x-responsive-nav-link :href="route('welcome')" :active="request()->routeIs('welcome')">
                 {{ __('Home') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('anime.list') }}" :active="request()->routeIs('anime.list')">
-                {{ __('Anime') }}
-            </x-responsive-nav-link>
+            <!-- Anime Dropdown for Mobile -->
+            <button @click="showAnimeDropdown = !showAnimeDropdown" class="flex items-center">
+                <x-responsive-nav-link href="#" :active="false">
+                    {{ __('Anime') }}
+                </x-responsive-nav-link>
+            </button>
+            <div x-show="showAnimeDropdown" class="ml-4 space-y-1">
+                <x-responsive-nav-link :href="route('anime.categories')" :active="request()->routeIs('anime.categories')">
+                    {{ __('Categories') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('anime.top')" :active="request()->routeIs('anime.top')">
+                    {{ __('Top Anime') }}
+                </x-responsive-nav-link>
+            </div>
             <x-responsive-nav-link href="{{ route('users.list') }}" :active="request()->routeIs('users.list')">
                 {{ __('Users') }}
             </x-responsive-nav-link>
