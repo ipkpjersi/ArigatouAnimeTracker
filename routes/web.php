@@ -44,6 +44,10 @@ Route::get('/animelist-v2/data/{username}', [AnimeController::class, 'getUserAni
 
 Route::get('/top-anime', [AnimeController::class, 'topAnime'])->name('anime.top');
 
+Route::get('/categories', [AnimeController::class, 'categories'])->name('anime.categories');
+
+Route::get('/category/{category}/{view?}', [AnimeController::class, 'category'])->name('anime.category');
+
 //Protected routes
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
