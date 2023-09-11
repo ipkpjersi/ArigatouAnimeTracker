@@ -183,10 +183,8 @@ class AnimeController extends Controller
     }
 
     public function category($category, $view = 'card') {
-        // Convert the category to lowercase to ensure case-insensitive search
         $category = strtolower($category);
 
-        // Query the database
         $query = Anime::where(function($query) use ($category) {
             $query->whereRaw('LOWER(tags) LIKE ?', ["%$category%"]);
         })->orderBy('mal_mean', 'desc');
@@ -196,10 +194,21 @@ class AnimeController extends Controller
             $query = $query->where('tags', 'NOT LIKE', '%' . str_rot13('uragnv') . '%');
         }
 
+        $query->with(['users' => function($query) {
+            if (auth()->user()) {
+                $query->where('user_id', auth()->user()->id);
+            }
+        }]);
+
         $categoryAnime = $query->paginate(50);
 
-        return view('category', ['categoryAnime' => $categoryAnime, 'category' => ucfirst($category), 'viewType' => $view]);
+        return view('category', [
+            'categoryAnime' => $categoryAnime,
+            'category' => ucfirst($category),
+            'viewType' => $view
+        ]);
     }
+
 
 
 

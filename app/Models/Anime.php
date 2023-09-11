@@ -40,4 +40,9 @@ class Anime extends Model
     {
         return $this->belongsTo(WatchStatus::class, 'watch_status_id');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'anime_user')->withPivot('watch_status_id', 'score', 'sort_order', 'progress')->withTimestamps();
+    }
 }
