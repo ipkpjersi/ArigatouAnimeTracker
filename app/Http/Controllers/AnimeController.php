@@ -339,6 +339,46 @@ class AnimeController extends Controller
         return redirect()->back()->with('message', 'Changes saved successfully!');
     }
 
+    public function updateAnimeStatus(Request $request, $username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+
+        $anime_id = $request->input('anime_id');
+        $watchStatusId = $request->input('watch_status_id');
+
+        // If watchStatusId is 0, we remove the anime from the list
+        if ($watchStatusId == 0) {
+            $user->anime()->detach($anime_id);
+            return response()->json(['message' => 'Removed from list']);
+        }
+
+        $anime = Anime::find($anime_id);
+
+        if (!$anime) {
+            return response()->json(['message' => 'Anime not found'], 404);
+        }
+
+        // Otherwise, insert or update the anime status
+        $progress = $request->input('progress', 0);
+
+        if ($watchStatusId == WatchStatus::where('status', 'COMPLETED')->first()->id) {
+            $progress = $anime->episodes;
+        } elseif ($watchStatusId == WatchStatus::where('status', 'PLAN-TO-WATCH')->first()->id) {
+            $progress = 0;
+        }
+
+        // Use syncWithoutDetaching to update the pivot data/junction table
+        // without removing the user's other rows in the junction table.
+        $user->anime()->syncWithoutDetaching([
+            $anime_id => [
+                'watch_status_id' => $watchStatusId,
+                'progress' => $progress
+            ]
+        ]);
+
+        return response()->json(['message' => 'Your anime status has been updated']);
+    }
+
     public function addToList($id, $redirect = true)
     {
         $user = Auth::user();
