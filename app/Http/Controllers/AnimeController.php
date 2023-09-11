@@ -127,7 +127,16 @@ class AnimeController extends Controller
             $userScores = Auth::user()->anime->pluck('pivot.score', 'pivot.anime_id');
         }
         $watchStatuses = WatchStatus::all()->keyBy('id');
-        return view('topanime', ['topAnime' => $topAnime, 'userScores' => $userScores, 'watchStatuses' => $watchStatuses]);
+        $userAnimeStatuses = [];
+        if (Auth::check()) {
+            $userAnimeStatuses = Auth::user()->anime->pluck('pivot.watch_status_id', 'pivot.anime_id');
+        }
+        return view('topanime', [
+            'topAnime' => $topAnime,
+            'userScores' => $userScores,
+            'watchStatuses' => $watchStatuses,
+            'userAnimeStatuses' => $userAnimeStatuses
+        ]);
     }
 
     public function categories() {

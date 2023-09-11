@@ -36,7 +36,7 @@
                                     </td>
                                     <td>{{ $anime->mal_mean }}</td>
                                     @if (Auth::user() != null)
-                                        <td>{{ $userScores[$anime->id] ?? 'N/A' }}</td>
+                                        <td>{{ !empty($userScores[$anime->id]) ? $userScores[$anime->id] : 'N/A' ?? 'N/A' }}</td>
                                         <td>
                                             @if (Auth::user())
                                                 @php
