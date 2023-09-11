@@ -35,6 +35,23 @@
     color: #333;
 }
 
+.no_dropdown_arrow_blank_select-wrapper {
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.no_dropdown_arrow_blank {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  width: 100%;
+  border: none;
+  padding: 0.5em;
+  color: white;
+}
+
+
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button,
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button.previous.disabled,
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button.next.disabled,

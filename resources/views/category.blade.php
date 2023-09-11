@@ -31,11 +31,19 @@
                                             @php
                                                 $userAnime = $anime->users->firstWhere('id', Auth::id());
                                                 $watchStatusId = optional($userAnime)->pivot->watch_status_id ?? null;
-                                                $watchStatus = $watchStatusId ? $watchStatuses[$watchStatusId] : null;
+                                                $selectedStatus = $watchStatusId ? $watchStatuses[$watchStatusId] : null;
                                             @endphp
-                                            <button class="text-sm bg-blue-500 text-white rounded p-1 flex-1 focus:outline-none z-50">
-                                                {{ optional($watchStatus)->status ?? 'Add to List' }}
-                                            </button>
+                                        <div class="no_dropdown_arrow_blank_select-wrapper bg-blue-500">
+                                            <select
+                                                class="text-sm text-white rounded p-1 flex-1 focus:outline-none z-50 update-anime-status no_dropdown_arrow_blank"
+                                                data-anime-id="{{ $anime->id }}"
+                                            >
+                                                <option value="">{{ 'Add to List' }}</option>
+                                                @foreach ($watchStatuses as $id => $status)
+                                                    <option value="{{ $id }}" {{ $watchStatusId == $id ? 'selected' : '' }}>{{ $status->status }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                         @endif
                                     </div>
                                 </div>
@@ -49,4 +57,7 @@
             </div>
         </div>
     </div>
+    <script>
+
+    </script>
 </x-app-layout>
