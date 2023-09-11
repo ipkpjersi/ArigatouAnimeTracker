@@ -30,9 +30,11 @@
                                         @if (Auth::user())
                                             @php
                                                 $userAnime = $anime->users->firstWhere('id', Auth::id());
+                                                $watchStatusId = optional($userAnime)->pivot->watch_status_id ?? null;
+                                                $watchStatus = $watchStatusId ? $watchStatuses[$watchStatusId] : null;
                                             @endphp
                                             <button class="text-sm bg-blue-500 text-white rounded p-1 flex-1 focus:outline-none z-50">
-                                                {{ App\Models\WatchStatus::where('id', '=', optional($userAnime)->pivot?->watch_status_id)->first()->status ?? 'Add to List' }}
+                                                {{ optional($watchStatus)->status ?? 'Add to List' }}
                                             </button>
                                         @endif
                                     </div>

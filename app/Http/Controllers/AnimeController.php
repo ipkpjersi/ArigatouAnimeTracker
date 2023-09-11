@@ -201,11 +201,12 @@ class AnimeController extends Controller
         }]);
 
         $categoryAnime = $query->paginate(50);
-
+        $watchStatuses = WatchStatus::all()->keyBy('id');
         return view('category', [
             'categoryAnime' => $categoryAnime,
             'category' => ucfirst($category),
-            'viewType' => $view
+            'viewType' => $view,
+            'watchStatuses' => $watchStatuses
         ]);
     }
 
