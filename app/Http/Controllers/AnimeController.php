@@ -103,8 +103,8 @@ class AnimeController extends Controller
         if (Auth::check()) {
             $userScores = Auth::user()->anime->pluck('pivot.score', 'pivot.anime_id');
         }
-
-        return view('topanime', ['topAnime' => $topAnime, 'userScores' => $userScores]);
+        $watchStatuses = WatchStatus::all()->keyBy('id');
+        return view('topanime', ['topAnime' => $topAnime, 'userScores' => $userScores, 'watchStatuses' => $watchStatuses]);
     }
 
     public function categories() {
