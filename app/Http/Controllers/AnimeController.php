@@ -87,8 +87,31 @@ class AnimeController extends Controller
         if ($anime->season === "UNDEFINED") {
             $anime->season = "UNKNOWN";
         }
-        return view('animedetail', compact('anime'));
+        $watchStatuses = WatchStatus::all()->keyBy('id');
+
+        // Initialize with null or default values
+        $currentUserStatus = null;
+        $currentUserProgress = null;
+        $currentUserScore = null;
+        $currentUserSortOrder = null;
+
+        $user = auth()->user();
+        if($user) {
+            // Get the pivot table data for the current user and this anime
+            $animeUser = $user->anime()->where('anime_id', $id)->first();
+
+            if ($animeUser) {
+                // Pivot data can be accessed using the ->pivot property on the model
+                $currentUserStatus = $animeUser->pivot->watch_status_id;
+                $currentUserProgress = $animeUser->pivot->progress;
+                $currentUserScore = $animeUser->pivot->score;
+                $currentUserSortOrder = $animeUser->pivot->sort_order;
+            }
+        }
+
+        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder'));
     }
+
 
 
     public function topAnime()
@@ -281,7 +304,7 @@ class AnimeController extends Controller
             ->make(true);
     }
 
-    public function updateUserAnimeList(Request $request, $username) {
+    public function updateUserAnimeList(Request $request, $username, $redirectBack = false) {
         $user = User::where('username', $username)->firstOrFail();
 
         if ($request->has('anime_ids') && is_array($request->anime_ids)) {
@@ -307,6 +330,9 @@ class AnimeController extends Controller
                     ]
                 ]);
             }
+        }
+        if ($redirectBack) {
+            return redirect()->back()->with('message', 'Your anime list has been updated!');
         }
         return redirect()->route('user.anime.list', ['username' => $username])->with('message', 'Your anime list has been updated!');
     }
