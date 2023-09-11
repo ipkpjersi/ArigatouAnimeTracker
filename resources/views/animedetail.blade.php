@@ -8,6 +8,13 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                @if (session()->has('popup'))
+                    <div id="status-modal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50">
+                      <div class="p-4 bg-white dark:bg-black rounded">
+                        <p id="status-message">{{ session()->get('popup') }}</p>
+                      </div>
+                    </div>
+                @endif
                 @if (session()->has('message'))
                     <span class="text-center">{{ session()->get('message') }}</span>
                 @endif
@@ -55,8 +62,13 @@
                                     <!-- Progress -->
                                     <div class="mt-4">
                                         <label for="progress" class="block text-sm font-medium text-gray-600 dark:text-gray-300">In Progress:</label>
-                                        <input type="checkbox" name="progress[]" value="1" {{ $currentUserProgress ? 'checked' : '' }} class="mt-1">
+                                        <select name="progress[]" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-select block w-full">
+                                            @for ($i = 0; $i <= $anime->episodes; $i++)
+                                                <option value="{{ $i }}" {{ $i == ($currentUserProgress ?? 0) ? 'selected' : '' }}>{{ $i }}</option>
+                                            @endfor
+                                        </select>
                                     </div>
+
 
                                     <!-- Score -->
                                     <label for="score" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mt-4">Score:</label>
@@ -114,4 +126,15 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if the element exists
+            const statusModal = document.getElementById('status-modal');
+            if (statusModal) {
+                setTimeout(() => {
+                    statusModal.classList.add('hidden');
+                }, 3000);  // 3 seconds
+            }
+        });
+    </script>
 </x-app-layout>

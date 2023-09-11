@@ -341,7 +341,7 @@ class AnimeController extends Controller
             }
         }
         if ($redirectBack) {
-            return redirect()->back()->with('message', 'Your anime list has been updated!');
+            return redirect()->back()->with('popup', 'Your anime list has been updated!');
         }
         return redirect()->route('user.anime.list', ['username' => $username])->with('message', 'Your anime list has been updated!');
     }
