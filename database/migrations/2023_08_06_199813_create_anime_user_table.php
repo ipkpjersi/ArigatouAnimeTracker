@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('score')->nullable();
             $table->integer('sort_order')->nullable();
             $table->integer('progress')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }
