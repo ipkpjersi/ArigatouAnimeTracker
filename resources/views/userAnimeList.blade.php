@@ -70,7 +70,7 @@
                                     <!-- desktop design -->
                                     @foreach ($userAnime as $anime)
                                         <tr class="hidden md:table-row">
-                                            <input type="hidden" name="anime_ids[]" value="{{ $anime->id }}">
+                                            <input type="hidden" class="desktop-anime-ids desktop-only" name="anime_ids[]" value="{{ $anime->id }}">
                                             @if ($show_anime_list_number)
                                                 <td class="py-2 px-4 border-b border-gray-200">{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}</td>
                                             @endif
@@ -82,7 +82,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_status)->status }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && auth()->user()->username === $username)
-                                                    <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800  min-w-[100px]" style="padding-right: 36px">
+                                                    <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800  min-w-[100px] desktop-only" style="padding-right: 36px">
                                                         <option value="">Pick a status...</option>
                                                         @foreach ($watchStatuses as $status)
                                                             <option value="{{ $status->id }}" @if ($anime->pivot->watch_status_id == $status->id) selected @endif>
@@ -96,7 +96,7 @@
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && auth()->user()->username === $username)
-                                                    <select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">
+                                                    <select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 desktop-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= $anime->episodes; $i++)
                                                             <option value="{{ $i }}" @if ($anime->pivot->progress == $i) selected @endif>
@@ -110,7 +110,7 @@
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200 min-w-[70px]">
                                                 @if (auth()->user() != null && auth()->user()->username === $username)
-                                                    <select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[70px]" style="padding-right: 36px">
+                                                    <select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[70px] desktop-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= 10; $i++)
                                                             <option value="{{ $i }}" @if ($anime->pivot->score == $i) selected @endif>{{ $i }}</option>
@@ -122,7 +122,7 @@
                                             </td>
                                             @if (auth()->user() != null && auth()->user()->username === $username)
                                                 <td class="py-2 px-4 border-b border-gray-200">
-                                                    <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">
+                                                    <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800 desktop-only">
                                                 </td>
                                             @endif
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->episodes }}</td>
@@ -142,8 +142,8 @@
                                     @endforeach
                                     <!-- mobile design -->
                                     @foreach ($userAnime as $anime)
-                                        <tr class="md:hidden">
-                                            <input type="hidden" name="anime_ids[]" value="{{ $anime->id }}">
+                                        <tr class="md:hidden mobile-only">
+                                            <input type="hidden" class="mobile-anime-ids mobile-only" name="anime_ids[]" value="{{ $anime->id }}">
                                             @if ($show_anime_list_number)
                                                 <td class="py-2 px-4 border-b border-gray-200">{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}</td>
                                             @endif
@@ -153,7 +153,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200"><a href="/anime/{{$anime->id}}">{{ $anime->title }}</a></td>
                                             <td class="py-2 px-4 border-b border-gray-200 min-w-[70px]">
                                                 @if (auth()->user() != null && auth()->user()->username === $username)
-                                                    <select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[70px]" style="padding-right: 36px">
+                                                    <select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[70px] mobile-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= 10; $i++)
                                                             <option value="{{ $i }}" @if ($anime->pivot->score == $i) selected @endif>{{ $i }}</option>
@@ -170,7 +170,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_status)->status }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200 min-w-[150px]">
                                                 @if (auth()->user() != null && auth()->user()->username === $username)
-                                                    <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[150px]" style="padding-right: 36px">
+                                                    <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[150px] mobile-only" style="padding-right: 36px">
                                                         <option value="">Pick a status...</option>
                                                         @foreach ($watchStatuses as $status)
                                                             <option value="{{ $status->id }}" @if ($anime->pivot->watch_status_id == $status->id) selected @endif>
@@ -184,7 +184,7 @@
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && auth()->user()->username === $username)
-                                                    <select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">
+                                                    <select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 mobile-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= $anime->episodes; $i++)
                                                             <option value="{{ $i }}" @if ($anime->pivot->progress == $i) selected @endif>
@@ -198,7 +198,7 @@
                                             </td>
                                             @if (auth()->user() != null && auth()->user()->username === $username)
                                                 <td class="py-2 px-4 border-b border-gray-200">
-                                                    <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">
+                                                    <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800 mobile-only">
                                                 </td>
                                             @endif
                                             <td class="py-2 px-4 border-b border-gray-200">
@@ -258,6 +258,37 @@
         import '/js/jquery.doubleScroll.js';
         $(document).ready(function() {
             $('.double-scroll').doubleScroll();
+
+            //Check viewport width and clear hidden inputs accordingly
+            function toggleHiddenInputs() {
+                const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+
+                const desktopElements = document.querySelectorAll('.desktop-only');
+                const mobileElements = document.querySelectorAll('.mobile-only');
+
+                if (isDesktop) {
+                    desktopElements.forEach(function(element) {
+                        element.disabled = false;
+                    });
+
+                    mobileElements.forEach(function(element) {
+                        element.disabled = true;
+                    });
+                } else {
+                    desktopElements.forEach(function(element) {
+                        element.disabled = true;
+                    });
+
+                    mobileElements.forEach(function(element) {
+                        element.disabled = false;
+                    });
+                }
+            }
+            toggleHiddenInputs(); //Run on document ready
+            //Re-run when the window is resized
+            $(window).resize(function() {
+                toggleHiddenInputs();
+            });
         });
     </script>
     <script>
