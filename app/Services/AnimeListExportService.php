@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AnimeUser;
+use App\Models\WatchStatus;
 use Illuminate\Support\Facades\Auth;
 use SimpleXMLElement;
 
@@ -50,7 +51,7 @@ class AnimeListExportService
             $anime->addChild('my_score', $animeUser->score);
             $anime->addChild('my_storage', '');
             $anime->addChild('my_storage_value', '0.00');
-            $anime->addChild('my_status', str_replace("-", " ", strtolower($animeUser->watch_status->status)));
+            $anime->addChild('my_status', str_replace("-", " ", strtolower($animeUser->watch_status?->status ?? $animeUser->watch_status?->status ?? 'PLAN-TO-WATCH')));
             $anime->addChild('my_comments', '');
             $anime->addChild('my_times_watched', 0);
             $anime->addChild('my_rewatch_value', '');
@@ -85,7 +86,7 @@ class AnimeListExportService
                 'title' => $animeUser->anime->title,
                 'type' => $animeUser->anime->anime_type->type,
                 'episodes' => $animeUser->anime->episodes,
-                'watch_status' => $animeUser->watch_status->status,
+                'watch_status' => $animeUser->watch_status?->status ?? 'PLAN-TO-WATCH',
                 'score' => $animeUser->score,
                 'progress' => $animeUser->progress
             ];
