@@ -69,6 +69,7 @@ class AnimeImageDownloadService
             }
         } else {
             $logger && $logger("Image $type already exists at: " . $fullPath);
+            return true; //Technically it's downloaded, if we manually downloaded might as well mark it true.
         }
         return false;
     }
