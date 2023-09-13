@@ -436,6 +436,20 @@ class AnimeController extends Controller
         return response()->json(['message' => 'Anime removed from your list.'], 200);
     }
 
+    public function clearAnimeList($username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+
+        //Check if the logged-in user matches the username or is an admin
+        if (auth()->user()->id === $user->id || auth()->user()->is_admin) {
+            $user->anime()->detach();
+
+            return redirect()->back()->with('message', 'Anime list cleared.');
+        } else {
+            return redirect()->back()->with('error', 'You do not have permission to clear this anime list.');
+        }
+    }
+
     public function importAnimeList(Request $request, AnimeListImportService $importer)
     {
         $importType = $request->input('import_type');

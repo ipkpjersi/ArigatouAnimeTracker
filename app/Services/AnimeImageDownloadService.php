@@ -19,11 +19,22 @@ class AnimeImageDownloadService
         $count = 0;
         $total = $anime->count();
         foreach ($anime as $current) {
+            $imageDownloaded = false;
             if ($current->thumbnail) {
-                $this->downloadImageFromUrl($current->thumbnail, 'thumbnail', $logger);
+                if ($this->downloadImageFromUrl($current->thumbnail, 'thumbnail', $logger)) {
+                    $imageDownloaded = true;
+                }
             }
             if ($current->picture) {
-                $this->downloadImageFromUrl($current->picture, 'picture', $logger);
+                if ($this->downloadImageFromUrl($current->picture, 'picture', $logger)) {
+                    $imageDownloaded = true;
+                }
+            }
+            if ($imageDownloaded) {
+                DB::table('anime')
+                  ->where('id', $current->id)
+                  ->limit(1)
+                  ->update(['image_downloaded' => true]);
             }
             sleep(rand(5, 22));
         }
@@ -35,7 +46,7 @@ class AnimeImageDownloadService
         ];
     }
 
-    private function downloadImageFromUrl($url, $type, $logger = null)
+    private function downloadImageFromUrl($url, $type, $logger = null): bool
     {
         $filePath = $this->getFilePathFromUrl($url, $type);
         $fullPath = public_path($filePath);
@@ -52,12 +63,14 @@ class AnimeImageDownloadService
             if ($response->successful()) {
                 file_put_contents($fullPath, $response->body());
                 $logger && $logger("Image $type downloaded successfully to: " . $fullPath);
+                return true;
             } else {
                 $logger && $logger("Failed to download $type image from: " . $url);
             }
         } else {
             $logger && $logger("Image $type already exists at: " . $fullPath);
         }
+        return false;
     }
 
     private function getFilePathFromUrl($url, $type)

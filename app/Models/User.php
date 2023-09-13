@@ -26,7 +26,8 @@ class User extends Authenticatable
         'avatar',
         'anime_list_pagination_size',
         'show_anime_list_number',
-        'registration_ip'
+        'registration_ip',
+        'show_clear_anime_list_button'
     ];
 
     /**

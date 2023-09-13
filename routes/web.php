@@ -84,6 +84,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/export/animelist', [AnimeController::class, 'exportAnimeList'])->name('export.animelistdata');
 
+    Route::post('/animelist/{username}/clear',  [AnimeController::class, 'clearAnimeList'])->name('user.anime.clear');
+
 });
 
 require __DIR__.'/auth.php';

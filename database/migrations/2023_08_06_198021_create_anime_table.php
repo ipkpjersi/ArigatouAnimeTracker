@@ -37,7 +37,8 @@ return new class extends Migration
             $table->integer('mal_popularity')->nullable();
             $table->integer('mal_scoring_users')->nullable();
             $table->integer('mal_list_members')->nullable();
-            $table->integer('is_deleted')->default(0);
+            $table->boolean('is_deleted')->default(false);
+            $table->boolean('image_downloaded')->default(false);
             $table->timestamps();
         });
     }

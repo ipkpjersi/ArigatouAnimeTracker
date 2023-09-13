@@ -8,6 +8,13 @@
     <div class="py-12">
         <div class="max-w-[1550px] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
+                <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 hidden">
+                    <div class="p-4 bg-white dark:bg-black rounded">
+                        <p>Are you sure you want to clear your anime list?</p>
+                        <button id="confirmClear" class="bg-red-500 text-white p-2 rounded">Yes</button>
+                        <button id="cancelClear" class="bg-gray-500 text-white p-2 rounded">No</button>
+                    </div>
+                </div>
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form action="{{ route('user.anime.update', ['username' => $username]) }}" method="POST">
                         @csrf
@@ -222,16 +229,26 @@
                         </div>
                     </form>
                     @if (auth()->user() != null && auth()->user()->username === $username)
-                        <a href="{{ route('import.animelist') }}">
-                            <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-                                Import from MyAnimeList and More
-                            </button>
-                        </a>
-                        <a href="{{ route('export.animelist') }}">
-                            <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-                                Export to MyAnimeList and More
-                            </button>
-                        </a>
+                        <div class="md:flex">
+                            <a href="{{ route('import.animelist') }}">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                                    Import from MyAnimeList and More
+                                </button>
+                            </a>
+                            <a href="{{ route('export.animelist') }}">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
+                                    Export to MyAnimeList and More
+                                </button>
+                            </a>
+                            @if (auth()->user()->show_clear_anime_list_button)
+                                <form id="clearForm" class="inline-block" action="{{ route('user.anime.clear', ['username' => $username]) }}" method="post">
+                                    @csrf
+                                    <button type="button" id="clearListBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
+                                        Clear Anime List
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
                     @endif
                 </div>
             </div>
@@ -259,5 +276,25 @@
                 console.log('Error removing anime. Please try again: ' + error);
             });
         }
+        document.addEventListener("DOMContentLoaded", function() {
+            const clearListBtn = document.getElementById("clearListBtn");
+            const clearModal = document.getElementById("clearModal");
+            const confirmClear = document.getElementById("confirmClear");
+            const cancelClear = document.getElementById("cancelClear");
+            const clearForm = document.getElementById("clearForm");
+
+            clearListBtn.addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent the form from submitting
+                clearModal.classList.remove("hidden"); // Show the modal
+            });
+
+            confirmClear.addEventListener("click", function() {
+                clearForm.submit(); // Submit the form
+            });
+
+            cancelClear.addEventListener("click", function() {
+                clearModal.classList.add("hidden"); // Hide the modal
+            });
+        });
     </script>
 </x-app-layout>

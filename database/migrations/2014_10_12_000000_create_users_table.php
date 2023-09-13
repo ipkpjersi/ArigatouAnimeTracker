@@ -27,6 +27,7 @@ return new class extends Migration
             $table->boolean('show_anime_list_number')->default(false);
             $table->string('registration_ip')->nullable();
             $table->string('login_ip')->nullable();
+            $table->boolean('show_clear_anime_list_button')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
