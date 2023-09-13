@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class ClearAnimeImageDownloads extends Command
 {
-    protected $signature = 'app:clear-anime-image-downloads {deleteFiles : Whether to delete the actual files (true/false)}';
+    protected $signature = 'app:clear-anime-image-downloads {deleteFiles=false : Whether to delete the actual files (true/false)}';
     protected $description = 'Clears the anime image download flags, optionally deleting the files.';
 
     public function handle()
@@ -22,22 +22,30 @@ class ClearAnimeImageDownloads extends Command
             DB::table('anime')->update(['image_downloaded' => false]);
 
             if ($deleteFiles) {
-                // Logic to delete files
                 $folders = [
-                    'public/picture/images/anime',
-                    'public/picture/anime',
-                    'public/picture/file',
-                    'public/thumbnail/images/anime',
-                    'public/thumbnail/anime',
-                    'public/thumbnail/file',
+                    'picture/images/anime',
+                    'picture/anime',
+                    'picture/file',
+                    'thumbnail/images/anime',
+                    'thumbnail/anime',
+                    'thumbnail/file'
                 ];
-
                 foreach ($folders as $folder) {
-                    if (Storage::exists($folder)) {
-                        Storage::deleteDirectory($folder);
+                    $dir = public_path($folder);
+                    if (is_dir($dir)) {
+                        $it = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
+                        $files = new \RecursiveIteratorIterator($it,
+                                    \RecursiveIteratorIterator::CHILD_FIRST);
+                        foreach($files as $file) {
+                            if ($file->isDir()){
+                                rmdir($file->getRealPath());
+                            } else {
+                                unlink($file->getRealPath());
+                            }
+                        }
+                        rmdir($dir);
                     }
                 }
-
                 $this->info("The actual image files have been deleted.");
             }
 
