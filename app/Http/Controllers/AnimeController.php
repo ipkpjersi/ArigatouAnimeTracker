@@ -419,7 +419,7 @@ class AnimeController extends Controller
         $user = Auth::user();
         $anime = Anime::findOrFail($id);
 
-        $user->anime()->attach($anime);
+        $user->anime()->attach($anime, ['status_id' => WatchStatus::where('status', 'PLAN-TO-WATCH')->first()->id]);
         if ($redirect == true) {
             return redirect()->back()->with('message', 'Anime added to your list.');
         }
