@@ -8,11 +8,20 @@
     <div class="py-12">
         <div class="max-w-[1550px] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 hidden">
-                    <div class="p-4 bg-white dark:bg-black rounded">
-                        <p>Are you sure you want to clear your anime list?</p>
-                        <button id="confirmClear" class="bg-red-500 text-white p-2 rounded">Yes</button>
-                        <button id="cancelClear" class="bg-gray-500 text-white p-2 rounded">No</button>
+                <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 hidden overflow-y-auto">
+                    <div class="bg-white dark:bg-gray-700 rounded relative w-96 h-64">
+                        <button id="closeModal" class="absolute top-2 right-4 bg-red-500 text-white p-2 pl-4 pr-4 mb-2 rounded">X</button>
+                        <div class="p-4 mt-10">
+                            <p>Are you sure you want to delete your anime list?</p>
+                            <div class="flex items-center mt-2">
+                              <input type="checkbox" id="confirmCheckbox">
+                              <label for="confirmCheckbox" class="ml-2">I understand the consequences</label>
+                            </div>
+                            <input type="text" id="confirmUsername" placeholder="Enter your username to confirm" class="bg-white dark:bg-gray-800 mt-3 w-full">
+                            <button id="confirmClear" class="bg-red-500 text-white p-2 pl-6 pr-6 rounded mt-4">Yes</button>
+                            <button id="cancelClear" class="bg-gray-500 text-white p-2 pl-6 pr-6 rounded mt-4 ml-3">No</button>
+                            <div id="errorText" class="text-red-500 hidden mt-1"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -245,18 +254,70 @@
             const confirmClear = document.getElementById("confirmClear");
             const cancelClear = document.getElementById("cancelClear");
             const clearForm = document.getElementById("clearForm");
+            const confirmUsername = document.getElementById("confirmUsername");
+            const confirmCheckbox = document.getElementById("confirmCheckbox");
+            const errorText = document.getElementById("errorText");
+            const closeModal = document.getElementById("closeModal")
+
+            var username = @json(Auth::user()->username ?? "whyisitnull");
+
+            let errorTimeout;
 
             clearListBtn.addEventListener("click", function(event) {
-                event.preventDefault(); // Prevent the form from submitting
-                clearModal.classList.remove("hidden"); // Show the modal
+                event.preventDefault();
+                document.body.style.overflow = 'hidden';
+                clearModal.classList.remove("hidden");
             });
 
             confirmClear.addEventListener("click", function() {
-                clearForm.submit(); // Submit the form
+                clearTimeout(errorTimeout); // Clear previous timeout if exists
+
+                if (!confirmCheckbox.checked) {
+                    showError("Please check the confirmation box.");
+                    return;
+                }
+
+                if (confirmUsername.value !== username) {
+                    showError("Username does not match.");
+                    return;
+                }
+
+                clearForm.submit();
             });
 
             cancelClear.addEventListener("click", function() {
-                clearModal.classList.add("hidden"); // Hide the modal
+                document.body.style.overflow = 'auto';
+                clearModal.classList.add("hidden");
+                errorText.classList.add("hidden");
+            });
+
+            window.addEventListener("click", function(event) {
+                if (event.target === clearModal) {
+                    document.body.style.overflow = 'auto';
+                    clearModal.classList.add("hidden");
+                    errorText.classList.add("hidden");
+                }
+            });
+
+            window.addEventListener("keydown", function(event) {
+                if (event.key === "Escape") {
+                    document.body.style.overflow = 'auto';
+                    clearModal.classList.add("hidden");
+                    errorText.classList.add("hidden");
+                }
+            });
+
+            function showError(message) {
+                errorText.textContent = message;
+                errorText.classList.remove("hidden");
+                errorTimeout = setTimeout(() => {
+                    errorText.classList.add("hidden");
+                }, 3000); // Hide the error message after 3 seconds
+            }
+            closeModal.addEventListener("click", function() {
+                document.body.style.overflow = 'auto';
+                clearModal.classList.add("hidden");
+                errorText.classList.add("hidden");
             });
         });
     </script>
