@@ -24,8 +24,6 @@
                         </div>
                     </div>
                 </div>
-
-
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form action="{{ route('user.anime.update', ['username' => $username]) }}" method="POST">
                         @csrf
