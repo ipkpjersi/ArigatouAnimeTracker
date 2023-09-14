@@ -257,16 +257,21 @@
             const confirmUsername = document.getElementById("confirmUsername");
             const confirmCheckbox = document.getElementById("confirmCheckbox");
             const errorText = document.getElementById("errorText");
-            const closeModal = document.getElementById("closeModal")
+            const closeModal = document.getElementById("closeModal");
 
             var username = @json(Auth::user()->username ?? "whyisitnull");
 
             let errorTimeout;
+            let focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+            let firstFocusableElement = clearModal.querySelectorAll(focusableElements)[0];
+            let focusableContent = clearModal.querySelectorAll(focusableElements);
+            let lastFocusableElement = focusableContent[focusableContent.length - 1];
 
             clearListBtn.addEventListener("click", function(event) {
                 event.preventDefault();
                 document.body.style.overflow = 'hidden';
                 clearModal.classList.remove("hidden");
+                firstFocusableElement.focus(); // Set focus on the first focusable element
             });
 
             confirmClear.addEventListener("click", function() {
@@ -285,40 +290,54 @@
                 clearForm.submit();
             });
 
-            cancelClear.addEventListener("click", function() {
-                document.body.style.overflow = 'auto';
-                clearModal.classList.add("hidden");
-                errorText.classList.add("hidden");
-            });
+            cancelClear.addEventListener("click", closeModalAction);
 
             window.addEventListener("click", function(event) {
                 if (event.target === clearModal) {
-                    document.body.style.overflow = 'auto';
-                    clearModal.classList.add("hidden");
-                    errorText.classList.add("hidden");
+                    closeModalAction();
                 }
             });
 
-            window.addEventListener("keydown", function(event) {
-                if (event.key === "Escape") {
-                    document.body.style.overflow = 'auto';
-                    clearModal.classList.add("hidden");
-                    errorText.classList.add("hidden");
+            window.addEventListener("keydown", function(e) {
+                if (e.key === "Escape") {
+                    closeModalAction();
+                }
+
+                // Focus trapping logic
+                let isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+
+                if (!isTabPressed) {
+                    return;
+                }
+
+                if (e.shiftKey) {
+                    if (document.activeElement === firstFocusableElement) {
+                        lastFocusableElement.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === lastFocusableElement) {
+                        firstFocusableElement.focus();
+                        e.preventDefault();
+                    }
                 }
             });
+
+            function closeModalAction() {
+                document.body.style.overflow = 'auto';
+                clearModal.classList.add("hidden");
+                errorText.classList.add("hidden");
+            }
 
             function showError(message) {
                 errorText.textContent = message;
                 errorText.classList.remove("hidden");
                 errorTimeout = setTimeout(() => {
                     errorText.classList.add("hidden");
-                }, 3000); // Hide the error message after 3 seconds
+                }, 3000);
             }
-            closeModal.addEventListener("click", function() {
-                document.body.style.overflow = 'auto';
-                clearModal.classList.add("hidden");
-                errorText.classList.add("hidden");
-            });
+
+            closeModal.addEventListener("click", closeModalAction);
         });
     </script>
 </x-app-layout>
