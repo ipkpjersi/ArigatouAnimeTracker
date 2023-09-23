@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class AnimeAdditionalDataImportService
 {
-    public function downloadAdditionalAnimeData($logger = null, $generateSqlFile = false)
+    public function downloadAdditionalAnimeData($logger = null, $generateSqlFile = false, $apiDescriptionsEmptyOnly = false)
     {
         $startTime = microtime(true);
         $count = 0;
@@ -18,12 +18,12 @@ class AnimeAdditionalDataImportService
                     ->whereNull('genres')
                     ->get();
         $anime = DB::table('anime')
-                    ->where("api_descriptions_empty", "=", "false")
+                    ->where("api_descriptions_empty", "=", $apiDescriptionsEmptyOnly ? "true" : "false")
                     ->whereNull('description')
                     ->whereNull('genres')
                     ->get();
         $downloaded = DB::table('anime')
-                    ->where("api_descriptions_empty", "=", "false")
+                    ->where("api_descriptions_empty", "=", $apiDescriptionsEmptyOnly ? "true" : "false")
                     ->whereNotNull('description')
                     ->orWhereNotNull('genres')
                     ->get();

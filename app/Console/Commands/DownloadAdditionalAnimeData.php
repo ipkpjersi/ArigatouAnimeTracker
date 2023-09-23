@@ -12,7 +12,7 @@ class DownloadAdditionalAnimeData extends Command
      *
      * @var string
      */
-    protected $signature = 'app:download-anime-additional-data {generateSqlFile?}';
+    protected $signature = 'app:download-anime-additional-data {generateSqlFile?} {apiDescriptionsEmptyOnly?}';
 
     /**
      * The console command description.
@@ -30,6 +30,7 @@ class DownloadAdditionalAnimeData extends Command
     public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService)
     {
         $generateSqlFile = $this->argument('generateSqlFile') ?? false;
+        $apiDescriptionsEmptyOnly = $this->argument('apiDescriptionsEmptyOnly') ?? false;
 
         $this->info("Starting to fetch additional anime data " . ($generateSqlFile ? "with generating an SQL file" : "without generating an SQL file") . "...");
         try {
@@ -37,7 +38,7 @@ class DownloadAdditionalAnimeData extends Command
                 $this->info($message);
             };
 
-            $result = $animeAdditionalDataImportService->downloadAdditionalAnimeData($logger, $generateSqlFile);
+            $result = $animeAdditionalDataImportService->downloadAdditionalAnimeData($logger, $generateSqlFile, $apiDescriptionsEmptyOnly);
             $duration = round($result['duration'], 2);
 
             $this->info("Fetched additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
