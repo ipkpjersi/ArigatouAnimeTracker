@@ -17,8 +17,13 @@ class AnimeAdditionalDataImportService
                     ->whereNull('description')
                     ->whereNull('genres')
                     ->get();
-        $total = count($anime);
-
+        $downloaded = DB::table('anime')
+                    ->whereNotNull('description')
+                    ->orWhereNotNull('genres')
+                    ->get();
+        $total = $anime->count();
+        $remaining = $total - $downloaded->count();
+        $logger && $logger("Downloading additional anime data for $remaining out of $total anime.");
         $sqlFile = $generateSqlFile ? fopen(('database/seeders/anime_additional_data.sql'), 'a') : null;
 
         foreach ($anime as $row) {
@@ -106,7 +111,9 @@ class AnimeAdditionalDataImportService
                 $logger && $logger("Failed to update description and genres for anime: " . $row->title);
                 Log::error('Failed to fetch additional data for anime: ' . $row->title);
             }
-            sleep(15);
+            $sleepTime = env("ADDITIONAL_DATA_SERVICE_SLEEP_TIME") ?? 15;
+            $logger && $logger("Sleeping for $sleepTime seconds");
+            sleep($sleepTime);
         }
 
         if ($generateSqlFile) {

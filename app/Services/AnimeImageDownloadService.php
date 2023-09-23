@@ -12,12 +12,24 @@ class AnimeImageDownloadService
     public function downloadImages($logger = null)
     {
         $anime = DB::table('anime')
-                    ->whereNotNull('picture')
-                    ->orWhereNotNull('thumbnail')
+                    ->whereNot("image_downloaded", "=", true)
+                    ->where(function($query) {
+                        $query->whereNotNull('picture')
+                              ->orWhereNotNull('thumbnail');
+                    })
+                    ->get();
+        $downloaded = DB::table('anime')
+                    ->where("image_downloaded", "=", true)
+                    ->where(function($query) {
+                        $query->whereNotNull('picture')
+                              ->orWhereNotNull('thumbnail');
+                    })
                     ->get();
         $startTime = microtime(true);
         $count = 0;
         $total = $anime->count();
+        $remaining = $total - $downloaded->count();
+        $logger && $logger("Downloading images for $remaining out of $total anime.");
         foreach ($anime as $current) {
             $imageDownloaded = false;
             if ($current->thumbnail) {
@@ -36,7 +48,9 @@ class AnimeImageDownloadService
                   ->limit(1)
                   ->update(['image_downloaded' => true]);
             }
-            sleep(rand(5, 22));
+            $sleepTime = rand(env("IMAGE_DOWNLOAD_SERVICE_SLEEP_LOWER") ?? 5, env("IMAGE_DOWNLOAD_SERVICE_SLEEP_UPPER") ?? 22);
+            $logger && $logger("Sleeping for $sleepTime seconds");
+            sleep($sleepTime);
         }
         $duration = microtime(true) - $startTime;
         return [
