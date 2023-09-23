@@ -110,6 +110,9 @@ class AnimeAdditionalDataImportService
             } else {
                 $logger && $logger("Failed to update description and genres for anime: " . $row->title);
                 Log::error('Failed to fetch additional data for anime: ' . $row->title);
+                DB::table('anime')
+                ->where('id', $row->id)
+                ->update(['api_descriptions_empty' => true]);
             }
             $sleepTime = config("global.additional_data_service_sleep_time", 15);
             $logger && $logger("Sleeping for $sleepTime seconds");

@@ -31,8 +31,8 @@ class ClearAnimeDescriptions extends Command
         $this->info("Starting to clear all anime descriptions...");
 
         try {
-            // Clear all anime descriptions
-            DB::table('anime')->update(['description' => null]);
+            // Clear all anime descriptions and api empty flag so all can be downloaded again
+            DB::table('anime')->update(['description' => null, 'api_descriptions_empty' => false]);
 
             $this->info("All anime descriptions have been cleared.");
         } catch (\Exception $e) {

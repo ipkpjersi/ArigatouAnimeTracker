@@ -39,6 +39,7 @@ return new class extends Migration
             $table->integer('mal_list_members')->nullable();
             $table->boolean('is_deleted')->default(false);
             $table->boolean('image_downloaded')->default(false);
+            $table->boolean('api_descriptions_empty')->default(false);
             $table->timestamps();
         });
     }

@@ -31,8 +31,8 @@ class ClearAnimeGenres extends Command
         $this->info("Starting to clear all anime genres...");
 
         try {
-            // Clear all anime descriptions
-            DB::table('anime')->update(['genres' => null]);
+            // Clear all anime genres and api empty flag so all can be downloaded again
+            DB::table('anime')->update(['genres' => null, 'api_descriptions_empty' => false]);
 
             $this->info("All anime genres have been cleared.");
         } catch (\Exception $e) {
