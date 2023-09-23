@@ -31,7 +31,10 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-
+        if (!config("global.registrations_enabled")) {
+            return redirect()->route('register')->with('error', 'Registrations are currently closed. Please try again later.');
+        }
+        
         $ipAddress = get_client_ip_address();
 
         $recentRegistrations = User::where('registration_ip', $ipAddress)

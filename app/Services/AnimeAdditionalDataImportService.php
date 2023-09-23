@@ -111,7 +111,7 @@ class AnimeAdditionalDataImportService
                 $logger && $logger("Failed to update description and genres for anime: " . $row->title);
                 Log::error('Failed to fetch additional data for anime: ' . $row->title);
             }
-            $sleepTime = env("ADDITIONAL_DATA_SERVICE_SLEEP_TIME") ?? 15;
+            $sleepTime = config("global.additional_data_service_sleep_time", 15);
             $logger && $logger("Sleeping for $sleepTime seconds");
             sleep($sleepTime);
         }

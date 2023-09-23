@@ -48,7 +48,7 @@ class AnimeImageDownloadService
                   ->limit(1)
                   ->update(['image_downloaded' => true]);
             }
-            $sleepTime = rand(env("IMAGE_DOWNLOAD_SERVICE_SLEEP_LOWER") ?? 5, env("IMAGE_DOWNLOAD_SERVICE_SLEEP_UPPER") ?? 22);
+            $sleepTime = rand(config("global.image_download_service_sleep_time_lower", 5), config("global.image_download_service_sleep_time_upper", 22));
             $logger && $logger("Sleeping for $sleepTime seconds");
             sleep($sleepTime);
         }
