@@ -15,6 +15,10 @@ class AnimeAdditionalDataImportService
         $count = 0;
         $all = DB::table('anime')
                     ->get();
+        $downloaded = DB::table('anime')
+                    ->whereNotNull('description')
+                    ->orWhereNotNull('genres')
+                    ->get();
         $anime = DB::table('anime')
                     ->where("api_descriptions_empty", "=", $apiDescriptionsEmptyOnly ? "true" : "false")
                     ->whereNull('description')
@@ -22,7 +26,8 @@ class AnimeAdditionalDataImportService
                     ->get();
         $total = $all->count();
         $downloading = $anime->count();
-        $logger && $logger("Downloading additional anime data for $downloading out of $total anime.");
+        $pending = $total - $downloaded->count();
+        $logger && $logger("Downloading additional anime data for $downloading out of $total) anime.");
         $sqlFile = $generateSqlFile ? fopen(('database/seeders/anime_additional_data.sql'), 'a') : null;
 
         foreach ($anime as $row) {
