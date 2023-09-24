@@ -27,7 +27,7 @@ class AnimeAdditionalDataImportService
         $total = $all->count();
         $downloading = $anime->count();
         $pending = $total - $downloaded->count();
-        $logger && $logger("Downloading additional anime data for $downloading out of $total) anime.");
+        $logger && $logger("Downloading additional anime data for $downloading out of $pending ($total) anime.");
         $sqlFile = $generateSqlFile ? fopen(('database/seeders/anime_additional_data.sql'), 'a') : null;
 
         foreach ($anime as $row) {
