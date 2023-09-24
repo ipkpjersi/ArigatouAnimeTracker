@@ -18,7 +18,54 @@
                     </div>
 
                     @if ($viewType === 'list')
-                        <!-- Table View Here -->
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Eps.</th>
+                                    <th>MAL Score</th>
+                                    <th>Start Date</th>
+                                    <th>MAL List Members</th>
+                                    @if (Auth::user() != null)
+                                        <th>Status</th>
+                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($categoryAnime as $anime)
+                                    <tr>
+                                        <td>
+                                            <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }}" class="inline-block" width="50" height="70">
+                                            <a href="{{ route('anime.detail', $anime->id) }}" class="ml-4">{{ $anime->title }}</a>
+                                        </td>
+                                        <td>{{ $anime->anime_type->type }}</td>
+                                        <td>{{ $anime->episodes }}</td> <!-- Assuming column name is episode_count -->
+                                        <td>{{ $anime->mal_mean }}</td>
+                                        <td>{{ Carbon\Carbon::parse($anime->start_date)->format('Y-m-d') }}</td> <!-- Assuming start_date is a Carbon instance -->
+                                        <td>{{ $anime->mal_list_members }}</td>
+                                        @if (Auth::user())
+                                            <td>
+                                                @php
+                                                    $watchStatusId = $userAnimeStatuses[$anime->id] ?? null;
+                                                @endphp
+                                                <div class="no_dropdown_arrow_blank_select-wrapper bg-blue-500">
+                                                    <select
+                                                        class="text-sm text-white rounded p-1 flex-1 focus:outline-none z-50 update-anime-status no_dropdown_arrow_blank"
+                                                        data-anime-id="{{ $anime->id }}"
+                                                    >
+                                                        <option value="0">{{ 'Add to List' }}</option>
+                                                        @foreach ($watchStatuses as $id => $status)
+                                                            <option value="{{ $id }}" {{ $watchStatusId == $id ? 'selected' : '' }}>{{ $status->status }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        @endif
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     @else
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                             @foreach ($categoryAnime as $anime)
