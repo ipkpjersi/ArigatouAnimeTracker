@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('registration_ip')->nullable();
             $table->string('login_ip')->nullable();
             $table->boolean('show_clear_anime_list_button')->default(false);
+            $table->boolean('display_anime_cards')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });

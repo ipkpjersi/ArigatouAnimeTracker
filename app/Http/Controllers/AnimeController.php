@@ -218,8 +218,12 @@ class AnimeController extends Controller
         return view('categories', compact('categories'));
     }
 
-    public function category($category, $view = 'card') {
+    public function category(Request $request, $category, $view = 'card') {
         $category = strtolower($category);
+
+        if (!$request->route('view') && auth()->user()) {
+            $view = auth()->user()->display_anime_cards ? 'card' : 'list';
+        }
 
         $query = Anime::where(function($query) use ($category) {
             $query->whereRaw('LOWER(tags) LIKE ?', ["%$category%"]);

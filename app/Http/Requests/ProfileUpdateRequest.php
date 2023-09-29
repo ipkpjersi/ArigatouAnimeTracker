@@ -24,6 +24,7 @@ class ProfileUpdateRequest extends FormRequest
             'anime_list_pagination_size' => ['integer', 'min:2', 'max:250'],
             'show_anime_list_number' => ['nullable', 'in:1,0'],
             'show_clear_anime_list_button' => ['nullable', 'in:1,0'],
+            'display_anime_cards' => ['nullable', 'in:1,0'],
         ];
     }
 }
