@@ -73,7 +73,7 @@
                                     <!-- Score -->
                                     <label for="score" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mt-4">Score:</label>
                                     <select name="score[]" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-select block w-full">
-                                        <option value="" disabled selected>Pick an option</option>
+                                        <option value="" selected>Pick an option</option>
                                         @for ($i = 1; $i <= 10; $i++)
                                             <option value="{{ $i }}" {{ $currentUserScore == $i ? 'selected' : '' }}>{{ $i }}</option>
                                         @endfor
@@ -82,7 +82,22 @@
                                     <!-- Sort Order -->
                                     <div class="mt-4">
                                         <label for="sort_order" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Sort Order:</label>
-                                        <input type="number" name="sort_order[]" value="{{ $currentUserSortOrder ?? '' }}" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-input block w-full">
+                                        <input type="number" name="sort_order[]" value="{{ $currentUserSortOrder ?? '' }}" min="0" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-input block w-full">
+                                    </div>
+
+                                    <!-- Notes -->
+                                    <div class="mt-4">
+                                        <label for="notes" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Notes:</label>
+                                        <textarea name="notes[]" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-input block w-full" rows="3">{{ $currentUserNotes ?? '' }}</textarea>
+                                    </div>
+
+                                    <!-- Display in List -->
+                                    <div class="mt-4">
+                                        <label for="display_in_list" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Display in List:</label>
+                                        <select name="display_in_list[]" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-select block w-full">
+                                            <option value="1" {{ ($currentUserDisplayInList === 1) ? 'selected' : '' }}>Yes</option>
+                                            <option value="0" {{ ($currentUserDisplayInList === 0) ? 'selected' : '' }}>No</option>
+                                        </select>
                                     </div>
 
                                     <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">

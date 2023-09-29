@@ -18,7 +18,9 @@ class AnimeUser extends Model
         'watch_status_id',
         'score',
         'sort_order',
-        'progress'
+        'progress',
+        'notes',
+        'display_in_list'
     ];
 
     public function anime()

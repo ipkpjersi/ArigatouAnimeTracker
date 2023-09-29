@@ -94,6 +94,8 @@ class AnimeController extends Controller
         $currentUserProgress = null;
         $currentUserScore = null;
         $currentUserSortOrder = null;
+        $currentUserNotes = null;
+        $currentUserDisplayInList = true;
 
         $user = auth()->user();
         if($user) {
@@ -106,10 +108,12 @@ class AnimeController extends Controller
                 $currentUserProgress = $animeUser->pivot->progress;
                 $currentUserScore = $animeUser->pivot->score;
                 $currentUserSortOrder = $animeUser->pivot->sort_order;
+                $currentUserNotes = $animeUser->pivot->notes;
+                $currentUserDisplayInList = $animeUser->pivot->display_in_list;
             }
         }
 
-        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder'));
+        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList'));
     }
 
 
@@ -226,7 +230,7 @@ class AnimeController extends Controller
             $query = $query->where('tags', 'NOT LIKE', '%' . str_rot13('uragnv') . '%');
         }
 
-        $query->with(['users' => function($query) {
+        $query->with(['user' => function($query) {
             if (auth()->user()) {
                 $query->where('user_id', auth()->user()->id);
             }
@@ -253,6 +257,7 @@ class AnimeController extends Controller
         $userAnime = $user->anime()
                           ->with(['anime_type', 'anime_status'])
                           ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC')
+                          ->where('anime_user.display_in_list', '=', 1)
                           ->paginate($user->anime_list_pagination_size ?? 15);
 
         return view('userAnimeList', ['userAnime' => $userAnime, 'username' => $username, 'show_anime_list_number' => $show_anime_list_number, 'watchStatuses' => $watchStatuses, 'watchStatusMap' => $watchStatusMap]);
@@ -281,6 +286,7 @@ class AnimeController extends Controller
         $user = User::where('username', $username)->firstOrFail();
         $query = $user->anime()
               ->with(['anime_type', 'anime_status', 'watch_status'])
+              ->where('anime_user.display_in_list', '=', 1)
               ->selectRaw('anime.*, anime_user.sort_order, anime_user.score, anime_user.progress, anime_user.watch_status_id');
         $defaultOrder = [
             ['column' => 7, 'dir' => 'asc'],
@@ -319,8 +325,11 @@ class AnimeController extends Controller
         if ($request->has('anime_ids') && is_array($request->anime_ids)) {
             foreach ($request->anime_ids as $index => $anime_id) {
                 $anime = Anime::find($anime_id);
-                $score = $request->score[$index];
-                $sortOrder = $request->sort_order[$index];
+                $currentPivotData = $user->anime()->where('anime_id', $anime_id)->first()->pivot;
+                $currentDisplayInList = $currentPivotData->display_in_list ?? true;
+                $currentNotes = $currentPivotData->notes ?? null;
+                $score = isset($request->score[$index]) ? $request->score[$index] : null;
+                $sortOrder = isset($request->sort_order[$index]) ? $request->sort_order[$index] : null;
                 $watchStatusId = $request->watch_status_id[$index] ? $request->watch_status_id[$index] : null;
                 $progress = $request->progress[$index] ?? 0;
                 if ($watchStatusId == WatchStatus::where('status', 'COMPLETED')->first()->id) {
@@ -328,6 +337,8 @@ class AnimeController extends Controller
                 } else if ($watchStatusId == WatchStatus::where('status', 'PLAN-TO-WATCH')->first()->id) {
                     $progress = 0;
                 }
+                $displayInList = $request->display_in_list[$index] ?? $currentDisplayInList;
+                $notes = $request->notes[$index] ?? $currentNotes;
                 //Use syncWithoutDetaching to update the pivot data/junction table
                 //without removing the user's other rows in the junction table.
                 $user->anime()->syncWithoutDetaching([
@@ -335,7 +346,9 @@ class AnimeController extends Controller
                         'score' => $score ? $score : null,
                         'sort_order' => $sortOrder,
                         'watch_status_id' => $watchStatusId,
-                        'progress' => $progress
+                        'progress' => $progress,
+                        'display_in_list' => $displayInList,
+                        'notes' => $notes
                     ]
                 ]);
             }

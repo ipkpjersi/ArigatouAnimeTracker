@@ -78,11 +78,11 @@
                                         </a>
                                     </div>
                                     <div class="flex items-center relative z-20">
-                                        <span class="text-sm dark:text-gray-300 flex-1">MAL Score: {{ $anime->mal_mean }}</span>
-                                        <span class="text-sm dark:text-gray-300 flex-1">MAL Members: {{ $anime->mal_list_members }}</span>
+                                        <span class="text-sm dark:text-gray-300 flex-1">MAL Score: {{ $anime->mal_mean ?? "N/A" }}</span>
+                                        <span class="text-sm dark:text-gray-300 flex-1">MAL Members: {{ $anime->mal_list_members ?? "N/A" }}</span>
                                         @if (Auth::user())
                                             @php
-                                                $userAnime = $anime->users->firstWhere('id', Auth::id());
+                                                $userAnime = $anime->user->firstWhere('id', Auth::id());
                                                 $watchStatusId = optional($userAnime)->pivot->watch_status_id ?? null;
                                                 $selectedStatus = $watchStatusId ? $watchStatuses[$watchStatusId] : null;
                                             @endphp
