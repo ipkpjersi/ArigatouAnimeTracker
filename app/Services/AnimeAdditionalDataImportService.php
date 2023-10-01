@@ -133,6 +133,7 @@ class AnimeAdditionalDataImportService
     public function importAdditionalAnimeData($logger = null) {
         $startTime = microtime(true);
         $count = 0;
+        $hasError = false;
         $sqlPath = database_path('seeders/anime_additional_data.sql');
         $anime = DB::table('anime')->get();
         $total = count($anime);
@@ -141,11 +142,20 @@ class AnimeAdditionalDataImportService
             $sqlQueries = explode(";\n", $sqlContent);
             foreach ($sqlQueries as $query) {
                 if (trim($query) !== '') {
-                    DB::unprepared($query . ';');
-                    $count++;
+                    try {
+                        DB::unprepared($query . ';');
+                        $count++;
+                    } catch (\Exception $e) {
+                        $hasError = true;
+                        $logger && $logger("Error importing additional anime data: " . $e->getMessage() . "\n Error on query: " . $query);
+                        $logger && $logger("Imported {$count} SQL queries out of {$total} before running into an error.");
+                        break;
+                    }
                 }
             }
-            $logger && $logger("Imported {$count} SQL queries successfully.");
+            if (!$hasError) {
+                $logger && $logger("Imported {$count} SQL queries successfully.");
+            }
         } else {
             $logger && $logger('SQL file does not exist.');
         }
