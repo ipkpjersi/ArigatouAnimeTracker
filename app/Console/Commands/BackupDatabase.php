@@ -18,7 +18,7 @@ class BackupDatabase extends Command
      *
      * @var string
      */
-    protected $description = 'Back up the arigatouanimetracker database';
+    protected $description = 'Back up the current database';
 
     /**
      * Execute the console command.
