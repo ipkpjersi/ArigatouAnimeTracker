@@ -144,6 +144,7 @@ class AnimeAdditionalDataImportService
                 if (trim($query) !== '') {
                     try {
                         DB::unprepared($query . ';');
+                        $logger && $logger("Importing additional anime data for anime " . ($count + 1));
                         $count++;
                     } catch (\Exception $e) {
                         $hasError = true;
