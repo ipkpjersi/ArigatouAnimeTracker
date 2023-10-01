@@ -157,7 +157,7 @@ class AnimeAdditionalDataImportService
                 $logger && $logger("Imported {$count} SQL queries successfully.");
             }
         } else {
-            $logger && $logger('SQL file does not exist.');
+            $logger && $logger('Error importing additional anime data: SQL file does not exist.');
         }
         $duration = microtime(true) - $startTime;
         return [
