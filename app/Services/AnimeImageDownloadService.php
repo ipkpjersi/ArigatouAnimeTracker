@@ -68,7 +68,9 @@ class AnimeImageDownloadService
         // Create the directories if they don't exist
         $directory = dirname($fullPath);
         if (!file_exists($directory)) {
-            mkdir($directory, 0755, true);
+            if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $directory));
+            }
         }
 
         // Check if the file already exists
