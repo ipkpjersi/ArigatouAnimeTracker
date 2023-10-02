@@ -27,6 +27,7 @@ class AnimeImageDownloadService
                     ->get();
         $startTime = microtime(true);
         $count = 0;
+        $imageFailed = 0;
         $total = $anime->count();
         $remaining = $total - $downloaded->count();
         $logger && $logger("Downloading images for $remaining out of $total anime.");
@@ -35,11 +36,15 @@ class AnimeImageDownloadService
             if ($current->thumbnail) {
                 if ($this->downloadImageFromUrl($current->thumbnail, 'thumbnail', $logger)) {
                     $imageDownloaded = true;
+                } else {
+                    $imageFailed++;
                 }
             }
             if ($current->picture) {
                 if ($this->downloadImageFromUrl($current->picture, 'picture', $logger)) {
                     $imageDownloaded = true;
+                } else {
+                    $imageFailed++;
                 }
             }
             if ($imageDownloaded) {
@@ -56,6 +61,8 @@ class AnimeImageDownloadService
         return [
             'count' => $count,
             'total' => $total,
+            'failed' => $imageFailed,
+            'totalImages' => $count + $imageFailed,
             'duration' => $duration,
         ];
     }
