@@ -40,7 +40,7 @@ class DownloadAnimeImages extends Command
             $result = $animeImageDownloadService->downloadImages($logger);
             $duration = round($result['duration'], 2);
 
-            $this->info("Downloaded images for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
+            $this->info("Downloaded {$result['count']} images for {$result['total']} anime records successfully in {$duration} seconds.");
         } catch (\Exception $e) {
             $this->error('An error occurred during the data fetch: ' . $e->getMessage());
         }
