@@ -1,7 +1,10 @@
 <x-app-layout>
+    <x-slot name="title">
+        {{ config('app.name', 'Laravel') }} - Import Anime List
+    </x-slot>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Import Anime Export File
+            Import Anime List
         </h2>
     </x-slot>
 

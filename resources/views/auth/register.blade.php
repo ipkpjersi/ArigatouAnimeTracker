@@ -1,4 +1,7 @@
 <x-guest-layout>
+    <x-slot name="title">
+        {{ config('app.name', 'Laravel') }} - Register
+    </x-slot>
     <div class="flex justify-center flex-col items-center mb-6">
         <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
         <h2 class="text-xl text-gray-700 dark:text-gray-300">Arigatou Anime Tracker</h2>

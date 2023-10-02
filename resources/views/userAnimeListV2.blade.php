@@ -1,4 +1,7 @@
 <x-app-layout>
+    <x-slot name="title">
+        {{ config('app.name', 'Laravel') }} - User Anime List V2 for {{ $username }}
+    </x-slot>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             User Anime List V2 for {{ $username }}

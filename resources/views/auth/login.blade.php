@@ -1,4 +1,7 @@
 <x-guest-layout>
+    <x-slot name="title">
+        {{ config('app.name', 'Laravel') }} - Login
+    </x-slot>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
     <div class="flex justify-center flex-col items-center mb-6">
