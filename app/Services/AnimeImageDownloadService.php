@@ -81,7 +81,7 @@ class AnimeImageDownloadService
                 $logger && $logger("Image $type downloaded successfully to: " . $fullPath);
                 return true;
             } else {
-                $logger && $logger("Failed to download $type image from: " . $url);
+                $logger && $logger("Failed to download $type image from: " . $url . " with response status: " . $response->status());
             }
         } else {
             $logger && $logger("Image $type already exists at: " . $fullPath);
