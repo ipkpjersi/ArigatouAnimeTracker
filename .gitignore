@@ -19,3 +19,5 @@ yarn-error.log
 /.vscode
 public/img/avatars/**
 !storage/app/imports/anime-offline-database.json
+public/picture/**
+public/thumbnail/**
