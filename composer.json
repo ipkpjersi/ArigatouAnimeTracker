@@ -16,7 +16,8 @@
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^2.11",
         "spatie/laravel-backup": "^8.3",
-        "yajra/laravel-datatables-oracle": "^10.3"
+        "yajra/laravel-datatables-oracle": "^10.3",
+        "ext-zip": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.8",

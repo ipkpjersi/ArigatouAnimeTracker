@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ZipArchive;
 
 class AnimeImageDownloadService
 {
@@ -102,5 +105,81 @@ class AnimeImageDownloadService
         $parsedUrl = parse_url($url);
         $path = $parsedUrl['path'];
         return "$type" . $path;
+    }
+
+        public function zipImages()
+    {
+        $directories = [
+            public_path('picture'),
+            public_path('thumbnail')
+        ];
+
+        foreach ($directories as $dir) {
+            $this->createZipArchives($dir);
+        }
+    }
+
+    private function createZipArchives($dir)
+    {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST,
+            RecursiveIteratorIterator::CATCH_GET_CHILD
+        );
+
+        foreach ($iterator as $path) {
+            if ($path->isFile()) {
+                $filePath = $path->getPathname();
+                $zipPath = str_replace([public_path(), '/'], ['', '.zip/'], $filePath) . '.zip';
+
+                $zip = new ZipArchive();
+                if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+                    $zip->addFile($filePath, $iterator->getSubPathName());
+                    $zip->close();
+                } else {
+                    throw new \RuntimeException(sprintf('Failed to create ZIP archive: %s', $zipPath));
+                }
+            }
+        }
+    }
+
+    public function unzipImages()
+    {
+        $directories = [
+            public_path('picture'),
+            public_path('thumbnail')
+        ];
+
+        foreach ($directories as $dir) {
+            $this->unzipInDirectory($dir);
+        }
+    }
+
+    private function unzipInDirectory($dir)
+    {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST,
+            RecursiveIteratorIterator::CATCH_GET_CHILD
+        );
+
+        foreach ($iterator as $path) {
+            if ($path->isFile() && strtolower($path->getExtension()) === 'zip') {
+                $zipPath = $path->getPathname();
+                $this->unzipImage($zipPath);
+            }
+        }
+    }
+
+    private function unzipImage($zipPath)
+    {
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath) === TRUE) {
+            $extractPath = dirname($zipPath);  // Extract in the same directory where the zip file is located
+            $zip->extractTo($extractPath);
+            $zip->close();
+        } else {
+            throw new \RuntimeException(sprintf('Failed to open ZIP archive: %s', $zipPath));
+        }
     }
 }
