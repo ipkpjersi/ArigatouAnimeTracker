@@ -21,3 +21,4 @@ public/img/avatars/**
 !storage/app/imports/anime-offline-database.json
 public/picture/**
 public/thumbnail/**
+database/seeders/anime_additional_data.sql
