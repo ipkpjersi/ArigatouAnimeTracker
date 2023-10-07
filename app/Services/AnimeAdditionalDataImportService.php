@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use ZipArchive;
 
 class AnimeAdditionalDataImportService
 {
@@ -120,6 +121,7 @@ class AnimeAdditionalDataImportService
 
         if ($generateSqlFile) {
             fclose($sqlFile);
+            $this->zipSqlFile();
         }
 
         $duration = microtime(true) - $startTime;
@@ -135,6 +137,9 @@ class AnimeAdditionalDataImportService
         $count = 0;
         $hasError = false;
         $sqlPath = database_path('seeders/anime_additional_data.sql');
+        if (!File::exists($sqlPath)) {
+            $this->unzipSqlFile();
+        }
         $anime = DB::table('anime')->get();
         $total = count($anime);
         if (File::exists($sqlPath)) {
@@ -202,5 +207,31 @@ class AnimeAdditionalDataImportService
         }
     }
 
+     private function zipSqlFile()
+    {
+        $sqlPath = database_path('seeders/anime_additional_data.sql');
+        $zipPath = database_path('seeders/anime_additional_data.zip');
 
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+            $zip->addFile($sqlPath, 'anime_additional_data.sql');
+            $zip->close();
+        } else {
+            throw new \RuntimeException('Failed to create ZIP archive for SQL file.');
+        }
+    }
+
+    private function unzipSqlFile()
+    {
+        $zipPath = database_path('seeders/anime_additional_data.zip');
+        $sqlPath = database_path('seeders/anime_additional_data.sql');
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath) === TRUE) {
+            $zip->extractTo(database_path('seeders/'));
+            $zip->close();
+        } else {
+            throw new \RuntimeException('Failed to unzip SQL file.');
+        }
+    }
 }
