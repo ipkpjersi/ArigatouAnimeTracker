@@ -30,7 +30,7 @@
 
             <div id="confirmation-modal" class="fixed inset-0 bg-opacity-50 flex items-center justify-center hidden">
                 <div class="bg-gray-100 dark:bg-black p-4 rounded-lg text-center">
-                    <p class="mb-4">Are you sure you want to delete the avatar?</p>
+                    <p class="mb-4">Are you sure you want to delete your avatar?</p>
                     <div class="flex justify-around">
                         <button type="button" onclick="deleteAvatar()" class="px-4 py-2 bg-green-500 text-white rounded-lg">Yes</button>
                         <button type="button" onclick="closeModal()" class="px-4 py-2 bg-red-500 text-white rounded-lg">No</button>
