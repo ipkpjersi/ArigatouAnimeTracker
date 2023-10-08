@@ -55,10 +55,10 @@ class AnimeImageDownloadService
                   ->where('id', $current->id)
                   ->limit(1)
                   ->update(['image_downloaded' => true]);
-                $sleepTime = rand(config("global.image_download_service_sleep_time_lower", 5), config("global.image_download_service_sleep_time_upper", 22));
-                $logger && $logger("Sleeping for $sleepTime seconds");
-                sleep($sleepTime);
             }
+            $sleepTime = rand(config("global.image_download_service_sleep_time_lower", 5), config("global.image_download_service_sleep_time_upper", 22));
+            $logger && $logger("Sleeping for $sleepTime seconds");
+            sleep($sleepTime);
         }
         $duration = microtime(true) - $startTime;
         return [
