@@ -55,10 +55,10 @@ class AnimeImageDownloadService
                   ->where('id', $current->id)
                   ->limit(1)
                   ->update(['image_downloaded' => true]);
+                $sleepTime = rand(config("global.image_download_service_sleep_time_lower", 5), config("global.image_download_service_sleep_time_upper", 22));
+                $logger && $logger("Sleeping for $sleepTime seconds");
+                sleep($sleepTime);
             }
-            $sleepTime = rand(config("global.image_download_service_sleep_time_lower", 5), config("global.image_download_service_sleep_time_upper", 22));
-            $logger && $logger("Sleeping for $sleepTime seconds");
-            sleep($sleepTime);
         }
         $duration = microtime(true) - $startTime;
         return [
@@ -130,16 +130,7 @@ class AnimeImageDownloadService
         foreach ($iterator as $path) {
             if ($path->isFile()) {
                 $filePath = $path->getPathname();
-                $relativePath = str_replace(public_path(), '', $filePath);
-                $zipDir = public_path('zips') . dirname($relativePath);
-                $zipPath = $zipDir . '/' . basename($filePath) . '.zip';
-
-                // Ensure the directory for the zip file exists
-                if (!is_dir($zipDir)) {
-                    if (!mkdir($zipDir, 0755, true) && !is_dir($zipDir)) {
-                        throw new \RuntimeException(sprintf('Directory "%s" was not created', $zipDir));
-                    }
-                }
+                $zipPath = $filePath . '.zip';  // This appends .zip to the original file path
 
                 $zip = new ZipArchive();
                 if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
@@ -151,6 +142,7 @@ class AnimeImageDownloadService
             }
         }
     }
+
 
     public function unzipImages()
     {
