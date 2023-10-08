@@ -32,7 +32,7 @@
 - PHP >= 8.1
 - Composer
 - Node.js & npm
-- A MySQL or PostgreSQL database
+- A MySQL database
 
 ### Installation:
 1. Clone the repository to your local machine.
