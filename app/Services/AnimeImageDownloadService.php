@@ -130,7 +130,16 @@ class AnimeImageDownloadService
         foreach ($iterator as $path) {
             if ($path->isFile()) {
                 $filePath = $path->getPathname();
-                $zipPath = str_replace([public_path(), '/'], ['', '.zip/'], $filePath) . '.zip';
+                $relativePath = str_replace(public_path(), '', $filePath);
+                $zipDir = public_path('zips') . dirname($relativePath);
+                $zipPath = $zipDir . '/' . basename($filePath) . '.zip';
+
+                // Ensure the directory for the zip file exists
+                if (!is_dir($zipDir)) {
+                    if (!mkdir($zipDir, 0755, true) && !is_dir($zipDir)) {
+                        throw new \RuntimeException(sprintf('Directory "%s" was not created', $zipDir));
+                    }
+                }
 
                 $zip = new ZipArchive();
                 if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
