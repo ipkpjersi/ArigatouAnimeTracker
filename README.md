@@ -55,4 +55,4 @@ We value your contributions. To get started, please fork the repository and open
 
 ---
 
-Embark on a journey through the diverse world of anime with **Arigatou Anime Tracker**!
+Embark on a journey through the fascinating world of anime with **Arigatou Anime Tracker**!
