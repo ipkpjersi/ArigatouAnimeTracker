@@ -32,8 +32,8 @@ class AnimeImageDownloadService
         $startTime = microtime(true);
         $count = 0;
         $imageFailed = 0;
-        $total = $anime->count();
-        $remaining = $total - $downloaded->count();
+        $total = $anime->count() + $downloaded->count();
+        $remaining = $anime->count();
         $logger && $logger("Downloading images for $remaining out of $total anime.");
         foreach ($anime as $current) {
             $imageDownloaded = false;
