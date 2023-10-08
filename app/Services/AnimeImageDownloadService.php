@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ZipArchive;
+use function App\Helpers\rot19;
 
 class AnimeImageDownloadService
 {
@@ -128,9 +129,11 @@ class AnimeImageDownloadService
         );
 
         foreach ($iterator as $path) {
-            if ($path->isFile()) {
+            if ($path->isFile() && strtolower($path->getExtension()) !== 'zip') {
                 $filePath = $path->getPathname();
-                $zipPath = $filePath . '.zip';  // This appends .zip to the original file path
+                $fileName = basename($filePath);  // Get the file name from the file path
+                $rot19Filename = rot19($fileName) . '.zip';  // Apply rot19 and append '.zip'
+                $zipPath = dirname($filePath) . DIRECTORY_SEPARATOR . $rot19Filename;  // Construct the new zip file path
 
                 $zip = new ZipArchive();
                 if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
