@@ -27,7 +27,7 @@ Route::get('/', function () {
 
 Route::get('/users/', [UserController::class, 'list'])->name("users.list");
 
-Route::get('/user/getUserData', [UserController::class, 'getUserData'])->name('users.data');
+Route::get('/users/getUserData', [UserController::class, 'getUserData'])->name('users.data');
 
 Route::get('/users/{username}', [UserController::class, 'detail'])->name("users.detail");
 
@@ -69,6 +69,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/{userId}/ban', [UserController::class, 'banUser'])->name('users.ban');
     Route::post('/users/{userId}/unban', [UserController::class, 'unbanUser'])->name('users.unban');
     Route::post('/users/{userId}/remove-avatar', [UserController::class, 'removeAvatar'])->name('users.removeAvatar');
+
+    Route::post('/user/{userId}/clear-avatar', [UserController::class, 'clearAvatar'])->name('avatar.clear');
 
     Route::post('/animelist/{username}/update/{redirectBack?}', [AnimeController::class, 'updateUserAnimeList'])->name('user.anime.update');
 

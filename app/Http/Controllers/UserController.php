@@ -92,4 +92,16 @@ class UserController extends Controller
         return response()->json(['message' => 'Avatar removed successfully']);
     }
 
+    public function clearAvatar(Request $request, $userId)
+    {
+        if (auth()->user() == null || auth()->user()->id != $userId) {
+            return response()->json([], 404);
+        }
+        $user = User::findOrFail($userId);
+        $user->avatar = null;
+        $user->save();
+
+        return response()->json(['success' => true, 'message' => 'Avatar cleared successfully']);
+    }
+
 }
