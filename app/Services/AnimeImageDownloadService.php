@@ -131,10 +131,10 @@ class AnimeImageDownloadService
         foreach ($iterator as $path) {
             if ($path->isFile() && strtolower($path->getExtension()) !== 'zip') {
                 $filePath = $path->getPathname();
-                $fileName = basename($filePath);  // Get the file name from the file path
-                $rot19Filename = rot19($fileName) . '.zip';  // Apply rot19 and append '.zip'
-                $zipPath = dirname($filePath) . DIRECTORY_SEPARATOR . $rot19Filename;  // Construct the new zip file path
-
+                $fileNameWithoutExtension = pathinfo($filePath, PATHINFO_FILENAME);
+                $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
+                $rot19Filename = rot19($fileNameWithoutExtension) . '.' . $fileExtension . '.zip';
+                $zipPath = dirname($filePath) . DIRECTORY_SEPARATOR . $rot19Filename;
                 $zip = new ZipArchive();
                 if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
                     $zip->addFile($filePath, $iterator->getSubPathName());
