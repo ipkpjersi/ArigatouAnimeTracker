@@ -28,10 +28,20 @@
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="email" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
+            <div id="confirmation-modal" class="fixed inset-0 bg-opacity-50 flex items-center justify-center hidden">
+                <div class="bg-gray-100 dark:bg-black p-4 rounded-lg text-center">
+                    <p class="mb-4">Are you sure you want to delete the avatar?</p>
+                    <div class="flex justify-around">
+                        <button type="button" onclick="deleteAvatar()" class="px-4 py-2 bg-green-500 text-white rounded-lg">Yes</button>
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-red-500 text-white rounded-lg">No</button>
+                    </div>
+                </div>
+            </div>
+
             <x-input-label class="mt-4" for="avatar" :value="__('Avatar (Resized to 150x150)')" />
             <img id="current-avatar" src="{{ $user->avatar }}" alt="Current Avatar" @if (!$user->avatar) style="display:none; width:150px; height:150px" @endif class="rounded-lg w-24 h-24 mb-3" style="width:150px; height: 150px;">
             <input id="avatar" name="avatar" type="file" class="mt-1 block w-full" value="old('avatar', $user->avatar)" accept="image/*" autocomplete="avatar" />
-            <button type="button" id="clear-avatar-button" class="mt-3 text-black bg-yellow-400 hover:bg-yellow-600 px-4 py-2 rounded shadow">{{ __('Clear Avatar') }}</button>
+            <button type="button" id="delete-avatar-button" class="mt-3 text-black bg-yellow-400 hover:bg-yellow-600 px-4 py-2 rounded shadow">{{ __('Delete Avatar') }}</button>
             <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
 
             <x-input-label class="mt-4" for="dark_mode" :value="__('Dark Mode')" />
@@ -84,7 +94,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_anime_list_number')" />
 
-            <x-input-label class="mt-4" for="show_clear_anime_list_button" :value="__('Show Clear Anime List Button')" />
+            <x-input-label class="mt-4" for="show_clear_anime_list_button" :value="__('Show Delete Anime List Button')" />
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
                     <input id="show_clear_anime_list_button" type="radio" name="show_clear_anime_list_button" value="1" class="form-radio"
@@ -161,8 +171,8 @@
             }
         });
 
-        document.getElementById('clear-avatar-button').addEventListener('click', function() {
-            fetch('{{ route('avatar.clear', ['userId' => $user->id]) }}', {
+        function deleteAvatar() {
+            fetch('{{ route('avatar.delete', ['userId' => $user->id]) }}', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -174,8 +184,29 @@
                     document.getElementById('current-avatar').style.display = 'none';
                     document.getElementById('current-avatar').src = '';
                     document.getElementById('avatar').value = '';
+                    closeModal();
                 }
             });
+        }
+
+        function closeModal() {
+            document.getElementById('confirmation-modal').classList.add('hidden');
+        }
+
+        document.getElementById('delete-avatar-button').addEventListener('click', function() {
+            document.getElementById('confirmation-modal').classList.remove('hidden');
+        });
+
+        window.addEventListener("click", function(event) {
+            if (event.target === document.getElementById("confirmation-modal")) {
+                closeModal();
+            }
+        });
+
+        window.addEventListener("keydown", function(e) {
+            if (e.key === "Escape") {
+                closeModal();
+            }
         });
     </script>
 </section>

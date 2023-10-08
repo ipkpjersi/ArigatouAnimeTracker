@@ -92,7 +92,7 @@ class UserController extends Controller
         return response()->json(['message' => 'Avatar removed successfully']);
     }
 
-    public function clearAvatar(Request $request, $userId)
+    public function deleteAvatar(Request $request, $userId)
     {
         if (auth()->user() == null || auth()->user()->id != $userId) {
             return response()->json([], 404);
@@ -101,7 +101,7 @@ class UserController extends Controller
         $user->avatar = null;
         $user->save();
 
-        return response()->json(['success' => true, 'message' => 'Avatar cleared successfully']);
+        return response()->json(['success' => true, 'message' => 'Avatar deleted successfully']);
     }
 
 }

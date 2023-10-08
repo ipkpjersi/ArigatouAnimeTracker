@@ -70,7 +70,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/{userId}/unban', [UserController::class, 'unbanUser'])->name('users.unban');
     Route::post('/users/{userId}/remove-avatar', [UserController::class, 'removeAvatar'])->name('users.removeAvatar');
 
-    Route::post('/user/{userId}/clear-avatar', [UserController::class, 'clearAvatar'])->name('avatar.clear');
+    Route::post('/user/{userId}/delete-avatar', [UserController::class, 'deleteAvatar'])->name('avatar.delete');
 
     Route::post('/animelist/{username}/update/{redirectBack?}', [AnimeController::class, 'updateUserAnimeList'])->name('user.anime.update');
 
