@@ -8,6 +8,13 @@
         </h2>
         <a href="{{ route('anime.category', ['category' => $category, 'view' => 'list'] + request()->query()) }}">List View</a> |
         <a href="{{ route('anime.category', ['category' => $category, 'view' => 'card'] + request()->query()) }}">Card View</a>
+
+        <select id="sort-dropdown" class="ml-4 dark:bg-gray-800 bg-white">
+            <option value="mal_score" {{ request()->get('sort') == 'mal_score' ? 'selected' : '' }}>MAL Score</option>
+            <option value="mal_members" {{ request()->get('sort') == 'mal_members' ? 'selected' : '' }}>MAL Members</option>
+            <option value="newest" {{ request()->get('sort') == 'newest' ? 'selected' : '' }}>Newest</option>
+            <option value="title" {{ request()->get('sort') == 'title' ? 'selected' : '' }}>Title</option>
+        </select>
     </x-slot>
 
     <div class="py-12">
@@ -148,5 +155,11 @@
             });
         }
         @endif
+        document.getElementById('sort-dropdown').addEventListener('change', function() {
+            const selectedSort = this.value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('sort', selectedSort);
+            window.location.href = url.toString();
+        });
     </script>
 </x-app-layout>

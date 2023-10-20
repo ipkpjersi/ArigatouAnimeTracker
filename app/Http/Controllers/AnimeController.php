@@ -227,7 +227,24 @@ class AnimeController extends Controller
 
         $query = Anime::where(function($query) use ($category) {
             $query->whereRaw('LOWER(tags) LIKE ?', ["%$category%"]);
-        })->orderBy('mal_mean', 'desc');
+        });
+
+        $sort = $request->get('sort', 'mal_mean');
+
+        switch ($sort) {
+            case 'mal_members':
+                $query->orderBy('mal_list_members', 'desc');
+                break;
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'title':
+                $query->orderBy('title', 'asc');
+                break;
+            default:
+                $query->orderBy('mal_mean', 'desc');
+                break;
+        }
 
         if (auth()->user() == null || auth()->user()->show_adult_content == false) {
             //No need for this to be plain-text, so we'll use rot13.
@@ -240,7 +257,7 @@ class AnimeController extends Controller
             }
         }]);
 
-        $categoryAnime = $query->paginate(50);
+        $categoryAnime = $query->paginate(50)->appends(['sort' => $sort]);
         $watchStatuses = WatchStatus::all()->keyBy('id');
         return view('category', [
             'categoryAnime' => $categoryAnime,
