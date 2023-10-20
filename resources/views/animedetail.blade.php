@@ -127,7 +127,7 @@
                     <div class="w-full md:w-3/5 mt-0">
 
                         <h4 class="font-bold mb-2">Description:</h4>
-                        <span>{{ $anime->description ?? "This title does not have a description yet." }}</span>
+                        <p class="mb-4">{{ $anime->description ?? "This title does not have a description yet." }}</p>
 
                         <h4 class="font-bold @if (!empty($anime->description)) mt-4 @endif mb-2">More Details:</h4>
                         <ul>
