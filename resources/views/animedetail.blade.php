@@ -31,6 +31,10 @@
                         <p><strong>Episodes:</strong> {{ $anime->episodes }}</p>
                         <p><strong>Season:</strong> {{ $anime->season }}</p>
                         <p><strong>Year:</strong> {{ $anime->year }}</p>
+                        @if (!empty($anime->synonyms))
+                            <h4 class="font-bold">Also known as:</h4>
+                            <span>{{ $anime->synonyms }}</span>
+                        @endif
                         @if (auth()->user())
                             @if (!auth()->user()->anime->contains($anime->id))
                                 <form action="{{ route('anime.addToList', $anime->id) }}" method="POST">
@@ -121,10 +125,6 @@
 
                     <!-- Right Column -->
                     <div class="w-full md:w-3/5 mt-0">
-                        @if (!empty($anime->synonyms))
-                            <h4 class="font-bold mb-2">Also known as:</h4>
-                            <p>{{ $anime->synonyms }}</p>
-                        @endif
 
                         <h4 class="font-bold @if (!empty($anime->synonyms)) mt-4 @endif mb-2">More Details:</h4>
                         <ul>
