@@ -19,7 +19,7 @@
                     </div>
                     <table class="w-full">
                         <thead>
-                            <tr>
+                            <tr class="text-left">
                                 <th>Rank</th>
                                 <th>Title</th>
                                 <th>MAL Score</th>
