@@ -23,7 +23,7 @@
                     @if ($viewType === 'list')
                         <table class="w-full">
                             <thead>
-                                <tr>
+                                <tr class="text-left">
                                     <th>Title</th>
                                     <th>Type</th>
                                     <th>Eps.</th>
