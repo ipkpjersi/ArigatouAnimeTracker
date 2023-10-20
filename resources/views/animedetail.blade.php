@@ -117,7 +117,7 @@
                         <h4 class="font-bold mt-4 mb-2">Tags:</h4>
                         <ul>
                             @foreach (explode(', ', $anime->tags) as $tag)
-                                <li>{{ $tag }}</li>
+                                <a href="{{ route("anime.list", ["search" => $tag]) }}"><li>{{ $tag }}</li></a>
                             @endforeach
                         </ul>
                     </div>
