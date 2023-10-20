@@ -126,7 +126,10 @@
                     <!-- Right Column -->
                     <div class="w-full md:w-3/5 mt-0">
 
-                        <h4 class="font-bold @if (!empty($anime->synonyms)) mt-4 @endif mb-2">More Details:</h4>
+                        <h4 class="font-bold mb-2">Description:</h4>
+                        <span>{{ $anime->description ?? "This title does not have a description yet." }}</span>
+
+                        <h4 class="font-bold @if (!empty($anime->description)) mt-4 @endif mb-2">More Details:</h4>
                         <ul>
                             @foreach (explode(', ', $anime->sources) as $source)
                                 <li><a href="{{ $source }}" target="_blank" rel="noopener">{{ $source }}</a></li>
