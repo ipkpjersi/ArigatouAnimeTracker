@@ -229,6 +229,17 @@ class AnimeController extends Controller
             $query->whereRaw('LOWER(tags) LIKE ?', ["%$category%"]);
         });
 
+        $query = $query->selectRaw('*,
+            CASE WHEN season = "UNDEFINED" THEN "UNKNOWN" ELSE season END as season_display,
+            CASE season
+                WHEN "SPRING" THEN 1
+                WHEN "SUMMER" THEN 2
+                WHEN "FALL" THEN 3
+                WHEN "WINTER" THEN 4
+                ELSE 0
+            END as season_sort'
+        );
+
         $sort = $request->get('sort', 'mal_mean');
 
         switch ($sort) {
@@ -236,7 +247,7 @@ class AnimeController extends Controller
                 $query->orderBy('mal_list_members', 'desc');
                 break;
             case 'newest':
-                $query->orderBy('created_at', 'desc');
+                $query->orderBy('year', 'desc')->orderBy('season_sort', 'asc');
                 break;
             case 'title':
                 $query->orderBy('title', 'asc');
