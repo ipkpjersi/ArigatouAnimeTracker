@@ -35,7 +35,8 @@
                                     <th>Type</th>
                                     <th>Eps.</th>
                                     <th>MAL Score</th>
-                                    <th>Start Date</th>
+                                    <th>Year</th>
+                                    <th>Season</th>
                                     <th>MAL List Members</th>
                                     @if (Auth::user() != null)
                                         <th>Status</th>
@@ -46,14 +47,15 @@
                                 @foreach ($categoryAnime as $anime)
                                     <tr>
                                         <td>
-                                            <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }}" class="inline-block" width="50" height="70">
+                                            <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }}" class="inline-block" width="50" height="70" onerror="this.onerror=null; this.src='/img/notfound.gif';">
                                             <a href="{{ route('anime.detail', $anime->id) }}" class="ml-4">{{ $anime->title }}</a>
                                         </td>
                                         <td>{{ $anime->anime_type->type }}</td>
-                                        <td>{{ $anime->episodes }}</td> <!-- Assuming column name is episode_count -->
-                                        <td>{{ $anime->mal_mean }}</td>
-                                        <td>{{ Carbon\Carbon::parse($anime->start_date)->format('Y-m-d') }}</td> <!-- Assuming start_date is a Carbon instance -->
-                                        <td>{{ $anime->mal_list_members }}</td>
+                                        <td>{{ $anime->episodes }}</td>
+                                        <td>{{ $anime->mal_mean ?? "N/A" }}</td>
+                                        <td>{{ $anime->year }}</td>
+                                        <td>{{ $anime->season_display }}</td>
+                                        <td>{{ $anime->mal_list_members ?? 0 }}</td>
                                         @if (Auth::user())
                                             <td>
                                                 @php
@@ -83,7 +85,7 @@
                                     <div class="relative z-20">
                                         <a href="{{ route("anime.detail", $anime->id) }}">
                                         <h3 class="text-xl font-semibold mb-2">{{ $anime->title }}</h3>
-                                        <img src="{{ $anime->picture }}" alt="{{ $anime->title }}" width="100" height="140" class="rounded mb-4">
+                                        <img src="{{ $anime->picture }}" alt="{{ $anime->title }}" width="100" height="140" class="rounded mb-4" onerror="this.onerror=null; this.src='/img/notfound.gif';">
                                         <p class="text-sm text-gray-600">{{ Str::limit($anime->description, 300) }}</p>
                                         </a>
                                     </div>
