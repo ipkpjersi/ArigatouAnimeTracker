@@ -5,7 +5,8 @@
 ## 🛠️ Technology Stack
 
 ### Backend:
-- **[Laravel (with Laravel Breeze)](https://laravel.com/)**: The robust framework providing the backbone of our application.
+- **[Laravel](https://laravel.com/)**: The robust framework providing the backbone of our application.
+- **[Laravel Breeze](https://laravel.com/docs/10.x/starter-kits#laravel-breeze)**: A minimalistic starter kit for Laravel, providing essential authentication scaffolding for our backend.
 - **[PHP 8.1 and above](https://www.php.net/releases/8.1/en.php)**: The server-side scripting language powering our backend.
 
 ### Frontend:
