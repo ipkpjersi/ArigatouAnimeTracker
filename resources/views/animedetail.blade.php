@@ -32,8 +32,21 @@
                         <p><strong>Season:</strong> {{ $anime->season }}</p>
                         <p><strong>Year:</strong> {{ $anime->year }}</p>
                         @if (!empty($anime->synonyms))
-                            <h4 class="font-bold">Also known as:</h4>
-                            <span>{{ $anime->synonyms }}</span>
+                            @php
+                                $synonyms = explode(', ', $anime->synonyms);
+                            @endphp
+                            <h4 class="font-bold mt-4 cursor-pointer" onclick="toggleSynonyms()">Also known as:</h4>
+                            <div id="synonyms-div">
+                                <span>
+                                    {{ implode(', ', array_slice($synonyms, 0, 4)) }}
+                                    <span id="hidden-synonyms" class="hidden">
+                                        {{ count($synonyms) > 4 ? ', ' . implode(', ', array_slice($synonyms, 4)) : '' }}
+                                    </span>
+                                </span>
+                                @if (count($synonyms) > 4)
+                                    <button id="toggle-button" onclick="toggleSynonyms()">&#x25BC; More</button>
+                                @endif
+                            </div>
                         @endif
                         @if (auth()->user())
                             @if (!auth()->user()->anime->contains($anime->id))
@@ -157,5 +170,16 @@
                 }, 3000);  // 3 seconds
             }
         });
+        function toggleSynonyms() {
+            const hiddenSynonyms = document.getElementById('hidden-synonyms');
+            const toggleButton = document.getElementById('toggle-button');
+            if (hiddenSynonyms.classList.contains('hidden')) {
+                hiddenSynonyms.classList.remove('hidden');
+                toggleButton.innerHTML = '&#x25B2; Less';
+            } else {
+                hiddenSynonyms.classList.add('hidden');
+                toggleButton.innerHTML = '&#x25BC; More';
+            }
+        }
     </script>
 </x-app-layout>
