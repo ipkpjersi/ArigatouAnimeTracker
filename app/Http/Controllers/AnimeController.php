@@ -118,12 +118,26 @@ class AnimeController extends Controller
 
 
 
-    public function topAnime()
+    public function topAnime(Request $request)
     {
-        $query = Anime::orderBy('mal_mean', 'desc');
+        $query = Anime::with('anime_type', 'anime_status')->selectRaw('*,
+            CASE WHEN season = "UNDEFINED" THEN "UNKNOWN" ELSE season END as season_display,
+            CASE season
+                WHEN "SPRING" THEN 1
+                WHEN "SUMMER" THEN 2
+                WHEN "FALL" THEN 3
+                WHEN "WINTER" THEN 4
+                ELSE 0
+            END as season_sort');
         if (auth()->user() == null || auth()->user()->show_adult_content == false) {
             //No need for this to be plain-text, so we'll use rot13.
             $query = $query->where('tags', 'NOT LIKE', '%' . str_rot13('uragnv') . '%');
+        }
+        $sort = $request->get('sort', 'highest_rated');
+        if ($sort === 'highest_rated') {
+            $query->orderBy('mal_mean', 'desc');
+        } else if ($sort === 'most_popular') {
+            $query->orderBy('mal_list_members', 'desc');
         }
         $topAnime = $query->paginate(50);
         $userScores = [];

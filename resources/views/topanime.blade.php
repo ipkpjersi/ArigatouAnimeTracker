@@ -17,12 +17,19 @@
                         <p id="status-message"></p>
                       </div>
                     </div>
+                    <div class="mb-4 flex border-b">
+                        <a href="{{ route('anime.top', ['sort' => 'highest_rated']) }}" class="tab-button {{ request()->get('sort') == 'highest_rated' || !request()->get('sort') ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Highest Rated</a>
+                        <a href="{{ route('anime.top', ['sort' => 'most_popular']) }}" class="tab-button {{ request()->get('sort') == 'most_popular' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Most Popular</a>
+                    </div>
                     <table class="w-full">
                         <thead>
                             <tr class="text-left">
                                 <th>Rank</th>
                                 <th>Title</th>
+                                <th>Year</th>
+                                <th>Season</th>
                                 <th>MAL Score</th>
+                                <th>MAL Members</th>
                                 @if (Auth::user() != null)
                                     <th>My Score</th>
                                     <th>Status</th>
@@ -39,7 +46,10 @@
                                             <span class="ml-4">{{ $anime->title }}</span>
                                         </a>
                                     </td>
-                                    <td>{{ $anime->mal_mean }}</td>
+                                    <td>{{ $anime->year }}</td>
+                                    <td>{{ $anime->season_display }}</td>
+                                    <td>{{ $anime->mal_mean ?? "N/A" }}</td>
+                                    <td>{{ number_format($anime->mal_list_members ?? 0) }}</td>
                                     @if (Auth::user() != null)
                                         <td>{{ !empty($userScores[$anime->id]) ? $userScores[$anime->id] : 'N/A' ?? 'N/A' }}</td>
                                         <td>
