@@ -9,7 +9,7 @@
         <a href="{{ route('anime.category', ['category' => $category, 'view' => 'list'] + request()->query()) }}">List View</a> |
         <a href="{{ route('anime.category', ['category' => $category, 'view' => 'card'] + request()->query()) }}">Card View</a>
 
-        <select id="sort-dropdown" class="ml-4 dark:bg-gray-800 bg-white">
+        <select id="sort-dropdown" class="ml-4 dark:bg-gray-800 bg-white rounded">
             <option value="mal_score" {{ request()->get('sort') == 'mal_score' ? 'selected' : '' }}>MAL Score</option>
             <option value="mal_members" {{ request()->get('sort') == 'mal_members' ? 'selected' : '' }}>MAL Members</option>
             <option value="newest" {{ request()->get('sort') == 'newest' ? 'selected' : '' }}>Newest</option>
@@ -34,9 +34,9 @@
                                     <th>Title</th>
                                     <th>Type</th>
                                     <th>Eps.</th>
-                                    <th>MAL Score</th>
                                     <th>Year</th>
                                     <th>Season</th>
+                                    <th>MAL Score</th>
                                     <th>MAL List Members</th>
                                     @if (Auth::user() != null)
                                         <th>Status</th>
@@ -52,9 +52,9 @@
                                         </td>
                                         <td>{{ $anime->anime_type->type }}</td>
                                         <td>{{ $anime->episodes }}</td>
-                                        <td>{{ $anime->mal_mean ?? "N/A" }}</td>
                                         <td>{{ $anime->year }}</td>
                                         <td>{{ $anime->season_display }}</td>
+                                        <td>{{ $anime->mal_mean ?? "N/A" }}</td>
                                         <td>{{ $anime->mal_list_members ?? 0 }}</td>
                                         @if (Auth::user())
                                             <td>
