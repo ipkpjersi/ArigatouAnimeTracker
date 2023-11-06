@@ -29,6 +29,10 @@ return new class extends Migration
             $table->string('login_ip')->nullable();
             $table->boolean('show_clear_anime_list_button')->default(false);
             $table->boolean('display_anime_cards')->default(true);
+            $table->boolean('enable_friends_system')->default(true);
+            $table->boolean('show_friends_on_profile_publicly')->default(true);
+            $table->boolean('show_friends_on_profile_when_logged_in')->default(true);
+            $table->boolean('show_friends_in_nav_dropdown')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });
