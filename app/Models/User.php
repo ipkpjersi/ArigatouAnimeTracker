@@ -89,4 +89,29 @@ class User extends Authenticatable
 
         return compact('totalCompleted', 'totalEpisodes', 'averageScore', 'animeStatusCounts', 'totalDaysWatched');
     }
+
+    public function friends()
+    {
+        return $this->belongsToMany(User::class, 'user_friends', 'user_id', 'friend_user_id')
+                    ->withTimestamps();
+    }
+
+    public function addFriend($friendId)
+    {
+        if ($this->id == $friendId) {
+            throw new \Exception('You cannot add yourself as a friend.');
+        }
+
+        if ($this->friends()->where('friend_user_id', $friendId)->exists()) {
+            throw new \Exception('This user is already your friend.');
+        }
+
+        $this->friends()->attach($friendId);
+    }
+
+    public function friendOf()
+    {
+        return $this->belongsToMany(User::class, 'user_friends', 'friend_user_id', 'user_id')
+                    ->withTimestamps();
+    }
 }
