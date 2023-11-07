@@ -37,7 +37,7 @@
                                     <th>Year</th>
                                     <th>Season</th>
                                     <th>MAL Score</th>
-                                    <th>MAL List Members</th>
+                                    <th>MAL Members</th>
                                     @if (Auth::user() != null)
                                         <th>Status</th>
                                     @endif
