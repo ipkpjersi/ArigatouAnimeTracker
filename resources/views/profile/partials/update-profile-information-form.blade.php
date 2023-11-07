@@ -124,6 +124,81 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_anime_list_number')" />
 
+            <x-input-label class="mt-4" for="enable_friends_system" :value="__('Enable Friends System')" />
+                <div class="mt-1 text-gray-800 dark:text-gray-200">
+                    <label class="inline-flex items-center">
+                        <input id="enable_friends_system" type="radio" name="enable_friends_system" value="1" class="form-radio"
+                               @if (old('enable_friends_system', $user->enable_friends_system) === 1) checked @endif>
+                        <span class="ml-2">Yes</span>
+                    </label>
+                    <label class="inline-flex items-center ml-6">
+                        <input id="enable_friends_system" type="radio" name="enable_friends_system" value="0" class="form-radio"
+                               @if (old('enable_friends_system', $user->enable_friends_system) !== 1) checked @endif>
+                        <span class="ml-2">No</span>
+                    </label>
+                </div>
+                <x-input-error class="mt-2" :messages="$errors->get('enable_friends_system')" />
+
+            <x-input-label class="mt-4" for="show_friends_on_profile_publicly" :value="__('Show Friends on My Profile Publicly')" />
+                <div class="mt-1 text-gray-800 dark:text-gray-200">
+                    <label class="inline-flex items-center">
+                        <input id="show_friends_on_profile_publicly" type="radio" name="show_friends_on_profile_publicly" value="1" class="form-radio"
+                               @if (old('show_friends_on_profile_publicly', $user->show_friends_on_profile_publicly) === 1) checked @endif>
+                        <span class="ml-2">Yes</span>
+                    </label>
+                    <label class="inline-flex items-center ml-6">
+                        <input id="show_friends_on_profile_publicly" type="radio" name="show_friends_on_profile_publicly" value="0" class="form-radio"
+                               @if (old('show_friends_on_profile_publicly', $user->show_friends_on_profile_publicly) !== 1) checked @endif>
+                        <span class="ml-2">No</span>
+                    </label>
+                </div>
+                <x-input-error class="mt-2" :messages="$errors->get('show_friends_on_profile_publicly')" />
+
+                <x-input-label class="mt-4" for="show_friends_on_profile_when_logged_in" :value="__('Show Friends on My Profile when I am Logged In')" />
+                <div class="mt-1 text-gray-800 dark:text-gray-200">
+                    <label class="inline-flex items-center">
+                        <input id="show_friends_on_profile_when_logged_in" type="radio" name="show_friends_on_profile_when_logged_in" value="1" class="form-radio"
+                               @if (old('show_friends_on_profile_when_logged_in', $user->show_friends_on_profile_when_logged_in) === 1) checked @endif>
+                        <span class="ml-2">Yes</span>
+                    </label>
+                    <label class="inline-flex items-center ml-6">
+                        <input id="show_friends_on_profile_when_logged_in" type="radio" name="show_friends_on_profile_when_logged_in" value="0" class="form-radio"
+                               @if (old('show_friends_on_profile_when_logged_in', $user->show_friends_on_profile_when_logged_in) !== 1) checked @endif>
+                        <span class="ml-2">No</span>
+                    </label>
+                </div>
+                <x-input-error class="mt-2" :messages="$errors->get('show_friends_on_profile_when_logged_in')" />
+
+                <x-input-label class="mt-4" for="show_friends_in_nav_dropdown" :value="__('Show Friends Link in Navigation Dropdown')" />
+                <div class="mt-1 text-gray-800 dark:text-gray-200">
+                    <label class="inline-flex items-center">
+                        <input id="show_friends_in_nav_dropdown" type="radio" name="show_friends_in_nav_dropdown" value="1" class="form-radio"
+                               @if (old('show_friends_in_nav_dropdown', $user->show_friends_in_nav_dropdown) === 1) checked @endif>
+                        <span class="ml-2">Yes</span>
+                    </label>
+                    <label class="inline-flex items-center ml-6">
+                        <input id="show_friends_in_nav_dropdown" type="radio" name="show_friends_in_nav_dropdown" value="0" class="form-radio"
+                               @if (old('show_friends_in_nav_dropdown', $user->show_friends_in_nav_dropdown) !== 1) checked @endif>
+                        <span class="ml-2">No</span>
+                    </label>
+                </div>
+                <x-input-error class="mt-2" :messages="$errors->get('show_friends_in_nav_dropdown')" />
+
+                <x-input-label class="mt-4" for="show_friends_on_others_profiles" :value="__('View Friends on Other Users\' Profiles')" />
+                <div class="mt-1 text-gray-800 dark:text-gray-200">
+                    <label class="inline-flex items-center">
+                        <input id="show_friends_on_others_profiles" type="radio" name="show_friends_on_others_profiles" value="1" class="form-radio"
+                               @if (old('show_friends_on_others_profiles', $user->show_friends_on_others_profiles) === 1) checked @endif>
+                        <span class="ml-2">Yes</span>
+                    </label>
+                    <label class="inline-flex items-center ml-6">
+                        <input id="show_friends_on_others_profiles" type="radio" name="show_friends_on_others_profiles" value="0" class="form-radio"
+                               @if (old('show_friends_on_others_profiles', $user->show_friends_on_others_profiles) !== 1) checked @endif>
+                        <span class="ml-2">No</span>
+                    </label>
+                </div>
+                <x-input-error class="mt-2" :messages="$errors->get('show_friends_on_others_profiles')" />
+
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
@@ -208,5 +283,49 @@
                 closeModal();
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to disable or enable related fields
+            function setRelatedFriendsFieldsDisabled(disabled) {
+                ['show_friends_on_profile_publicly', 'show_friends_on_profile_when_logged_in', 'show_friends_in_nav_dropdown', 'show_friends_on_others_profiles'].forEach(name => {
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+                        radio.disabled = disabled;
+                        if (disabled) {
+                            // Set to 'No' if disabled
+                            radio.checked = radio.value === '0';
+                        }
+                    });
+                });
+            }
+
+            // Event listener for 'Enable Friends System' radio buttons
+            document.querySelectorAll('input[name="enable_friends_system"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    setRelatedFriendsFieldsDisabled(this.value === '0');
+                });
+            });
+
+            // Function to ensure logical consistency
+            function adjustFriendsPubliclySetting() {
+                const showWhenLoggedIn = document.querySelector('input[name="show_friends_on_profile_when_logged_in"]:checked').value;
+                const showPubliclyRadios = document.querySelectorAll('input[name="show_friends_on_profile_publicly"]');
+                if (showWhenLoggedIn === '0') {
+                    // If 'Show when logged in' is 'No', 'Show publicly' must also be 'No'
+                    showPubliclyRadios.forEach(radio => radio.checked = radio.value === '0');
+                }
+                // Disable 'Show publicly' radios if 'Show when logged in' is 'No'
+                showPubliclyRadios.forEach(radio => radio.disabled = showWhenLoggedIn === '0');
+            }
+
+            // Event listener for 'Show Friends on Profile When Logged In' radio buttons
+            document.querySelectorAll('input[name="show_friends_on_profile_when_logged_in"]').forEach(radio => {
+                radio.addEventListener('change', adjustFriendsPubliclySetting);
+            });
+
+            // Initialize state on load
+            setRelatedFriendsFieldsDisabled(document.querySelector('input[name="enable_friends_system"]:checked').value === '0');
+            adjustFriendsPubliclySetting();
+        });
+
     </script>
 </section>

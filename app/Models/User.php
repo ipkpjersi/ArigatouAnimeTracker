@@ -28,7 +28,12 @@ class User extends Authenticatable
         'show_anime_list_number',
         'registration_ip',
         'show_clear_anime_list_button',
-        'display_anime_cards'
+        'display_anime_cards',
+        'enable_friends_system',
+        'show_friends_on_profile_publicly',
+        'show_friends_on_profile_when_logged_in',
+        'show_friends_in_nav_dropdown',
+        'show_friends_on_others_profiles',
     ];
 
     /**

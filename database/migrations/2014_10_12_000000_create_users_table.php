@@ -33,6 +33,7 @@ return new class extends Migration
             $table->boolean('show_friends_on_profile_publicly')->default(true);
             $table->boolean('show_friends_on_profile_when_logged_in')->default(true);
             $table->boolean('show_friends_in_nav_dropdown')->default(true);
+            $table->boolean('show_friends_on_others_profiles')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });

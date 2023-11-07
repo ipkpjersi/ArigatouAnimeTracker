@@ -33,6 +33,19 @@ class ProfileController extends Controller
             $request->user()->email_verified_at = null;
         }
 
+        // If enabling the friends system is turned off, turn off all related settings
+        if ($request->input('enable_friends_system') == false) {
+            $request->user()->show_friends_on_profile_publicly = false;
+            $request->user()->show_friends_on_profile_when_logged_in = false;
+            $request->user()->show_friends_in_nav_dropdown = false;
+            $request->user()->show_friends_on_others_profiles = false;
+        }
+
+        // If show_friends_on_profile_when_logged_in is turned off, turn off show_friends_on_profile_publicly too
+        if ($request->input('show_friends_on_profile_when_logged_in') == false) {
+            $request->user()->show_friends_on_profile_publicly = false;
+        }
+
 
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
