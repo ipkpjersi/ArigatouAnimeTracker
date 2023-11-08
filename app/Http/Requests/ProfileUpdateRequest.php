@@ -30,6 +30,7 @@ class ProfileUpdateRequest extends FormRequest
             'show_friends_on_profile_when_logged_in' => ['nullable', 'in:1,0'],
             'show_friends_in_nav_dropdown' => ['nullable', 'in:1,0'],
             'show_friends_on_others_profiles' => ['nullable', 'in:1,0'],
+            'show_anime_notes_publicly' => ['nullable', 'in:1,0'],
         ];
     }
 }
