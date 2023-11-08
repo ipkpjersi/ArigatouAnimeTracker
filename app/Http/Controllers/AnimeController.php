@@ -305,7 +305,11 @@ class AnimeController extends Controller
                           ->with(['anime_type', 'anime_status'])
                           ->selectRaw('
                               anime.*,
-                              anime_user.*,
+                              anime_user.sort_order,
+                              anime_user.score,
+                              anime_user.progress,
+                              anime_user.display_in_list,
+                              anime_user.show_anime_notes_publicly,
                               CASE
                                 WHEN anime_user.show_anime_notes_publicly = 1 AND users.show_anime_notes_publicly = 1 THEN  anime_user.notes
                                 ELSE NULL
@@ -345,7 +349,11 @@ class AnimeController extends Controller
           ->where('anime_user.display_in_list', '=', 1)
           ->selectRaw('
               anime.*,
-              anime_user.*,
+              anime_user.sort_order,
+              anime_user.score,
+              anime_user.progress,
+              anime_user.display_in_list,
+              anime_user.show_anime_notes_publicly,
               CASE
                 WHEN anime_user.show_anime_notes_publicly = 1 AND users.show_anime_notes_publicly = 1 THEN anime_user.notes
                 ELSE NULL
