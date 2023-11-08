@@ -384,19 +384,24 @@ class AnimeController extends Controller
                     $progress = 0;
                 }
                 $displayInList = $request->display_in_list[$index] ?? $currentDisplayInList;
-                $notes = $request->notes[$index] ?? $currentNotes;
-                //Use syncWithoutDetaching to update the pivot data/junction table
-                //without removing the user's other rows in the junction table.
-                $user->anime()->syncWithoutDetaching([
+
+                $syncData = [
                     $anime_id => [
-                        'score' => $score ? $score : null,
+                        'score' => $score ?? null,
                         'sort_order' => $sortOrder,
                         'watch_status_id' => $watchStatusId,
                         'progress' => $progress,
                         'display_in_list' => $displayInList,
-                        'notes' => $notes
                     ]
-                ]);
+                ];
+
+                //Add notes to the sync array only if it's provided in the request
+                if (array_key_exists('notes', $request->all())) {
+                    $syncData[$anime_id]['notes'] = $request->notes[$index] ?? "";
+                }
+                //Use syncWithoutDetaching to update the pivot data/junction table
+                //without removing the user's other rows in the junction table.
+                $user->anime()->syncWithoutDetaching($syncData);
             }
         }
         if ($redirectBack) {
