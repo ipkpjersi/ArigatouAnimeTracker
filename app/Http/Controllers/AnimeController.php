@@ -387,7 +387,7 @@ class AnimeController extends Controller
 
                 $syncData = [
                     $anime_id => [
-                        'score' => $score ?? null,
+                        'score' => $score ? $score : null,
                         'sort_order' => $sortOrder,
                         'watch_status_id' => $watchStatusId,
                         'progress' => $progress,
