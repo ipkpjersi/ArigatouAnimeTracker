@@ -301,12 +301,13 @@ class AnimeController extends Controller
         $watchStatuses = DB::table('watch_status')->get();
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
         $userAnime = $user->anime()
+                          ->join('users', 'anime_user.user_id', '=', 'users.id')
                           ->with(['anime_type', 'anime_status'])
                           ->selectRaw('
                               anime.*,
                               anime_user.*,
                               CASE
-                                WHEN anime_user.show_anime_notes_publicly = 1 THEN anime_user.notes
+                                WHEN anime_user.show_anime_notes_publicly = 1 AND users.show_anime_notes_publicly = 1 THEN  anime_user.notes
                                 ELSE NULL
                               END as notes
                          ')
@@ -339,9 +340,18 @@ class AnimeController extends Controller
     {
         $user = User::where('username', $username)->firstOrFail();
         $query = $user->anime()
-              ->with(['anime_type', 'anime_status', 'watch_status'])
-              ->where('anime_user.display_in_list', '=', 1)
-              ->selectRaw('anime.*, anime_user.sort_order, anime_user.score, anime_user.progress, anime_user.watch_status_id');
+          ->join('users', 'anime_user.user_id', '=', 'users.id')
+          ->with(['anime_type', 'anime_status', 'watch_status'])
+          ->where('anime_user.display_in_list', '=', 1)
+          ->selectRaw('
+              anime.*,
+              anime_user.*,
+              CASE
+                WHEN anime_user.show_anime_notes_publicly = 1 AND users.show_anime_notes_publicly = 1 THEN anime_user.notes
+                ELSE NULL
+              END as notes
+          ');
+
         $defaultOrder = [
             ['column' => 7, 'dir' => 'asc'],
             ['column' => 6, 'dir' => 'asc'],
@@ -369,9 +379,6 @@ class AnimeController extends Controller
         return DataTables::of($query)
             ->addColumn('anime_id', function ($row) {
                 return $row->id;
-            })
-            ->editColumn('notes', function ($animeUser) {
-                return $animeUser->show_anime_notes_publicly ? $animeUser->notes : null;
             })
             ->make(true);
     }
