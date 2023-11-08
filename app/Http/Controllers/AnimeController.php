@@ -302,6 +302,14 @@ class AnimeController extends Controller
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
         $userAnime = $user->anime()
                           ->with(['anime_type', 'anime_status'])
+                          ->selectRaw('
+                              anime.*,
+                              anime_user.*,
+                              CASE
+                                WHEN anime_user.show_anime_notes_publicly = 1 THEN anime_user.notes
+                                ELSE NULL
+                              END as notes
+                         ')
                           ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC')
                           ->where('anime_user.display_in_list', '=', 1)
                           ->paginate($user->anime_list_pagination_size ?? 15);
@@ -361,6 +369,9 @@ class AnimeController extends Controller
         return DataTables::of($query)
             ->addColumn('anime_id', function ($row) {
                 return $row->id;
+            })
+            ->editColumn('notes', function ($animeUser) {
+                return $animeUser->show_anime_notes_publicly ? $animeUser->notes : null;
             })
             ->make(true);
     }
