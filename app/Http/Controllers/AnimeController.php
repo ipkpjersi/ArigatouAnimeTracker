@@ -35,7 +35,7 @@ class AnimeController extends Controller
             ['column' => 8, 'dir' => 'desc']
         ];
 
-        $orderData = $request->input('order');
+        $orderData = $request->has('order') ? $request->input('order') : [];
         //Check if order count matches.
         $sortingMatchesDefault = count($defaultOrder) === count($orderData);
 
@@ -340,7 +340,7 @@ class AnimeController extends Controller
             ['column' => 1, 'dir' => 'asc']
         ];
 
-        $orderData = $request->input('order');
+        $orderData = $request->has('order') ? $request->input('order') : [];
         //Check if order count matches.
         $sortingMatchesDefault = count($defaultOrder) === count($orderData);
 
