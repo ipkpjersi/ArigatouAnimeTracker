@@ -306,6 +306,7 @@ class AnimeController extends Controller
                           ->with(['anime_type', 'anime_status'])
                           ->selectRaw('
                               anime.*,
+                              anime_user.watch_status_id,
                               anime_user.sort_order,
                               anime_user.score,
                               anime_user.progress,
@@ -350,6 +351,7 @@ class AnimeController extends Controller
           ->where('anime_user.display_in_list', '=', 1)
           ->selectRaw('
               anime.*,
+              anime_user.watch_status_id,
               anime_user.sort_order,
               anime_user.score,
               anime_user.progress,
