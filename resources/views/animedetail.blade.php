@@ -120,6 +120,15 @@
                                         </select>
                                     </div>
 
+                                    <!-- Show Anime Notes Publicly -->
+                                    <div class="mt-4">
+                                        <label for="show_anime_notes_publicly" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Show Notes Publicly:</label>
+                                        <select name="show_anime_notes_publicly[]" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-select block w-full">
+                                            <option value="1" {{ ($currentUserShowAnimeNotesPublicly === 1) ? 'selected' : '' }}>Yes</option>
+                                            <option value="0" {{ ($currentUserShowAnimeNotesPublicly === 0) ? 'selected' : '' }}>No</option>
+                                        </select>
+                                    </div>
+
                                     <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                         Update My Anime List
                                     </button>

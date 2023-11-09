@@ -110,10 +110,11 @@ class AnimeController extends Controller
                 $currentUserSortOrder = $animeUser->pivot->sort_order;
                 $currentUserNotes = $animeUser->pivot->notes;
                 $currentUserDisplayInList = $animeUser->pivot->display_in_list;
+                $currentUserShowAnimeNotesPublicly = $animeUser->pivot->show_anime_notes_publicly;
             }
         }
 
-        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList'));
+        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly'));
     }
 
 
@@ -399,6 +400,7 @@ class AnimeController extends Controller
                 $anime = Anime::find($anime_id);
                 $currentPivotData = $user->anime()->where('anime_id', $anime_id)->first()->pivot;
                 $currentDisplayInList = $currentPivotData->display_in_list ?? true;
+                $currentShowAnimeNotesPublicly = $currentPivotData->show_anime_notes_publicly ?? true;
                 $currentNotes = $currentPivotData->notes ?? null;
                 $score = isset($request->score[$index]) ? $request->score[$index] : null;
                 $sortOrder = isset($request->sort_order[$index]) ? $request->sort_order[$index] : null;
@@ -410,6 +412,7 @@ class AnimeController extends Controller
                     $progress = 0;
                 }
                 $displayInList = $request->display_in_list[$index] ?? $currentDisplayInList;
+                $showAnimeNotesPublicly = $request->show_anime_notes_publicly[$index] ?? $currentShowAnimeNotesPublicly;
 
                 $syncData = [
                     $anime_id => [
@@ -418,6 +421,7 @@ class AnimeController extends Controller
                         'watch_status_id' => $watchStatusId,
                         'progress' => $progress,
                         'display_in_list' => $displayInList,
+                        'show_anime_notes_publicly' => $showAnimeNotesPublicly,
                     ]
                 ];
 
