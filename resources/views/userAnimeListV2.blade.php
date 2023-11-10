@@ -43,14 +43,14 @@
                                     <th>Watch Status</th>
                                     <th>Progress</th>
                                     <th>Score</th>
-                                    @if (auth()->user() != null && auth()->user()->username === $username)
+                                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                         <th>Sort Order</th>
                                     @endif
                                     <th>Episodes</th>
                                     <th>Season</th>
                                     <th>Year</th>
                                     <th>Notes</th>
-                                    @if (auth()->user() != null && auth()->user()->username === $username)
+                                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                         <th>Delete</th>
                                     @endif
                                 </tr>
@@ -59,7 +59,7 @@
                                 <!-- DataTables will auto-populate this section based on the data returned from the server -->
                             </tbody>
                         </table>
-                        @if (auth()->user() != null && auth()->user()->username === $username && $userAnimeCount > 0)
+                        @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username) && $userAnimeCount > 0)
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                                 Save Changes
                             </button>
@@ -68,7 +68,7 @@
                             @endif
                         @endif
                     </form>
-                    @if (auth()->user() != null && auth()->user()->username === $username)
+                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                         <div class="flex flex-col md:flex-row">
                             <a href="{{ route('import.animelist') }}">
                                 <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
@@ -131,7 +131,7 @@
                 { data: 'anime_status.status', name: 'anime_status.status', searchable: 'false' }, // Adjust based on actual returned data structure
                 { data: 'watch_status_id', name: 'watch_status_id', searchable: 'false', render: function(data, type, row) {
                     //console.log("watch_status_id data" + data);
-                    if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
+                    if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                         var options = '';
                         options += options += '<option value="">Pick an option...</option>';
                         options += '@foreach ($watchStatuses as $status) <option value="{{ $status->id }}" ' + (data === {{ $status->id }} ? 'selected' : '') + '>{{ $status->status }}</option> @endforeach';
@@ -145,7 +145,7 @@
                     name: 'progress',
                     searchable: false,
                     render: function(data, type, row) {
-                        if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
+                        if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                             var options = '';
                             options += '<option value="">Pick an option...</option>';
                             for(var i = 1; i <= row.episodes; i++) {
@@ -162,7 +162,7 @@
                     name: 'score',
                     searchable: false,
                     render: function(data, type, row) {
-                        if('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
+                        if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                             var options = '';
                             options += '<option value="">Pick an option...</option>';
                             for(var i = 1; i <= 10; i++) {
@@ -176,7 +176,7 @@
                 }
             );
 
-            if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
+            if ('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                 columns.push({
                     data: 'sort_order',
                     name: 'sort_order',
@@ -209,7 +209,7 @@
                 name: 'notes',
                 searchable: false,
                 render: function(data, type, row) {
-                    if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
+                    if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                         // If the user matches, make textarea editable
                         return '<textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800">' + (data ? data : '') + '</textarea>';
                     } else {
@@ -219,7 +219,7 @@
                 }
             });
 
-            if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
+            if ('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                 columns.push({
                     data: 'anime_id',
                     name: 'delete',
