@@ -49,6 +49,7 @@
                                     <th>Episodes</th>
                                     <th>Season</th>
                                     <th>Year</th>
+                                    <th>Notes</th>
                                     @if (auth()->user() != null && auth()->user()->username === $username)
                                         <th>Delete</th>
                                     @endif
@@ -175,6 +176,7 @@
                     }
                 }
             );
+            //TODO: fix sort_order being guest editable
             //if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
                 columns.push({
                     data: 'sort_order',
@@ -202,6 +204,21 @@
                     searchable: false
                 },
             );
+
+            columns.push({
+                data: 'notes', // assuming 'notes' is the key that holds the notes data
+                name: 'notes',
+                searchable: false,
+                render: function(data, type, row) {
+                    if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
+                        // If the user matches, make textarea editable
+                        return '<textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800">' + (data ? data : '') + '</textarea>';
+                    } else {
+                        // If the user doesn't match, make textarea read-only
+                        return '<textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" readonly>' + (data ? data : '') + '</textarea>';
+                    }
+                }
+            });
 
             if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
                 columns.push({

@@ -449,6 +449,7 @@ class AnimeController extends Controller
         $scores = $request->input('score');
         $sort_orders = $request->input('sort_order');
         $progresses = $request->input('progress');
+        $notes = $request->input('notes');
 
         for ($i = 0; $i < $count; $i++) {
             $anime = Anime::find($anime_ids[$i]);
@@ -464,7 +465,8 @@ class AnimeController extends Controller
                 'watch_status_id' => $watch_status_ids[$i],
                 'score' => $scores[$i] ?? null,
                 'sort_order' => $sort_orders[$i] ?? null,
-                'progress' => $progress
+                'progress' => $progress,
+                'notes' => $notes[$i] ?? null
             ]);
         }
         return redirect()->back()->with('message', 'Changes saved successfully!');
