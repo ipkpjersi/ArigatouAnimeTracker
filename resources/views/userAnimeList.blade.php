@@ -45,14 +45,14 @@
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 min-w-[165px]">Watch Status</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Progress</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 min-w-[70px]">Score</th>
-                                        @if (auth()->user() != null && auth()->user()->username === $username)
+                                        @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Sort Order</th>
                                         @endif
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Episodes</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Season</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Year</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Notes</th>
-                                        @if (auth()->user() != null && auth()->user()->username === $username)
+                                        @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Delete</th>
                                         @endif
                                     </tr>
@@ -71,11 +71,11 @@
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 sm:">Status</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 min-w-[165px]">Watch Status</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Progress</th>
-                                        @if (auth()->user() != null && auth()->user()->username === $username)
+                                        @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Sort Order</th>
                                         @endif
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Notes</th>
-                                        @if (auth()->user() != null && auth()->user()->username === $username)
+                                        @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Delete</th>
                                         @endif
                                     </tr>
@@ -95,7 +95,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_type)->type }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_status)->status }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                @if (auth()->user() != null && auth()->user()->username === $username)
+                                                @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800  min-w-[100px] desktop-only" style="padding-right: 36px">
                                                         <option value="">Pick a status...</option>
                                                         @foreach ($watchStatuses as $status)
@@ -109,7 +109,7 @@
                                                 @endif
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                @if (auth()->user() != null && auth()->user()->username === $username)
+                                                @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 desktop-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= $anime->episodes; $i++)
@@ -123,7 +123,7 @@
                                                 @endif
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200 min-w-[70px]">
-                                                @if (auth()->user() != null && auth()->user()->username === $username)
+                                                @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[70px] desktop-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= 10; $i++)
@@ -134,7 +134,7 @@
                                                     {{ $anime->pivot->score ?? 'UNKNOWN' }}
                                                 @endif
                                             </td>
-                                            @if (auth()->user() != null && auth()->user()->username === $username)
+                                            @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                 <td class="py-2 px-4 border-b border-gray-200">
                                                     <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800 desktop-only">
                                                 </td>
@@ -143,10 +143,10 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->season }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->year }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                <textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 desktop-only" {{ (auth()->user() === null || auth()->user()->username !== $username) ? 'readonly' : '' }}>{{ $anime->pivot->notes ?? '' }}</textarea>
+                                                <textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 desktop-only" {{ (auth()->user() === null || strtolower(auth()->user()->username) !== strtolower($username)) ? 'readonly' : '' }}>{{ $anime->pivot->notes ?? '' }}</textarea>
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                @if (auth()->user() != null && auth()->user()->username === $username)
+                                                @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <button
                                                         onclick="deleteAnime({{ $anime->id }}, event)"
                                                         class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
@@ -169,7 +169,7 @@
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200"><a href="/anime/{{$anime->id}}">{{ $anime->title }}</a></td>
                                             <td class="py-2 px-4 border-b border-gray-200 min-w-[70px]">
-                                                @if (auth()->user() != null && auth()->user()->username === $username)
+                                                @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[70px] mobile-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= 10; $i++)
@@ -186,7 +186,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_type)->type }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_status)->status }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200 min-w-[150px]">
-                                                @if (auth()->user() != null && auth()->user()->username === $username)
+                                                @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[150px] mobile-only" style="padding-right: 36px">
                                                         <option value="">Pick a status...</option>
                                                         @foreach ($watchStatuses as $status)
@@ -200,7 +200,7 @@
                                                 @endif
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                @if (auth()->user() != null && auth()->user()->username === $username)
+                                                @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 mobile-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= $anime->episodes; $i++)
@@ -213,16 +213,16 @@
                                                     {{ $anime->progress ?? '0' }}
                                                 @endif
                                             </td>
-                                            @if (auth()->user() != null && auth()->user()->username === $username)
+                                            @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                 <td class="py-2 px-4 border-b border-gray-200">
                                                     <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800 mobile-only">
                                                 </td>
                                             @endif
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                <textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 mobile-only min-w-[90px]" {{ (auth()->user() === null || auth()->user()->username !== $username) ? 'readonly' : '' }}>{{ $anime->pivot->notes ?? '' }}</textarea>
+                                                <textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 mobile-only min-w-[90px]" {{ (auth()->user() === null || strtolower(auth()->user()->username) !== strtolower($username)) ? 'readonly' : '' }}>{{ $anime->pivot->notes ?? '' }}</textarea>
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                @if (auth()->user() != null && auth()->user()->username === $username)
+                                                @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <button
                                                         onclick="deleteAnime({{ $anime->id }}, event)"
                                                         class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
@@ -236,7 +236,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        @if (auth()->user() != null && auth()->user()->username === $username && $userAnime->isNotEmpty())
+                        @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username) && $userAnime->isNotEmpty())
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                                 Save Changes
                             </button>
@@ -248,7 +248,7 @@
                             {{ $userAnime->links() }}
                         </div>
                     </form>
-                    @if (auth()->user() != null && auth()->user()->username === $username)
+                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                         <div class="md:flex">
                             <a href="{{ route('import.animelist') }}">
                                 <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
