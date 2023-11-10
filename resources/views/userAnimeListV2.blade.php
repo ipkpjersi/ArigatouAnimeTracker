@@ -211,10 +211,10 @@
                 render: function(data, type, row) {
                     if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                         // If the user matches, make textarea editable
-                        return '<textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800">' + (data ? data : '') + '</textarea>';
+                        return '<textarea name="notes[]" class="border rounded py-2 px-3 dark:bg-gray-800">' + (data ? data : '') + '</textarea>';
                     } else {
                         // If the user doesn't match, make textarea read-only
-                        return '<textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" readonly>' + (data ? data : '') + '</textarea>';
+                        return '<textarea name="notes[]" class="border rounded py-2 px-3 dark:bg-gray-800" readonly>' + (data ? data : '') + '</textarea>';
                     }
                 }
             });
