@@ -43,9 +43,9 @@
                                     <th>Watch Status</th>
                                     <th>Progress</th>
                                     <th>Score</th>
-                                    {{-- @if (auth()->user() != null && auth()->user()->username === $username) --}}
+                                    @if (auth()->user() != null && auth()->user()->username === $username)
                                         <th>Sort Order</th>
-                                    {{-- @endif --}}
+                                    @endif
                                     <th>Episodes</th>
                                     <th>Season</th>
                                     <th>Year</th>
@@ -53,7 +53,6 @@
                                     @if (auth()->user() != null && auth()->user()->username === $username)
                                         <th>Delete</th>
                                     @endif
-                                    <!-- ... additional headers ... -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -176,17 +175,17 @@
                     }
                 }
             );
-            //TODO: fix sort_order being guest editable
-            //if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
+
+            if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
                 columns.push({
                     data: 'sort_order',
                     name: 'sort_order',
                     searchable: false,
                     render: function(data, type, row) {
-                        return '<input type="number" min="1" name="sort_order[]" value="'+data+'" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">';
+                         return '<input type="number" min="1" name="sort_order[]" value="' + data + '" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">';
                     }
                 });
-            //}
+            }
             columns.push(
                 {
                     data: 'episodes',
