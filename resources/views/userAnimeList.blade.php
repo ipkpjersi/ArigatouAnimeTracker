@@ -9,7 +9,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-[1550px] mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-[1650px] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
                 <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 hidden overflow-y-auto">
                     <div class="bg-white dark:bg-gray-700 rounded relative w-96 h-64">
@@ -51,6 +51,7 @@
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Episodes</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Season</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Year</th>
+                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Notes</th>
                                         @if (auth()->user() != null && auth()->user()->username === $username)
                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Delete</th>
                                         @endif
@@ -73,6 +74,7 @@
                                         @if (auth()->user() != null && auth()->user()->username === $username)
                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Sort Order</th>
                                         @endif
+                                        <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Notes</th>
                                         @if (auth()->user() != null && auth()->user()->username === $username)
                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Delete</th>
                                         @endif
@@ -140,6 +142,9 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->episodes }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->season }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->year }}</td>
+                                            <td class="py-2 px-4 border-b border-gray-200">
+                                                <textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 desktop-only" {{ (auth()->user() === null || auth()->user()->username !== $username) ? 'readonly' : '' }}>{{ $anime->pivot->notes ?? '' }}</textarea>
+                                            </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && auth()->user()->username === $username)
                                                     <button
@@ -213,6 +218,9 @@
                                                     <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800 mobile-only">
                                                 </td>
                                             @endif
+                                            <td class="py-2 px-4 border-b border-gray-200">
+                                                <textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 mobile-only min-w-[90px]" {{ (auth()->user() === null || auth()->user()->username !== $username) ? 'readonly' : '' }}>{{ $anime->pivot->notes ?? '' }}</textarea>
+                                            </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && auth()->user()->username === $username)
                                                     <button
