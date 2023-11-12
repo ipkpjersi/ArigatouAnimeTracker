@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('anime_reviews', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('anime_id')->constrained()->onDelete('cascade');
-            $table->string('title');
+            $table->foreignId('anime_id')->constrained('anime')->onDelete('cascade');
+            $table->string('title')->nullable();
             $table->text('body');
             $table->boolean('show_review_publicly');
+            $table->enum('recommendation', ['recommended', 'mixed', 'not_recommended']);
+            $table->boolean('contains_spoilers')->default(false);
             $table->timestamps();
         });
     }
