@@ -114,9 +114,21 @@ class User extends Authenticatable
         $this->friends()->attach($friendId);
     }
 
-    public function friendOf()
+    public function removeFriend($friendId)
     {
-        return $this->belongsToMany(User::class, 'user_friends', 'friend_user_id', 'user_id')
-                    ->withTimestamps();
+        if ($this->id == $friendId) {
+            throw new \Exception('You cannot remove yourself as a friend.');
+        }
+
+        if (!$this->friends()->where('friend_user_id', $friendId)->exists()) {
+            throw new \Exception('This user is already your friend.');
+        }
+
+        $this->friends()->detach($friendId);
+    }
+
+    public function isFriend($userId)
+    {
+        return $this->friends()->where('friend_user_id', $userId)->exists();
     }
 }

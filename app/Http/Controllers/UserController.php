@@ -6,6 +6,7 @@ use App\Models\StaffActionLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -32,7 +33,8 @@ class UserController extends Controller
     {
         $user = User::where(['username' => $username])->firstOrFail();
         $stats = $user->animeStatistics();
-        return view('userdetail', compact('user', 'stats'));
+        $friends = $user->friends()->paginate(4);
+        return view('userdetail', compact('user', 'stats', 'friends'));
     }
 
     public function banUser(Request $request, $userId)
@@ -103,5 +105,29 @@ class UserController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Avatar deleted successfully']);
     }
+
+    public function addFriend(Request $request, $friendId)
+    {
+        try {
+            $user = Auth::user();
+            $user->addFriend($friendId);
+            return redirect()->back()->with('success', 'Friend added successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function removeFriend(Request $request, $friendId)
+    {
+        try {
+            $user = Auth::user();
+            $user->removeFriend($friendId);
+            return redirect()->back()->with('success', 'Friend removed successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+
 
 }

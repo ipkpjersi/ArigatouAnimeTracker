@@ -88,6 +88,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/animelist/{username}/clear',  [AnimeController::class, 'clearAnimeList'])->name('user.anime.clear');
 
+    Route::post('/add-friend/{friendId}', [UserController::class, 'addFriend'])->name('add-friend');
+    Route::post('/remove-friend/{friendId}', [UserController::class, 'removeFriend'])->name('remove-friend');
+
 });
 
 require __DIR__.'/auth.php';
