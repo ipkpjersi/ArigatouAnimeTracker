@@ -42,7 +42,7 @@
                             </div>
                         @endif
                         @if ($enableFriendsSystem)
-                            @if (auth()->user() !== null && auth()->user()->id !== $user->id)
+                            @if (auth()->user() !== null && !$isOwnProfile)
                                 @if (auth()->user()->isFriend($user->id))
                                     <form action="/remove-friend/{{ $user->id }}" method="POST">
                                         @csrf

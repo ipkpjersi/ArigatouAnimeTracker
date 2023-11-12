@@ -54,7 +54,7 @@ class UserController extends Controller
         }
 
         $enableFriendsSystem = auth()->user()->enable_friends_system === 1;
-        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem'));
+        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile'));
     }
 
     public function banUser(Request $request, $userId)
