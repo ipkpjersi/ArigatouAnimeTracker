@@ -41,7 +41,7 @@
             <x-input-label class="mt-4" for="avatar" :value="__('Avatar (Resized to 150x150)')" />
             <img id="current-avatar" src="{{ $user->avatar }}" alt="Current Avatar" @if (!$user->avatar) style="display:none; width:150px; height:150px" @endif class="rounded-lg w-24 h-24 mb-3" style="width:150px; height: 150px;">
             <input id="avatar" name="avatar" type="file" class="mt-1 block w-full" value="old('avatar', $user->avatar)" accept="image/*" autocomplete="avatar" />
-            <button type="button" id="delete-avatar-button" class="mt-3 text-black bg-yellow-400 hover:bg-yellow-600 px-4 py-2 rounded shadow">{{ __('Delete Avatar') }}</button>
+            <button type="button" id="delete-avatar-button" class="mt-3 text-black bg-red-500 hover:bg-red-600 px-4 py-2 rounded shadow">{{ __('Delete Avatar') }}</button>
             <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
 
             <x-input-label class="mt-4" for="dark_mode" :value="__('Dark Mode')" />
