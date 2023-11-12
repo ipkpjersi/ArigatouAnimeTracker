@@ -42,14 +42,14 @@ class UserController extends Controller
         //Determine if the friends section should be displayed
         if ($isOwnProfile) {
             //User is viewing their own profile
-            $canViewFriends = $user->show_friends_on_profile_when_logged_in;
+            $canViewFriends = $user->show_friends_on_profile_when_logged_in === 1;
         } else {
             //Viewing someone else's profile, check if we are logged in first
             if ($currentUser) {
                 //Current user needs to have enabled viewing friends on other profiles
-                $canViewFriends = $currentUser->show_friends_on_others_profiles && $user->show_friends_on_profile_publicly;
+                $canViewFriends = $currentUser->show_friends_on_others_profiles === 1 && $user->show_friends_on_profile_publicly === 1;
             } else {
-                $canViewFriends = $user->show_friends_on_profile_publicly;
+                $canViewFriends = $user->show_friends_on_profile_publicly === 1;
             }
         }
 
