@@ -24,32 +24,36 @@
                             <button id="animeListButton" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2">Anime List</button>
                         </a>
                         <!-- Friends Section -->
-                        <div class="w-full md:w-3/5 mt-4">
-                            <div class="flex justify-between items-center mb-4">
-                                <h4 class="font-bold">Friends</h4>
-                                <a href="/users/{{ $user->username }}?view=friends" class="text-blue-500 hover:text-blue-700">All ({{ count($user->friends) }})</a>
+                        @if ($canViewFriends)
+                            <div class="w-full md:w-3/5 mt-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="font-bold">Friends</h4>
+                                    <a href="/users/{{ $user->username }}?view=friends" class="text-blue-500 hover:text-blue-700">All ({{ count($user->friends) }})</a>
+                                </div>
+                                <div class="flex flex-wrap mb-4">
+                                    @foreach ($user->friends->take(4) as $friend)
+                                        <div class="max-w-[50px] w-1/4 p-1">
+                                            <a href="/users/{{ $friend->username }}" class="block text-center">
+                                                <img src="{{ $friend->avatar }}" alt="{{ $friend->username }}" class="rounded-full w-full avatar-image" onerror="this.onerror=null; this.src='/img/notfound.gif';">
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
-                            <div class="flex flex-wrap mb-4">
-                                @foreach ($user->friends->take(4) as $friend)
-                                    <div class="max-w-[50px] w-1/4 p-1">
-                                        <a href="/users/{{ $friend->username }}" class="block text-center">
-                                            <img src="{{ $friend->avatar }}" alt="{{ $friend->username }}" class="rounded-full w-full avatar-image" onerror="this.onerror=null; this.src='/img/notfound.gif';">
-                                        </a>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        @if (auth()->user() !== null && auth()->user()->id !== $user->id)
-                            @if (auth()->user()->isFriend($user->id))
-                                <form action="/remove-friend/{{ $user->id }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="p-2 bg-red-500 hover:bg-red-700 text-white rounded-md mt-2">Remove Friend</button>
-                                </form>
-                            @else
-                                <form action="/add-friend/{{ $user->id }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2">Add Friend</button>
-                                </form>
+                        @endif
+                        @if ($enableFriendsSystem)
+                            @if (auth()->user() !== null && auth()->user()->id !== $user->id)
+                                @if (auth()->user()->isFriend($user->id))
+                                    <form action="/remove-friend/{{ $user->id }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="p-2 bg-red-500 hover:bg-red-700 text-white rounded-md mt-2">Remove Friend</button>
+                                    </form>
+                                @else
+                                    <form action="/add-friend/{{ $user->id }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2">Add Friend</button>
+                                    </form>
+                                @endif
                             @endif
                         @endif
                     </div>

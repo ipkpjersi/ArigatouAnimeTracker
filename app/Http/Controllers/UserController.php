@@ -34,7 +34,27 @@ class UserController extends Controller
         $user = User::where(['username' => $username])->firstOrFail();
         $stats = $user->animeStatistics();
         $friends = $user->friends()->paginate(4);
-        return view('userdetail', compact('user', 'stats', 'friends'));
+        $currentUser = auth()->user();
+
+        //Check if the user is viewing their own profile
+        $isOwnProfile = strtolower($currentUser->username ?? '') === strtolower($user->username);
+
+        //Determine if the friends section should be displayed
+        if ($isOwnProfile) {
+            //User is viewing their own profile
+            $canViewFriends = $user->show_friends_on_profile_when_logged_in;
+        } else {
+            //Viewing someone else's profile, check if we are logged in first
+            if ($currentUser) {
+                //Current user needs to have enabled viewing friends on other profiles
+                $canViewFriends = $currentUser->show_friends_on_others_profiles && $user->show_friends_on_profile_publicly;
+            } else {
+                $canViewFriends = $user->show_friends_on_profile_publicly;
+            }
+        }
+
+        $enableFriendsSystem = auth()->user()->enable_friends_system === 1;
+        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem'));
     }
 
     public function banUser(Request $request, $userId)
