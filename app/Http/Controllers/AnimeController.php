@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Anime;
+use App\Models\AnimeReview;
 use App\Models\User;
 use App\Models\WatchStatus;
 use App\Services\AnimeListExportService;
@@ -99,6 +100,8 @@ class AnimeController extends Controller
         $currentUserShowAnimeNotesPublicly = true;
 
         $user = auth()->user();
+        $userHasReview = false;
+        $userReview = null;
         if($user) {
             // Get the pivot table data for the current user and this anime
             $animeUser = $user->anime()->where('anime_id', $id)->first();
@@ -113,12 +116,67 @@ class AnimeController extends Controller
                 $currentUserDisplayInList = $animeUser->pivot->display_in_list;
                 $currentUserShowAnimeNotesPublicly = $animeUser->pivot->show_anime_notes_publicly;
             }
+             $userReview = AnimeReview::where('anime_id', $id)
+                                 ->where('user_id', $user->id)
+                                 ->first();
+            $userHasReview = $userReview != null;
         }
 
-        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly'));
+       $reviews = AnimeReview::where('anime_reviews.anime_id', $id)
+                  ->join('users', 'anime_reviews.user_id', '=', 'users.id')
+                  ->where('anime_reviews.show_review_publicly', true)
+                  ->where('anime_reviews.contains_spoilers', false)
+                  ->where('users.show_reviews_publicly', true)
+                  ->where('users.is_banned', false)
+                  ->latest('anime_reviews.created_at')
+                  ->paginate(2);
+
+        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview'));
     }
 
+    public function addReview(Request $request)
+    {
+        $validatedData = $request->validate([
+            'anime_id' => 'required|exists:anime,id',
+            'title' => 'nullable|string|max:255',
+            'body' => 'required|string',
+            'contains_spoilers' => 'boolean',
+            'show_review_publicly' => 'boolean',
+        ]);
 
+        $review = new AnimeReview($validatedData);
+        $review->user_id = auth()->id();
+        $review->contains_spoilers = $request->has('contains_spoilers');
+        $review->show_review_publicly = $request->has('show_review_publicly');
+        $review->save();
+
+        return redirect()->back()->with('reviewmessage', 'Review added successfully!');
+    }
+
+    public function updateReview(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'title' => 'nullable|string|max:255',
+            'body' => 'required|string',
+            'contains_spoilers' => 'boolean',
+            'show_review_publicly' => 'boolean',
+        ]);
+
+        $review = AnimeReview::where('anime_id', $id)->where('user_id', auth()->id())->firstOrFail();
+        $review->contains_spoilers = $request->has('contains_spoilers');
+        $review->show_review_publicly = $request->has('show_review_publicly');
+        $review->update($validatedData);
+
+        return redirect()->back()->with('reviewmessage', 'Review updated successfully!');
+    }
+
+    public function deleteReview($id)
+    {
+        $review = AnimeReview::where('anime_id', $id)->where('user_id', auth()->id())->firstOrFail();
+        $review->delete();
+
+        return redirect()->back()->with('reviewmessage', 'Review deleted successfully!');
+    }
 
     public function topAnime(Request $request)
     {

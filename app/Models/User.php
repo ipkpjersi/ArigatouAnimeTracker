@@ -75,6 +75,11 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(AnimeReview::class, 'user_id');
+    }
+
     public function animeStatistics() {
         $anime = $this->anime()->withPivot('score', 'watch_status_id', 'progress')->get();
 

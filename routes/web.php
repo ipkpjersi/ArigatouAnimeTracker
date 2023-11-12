@@ -91,6 +91,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/add-friend/{friendId}', [UserController::class, 'addFriend'])->name('add-friend');
     Route::post('/remove-friend/{friendId}', [UserController::class, 'removeFriend'])->name('remove-friend');
 
+    Route::post('/anime/add-review', [AnimeController::class, 'addReview'])->name('anime.addReview');
+    Route::put('/anime/{id}/update-review', [AnimeController::class, 'updateReview'])->name('anime.updateReview');
+    Route::delete('/anime/{id}/delete-review', [AnimeController::class, 'deleteReview'])->name('anime.deleteReview');
+
+
 });
 
 require __DIR__.'/auth.php';

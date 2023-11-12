@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('anime_id')->constrained('anime')->onDelete('cascade');
             $table->string('title')->nullable();
             $table->text('body');
-            $table->boolean('show_review_publicly');
+            $table->boolean('show_review_publicly')->default(true);
             $table->enum('recommendation', ['recommended', 'mixed', 'not_recommended']);
             $table->boolean('contains_spoilers')->default(false);
             $table->timestamps();
