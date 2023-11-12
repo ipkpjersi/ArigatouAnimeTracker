@@ -31,7 +31,7 @@
                                     <a href="/users/{{ $user->username }}?view=friends" class="text-blue-500 hover:text-blue-700">All ({{ count($user->friends) }})</a>
                                 </div>
                                 <div class="flex flex-wrap mb-4">
-                                    @foreach ($user->friends->take(4) as $friend)
+                                    @foreach ($friends as $friend)
                                         <div class="max-w-[50px] w-1/4 p-1">
                                             <a href="/users/{{ $friend->username }}" class="block text-center">
                                                 <img src="{{ $friend->avatar }}" alt="{{ $friend->username }}" class="rounded-full w-full avatar-image" onerror="this.onerror=null; this.src='/img/notfound.gif';">
