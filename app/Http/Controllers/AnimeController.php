@@ -96,7 +96,7 @@ class AnimeController extends Controller
         $currentUserSortOrder = null;
         $currentUserNotes = null;
         $currentUserDisplayInList = true;
-        $currentUserShowAnimeNotesPublicly = null;
+        $currentUserShowAnimeNotesPublicly = true;
 
         $user = auth()->user();
         if($user) {
