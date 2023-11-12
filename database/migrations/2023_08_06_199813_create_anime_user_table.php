@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('sort_order')->nullable();
             $table->integer('progress')->nullable();
             $table->text('notes')->nullable();
-            $table->boolean('show_anime_notes_publicly')->nullable()->default(true);
+            $table->boolean('show_anime_notes_publicly')->default(true);
             $table->boolean('display_in_list')->default(true);
             $table->timestamps();
         });
