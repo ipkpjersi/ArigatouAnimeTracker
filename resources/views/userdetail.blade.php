@@ -61,7 +61,7 @@
                     <!-- Right Column -->
                     <div class="w-full md:w-3/5 mt-0 flex flex-row flex-wrap">
                         @if(request('view') == 'friends')
-                            <div class="mb-4 flex border-b">
+                            <div class="mb-4 flex border-b items-end">
                                 <!-- Home Tab -->
                                 <a href="{{ route('users.detail', $user->username) }}" class="tab-button {{ !request()->get('view') ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Home</a>
                                 <!-- Friends Tab -->
