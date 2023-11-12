@@ -214,6 +214,82 @@
                 </div>
                 <x-input-error class="mt-2" :messages="$errors->get('show_anime_notes_publicly')" />
 
+            <!-- Enable Reviews System -->
+            <x-input-label class="mt-4" for="enable_reviews_system" :value="__('Enable Reviews System')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="enable_reviews_system" type="radio" name="enable_reviews_system" value="1" class="form-radio"
+                           @if (old('enable_reviews_system', $user->enable_reviews_system) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="enable_reviews_system" type="radio" name="enable_reviews_system" value="0" class="form-radio"
+                           @if (old('enable_reviews_system', $user->enable_reviews_system) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+
+            <!-- Show Own Reviews When Logged In -->
+            <x-input-label class="mt-4" for="show_reviews_when_logged_in" :value="__('Show Own Reviews When Logged In')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_reviews_when_logged_in" type="radio" name="show_reviews_when_logged_in" value="1" class="form-radio"
+                           @if (old('show_reviews_when_logged_in', $user->show_reviews_when_logged_in) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_reviews_when_logged_in" type="radio" name="show_reviews_when_logged_in" value="0" class="form-radio"
+                           @if (old('show_reviews_when_logged_in', $user->show_reviews_when_logged_in) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+
+            <!-- Show Own Reviews Publicly -->
+            <x-input-label class="mt-4" for="show_reviews_publicly" :value="__('Show Own Reviews Publicly')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_reviews_publicly" type="radio" name="show_reviews_publicly" value="1" class="form-radio"
+                           @if (old('show_reviews_publicly', $user->show_reviews_publicly) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_reviews_publicly" type="radio" name="show_reviews_publicly" value="0" class="form-radio"
+                           @if (old('show_reviews_publicly', $user->show_reviews_publicly) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+
+            <!-- Show Others' Reviews -->
+            <x-input-label class="mt-4" for="show_others_reviews" :value="__('Show Others\' Reviews')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_others_reviews" type="radio" name="show_others_reviews" value="1" class="form-radio"
+                           @if (old('show_others_reviews', $user->show_others_reviews) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_others_reviews" type="radio" name="show_others_reviews" value="0" class="form-radio"
+                           @if (old('show_others_reviews', $user->show_others_reviews) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+
+            <!-- Show Reviews in Navigation Dropdown -->
+            <x-input-label class="mt-4" for="show_reviews_in_nav_dropdown" :value="__('Show Reviews in Navigation Dropdown')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_reviews_in_nav_dropdown" type="radio" name="show_reviews_in_nav_dropdown" value="1" class="form-radio"
+                           @if (old('show_reviews_in_nav_dropdown', $user->show_reviews_in_nav_dropdown) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_reviews_in_nav_dropdown" type="radio" name="show_reviews_in_nav_dropdown" value="0" class="form-radio"
+                           @if (old('show_reviews_in_nav_dropdown', $user->show_reviews_in_nav_dropdown) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+
+
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
@@ -340,6 +416,29 @@
             // Initialize state on load
             setRelatedFriendsFieldsDisabled(document.querySelector('input[name="enable_friends_system"]:checked').value === '0');
             adjustFriendsPubliclySetting();
+
+            // Function to disable or enable review related fields
+            function setReviewFieldsDisabled(disabled) {
+                ['show_reviews_when_logged_in', 'show_reviews_publicly', 'show_others_reviews', 'show_reviews_in_nav_dropdown'].forEach(name => {
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+                        radio.disabled = disabled;
+                        if (disabled) {
+                            // Set to 'No' if disabled
+                            radio.checked = radio.value === '0';
+                        }
+                    });
+                });
+            }
+
+            // Event listener for 'Enable Reviews System' radio buttons
+            document.querySelectorAll('input[name="enable_reviews_system"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    setReviewFieldsDisabled(this.value === '0');
+                });
+            });
+
+            // Initialize review settings on load
+            setReviewFieldsDisabled(document.querySelector('input[name="enable_reviews_system"]:checked').value === '0');
         });
 
     </script>

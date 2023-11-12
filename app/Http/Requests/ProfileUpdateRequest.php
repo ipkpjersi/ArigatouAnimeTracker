@@ -31,6 +31,11 @@ class ProfileUpdateRequest extends FormRequest
             'show_friends_in_nav_dropdown' => ['nullable', 'in:1,0'],
             'show_friends_on_others_profiles' => ['nullable', 'in:1,0'],
             'show_anime_notes_publicly' => ['nullable', 'in:1,0'],
+            'enable_reviews_system' => ['nullable', 'in:1,0'],
+            'show_reviews_when_logged_in' => ['nullable', 'in:1,0'],
+            'show_reviews_publicly' => ['nullable', 'in:1,0'],
+            'show_others_reviews' => ['nullable', 'in:1,0'],
+            'show_reviews_in_nav_dropdown' => ['nullable', 'in:1,0'],
         ];
     }
 }

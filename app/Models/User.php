@@ -34,6 +34,11 @@ class User extends Authenticatable
         'show_friends_on_profile_when_logged_in',
         'show_friends_in_nav_dropdown',
         'show_friends_on_others_profiles',
+        'enable_reviews_system',
+        'show_reviews_when_logged_in',
+        'show_reviews_publicly',
+        'show_others_reviews',
+        'show_reviews_in_nav_dropdown',
     ];
 
     /**
