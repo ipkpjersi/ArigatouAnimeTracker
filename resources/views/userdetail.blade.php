@@ -32,7 +32,7 @@
                                 </div>
                                 <div class="flex flex-wrap mb-4">
                                     @foreach ($friends as $friend)
-                                        <div class="max-w-[50px] w-1/4 p-1">
+                                        <div class="max-w-[50px] w-1/2 p-1">
                                             <a href="/users/{{ $friend->username }}" class="block text-center">
                                                 <img src="{{ $friend->avatar }}" alt="{{ $friend->username }}" class="rounded-full w-full avatar-image" onerror="this.onerror=null; this.src='/img/notfound.gif';">
                                             </a>
