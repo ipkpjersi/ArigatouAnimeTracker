@@ -78,6 +78,16 @@
                             <x-dropdown-link :href="route('users.detail', Auth::user()->username)">
                                 {{ __('Profile') }}
                             </x-dropdown-link>
+                            @if(Auth::user()->show_friends_in_nav_dropdown === 1)
+                                <x-dropdown-link :href="route('users.detail', [Auth::user()->username, 'view' => 'friends'])">
+                                    {{ __('Friends') }}
+                                </x-dropdown-link>
+                            @endif
+                            @if(Auth::user()->show_reviews_in_nav_dropdown === 1)
+                                <x-dropdown-link :href="route('users.detail', [Auth::user()->username, 'view' => 'reviews'])">
+                                    {{ __('Reviews') }}
+                                </x-dropdown-link>
+                            @endif
                             <x-dropdown-link :href="route('profile.edit')">
                                 {{ __('Profile Settings') }}
                             </x-dropdown-link>
@@ -169,6 +179,16 @@
                     <x-responsive-nav-link :href="route('users.detail', Auth::user()->username)">
                         {{ __('Profile') }}
                     </x-responsive-nav-link>
+                    @if(Auth::user()->show_friends_in_nav_dropdown === 1)
+                        <x-responsive-nav-link :href="route('users.detail', [Auth::user()->username, 'view' => 'friends'])">
+                            {{ __('Friends') }}
+                        </x-responsive-nav-link>
+                    @endif
+                    @if(Auth::user()->show_reviews_in_nav_dropdown === 1)
+                        <x-responsive-nav-link :href="route('users.detail', [Auth::user()->username, 'view' => 'reviews'])">
+                            {{ __('Reviews') }}
+                        </x-responsive-nav-link>
+                    @endif
                     <x-responsive-nav-link :href="route('profile.edit')">
                         {{ __('Profile Settings') }}
                     </x-responsive-nav-link>

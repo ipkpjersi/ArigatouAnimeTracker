@@ -45,7 +45,12 @@ class Anime extends Model
     public function user()
     {
        return $this->belongsToMany(User::class)
-                    ->withPivot('score', 'sort_order', 'progress', 'watch_status_id', 'notes', 'display_in_list')
+                    ->withPivot('score', 'sort_order', 'progress', 'watch_status_id', 'notes', 'display_in_list', 'show_anime_notes_publicly')
                     ->withTimestamps();
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(AnimeReview::class, 'anime_id');
     }
 }

@@ -28,7 +28,17 @@ class User extends Authenticatable
         'show_anime_list_number',
         'registration_ip',
         'show_clear_anime_list_button',
-        'display_anime_cards'
+        'display_anime_cards',
+        'enable_friends_system',
+        'show_friends_on_profile_publicly',
+        'show_friends_on_profile_when_logged_in',
+        'show_friends_in_nav_dropdown',
+        'show_friends_on_others_profiles',
+        'enable_reviews_system',
+        'show_reviews_when_logged_in',
+        'show_reviews_publicly',
+        'show_others_reviews',
+        'show_reviews_in_nav_dropdown',
     ];
 
     /**
@@ -61,8 +71,13 @@ class User extends Authenticatable
 
     public function anime() {
         return $this->belongsToMany(Anime::class)
-                    ->withPivot('score', 'sort_order', 'progress', 'watch_status_id', 'notes', 'display_in_list')
+                    ->withPivot('score', 'sort_order', 'progress', 'watch_status_id', 'notes', 'display_in_list', 'show_anime_notes_publicly')
                     ->withTimestamps();
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(AnimeReview::class, 'user_id');
     }
 
     public function animeStatistics() {
@@ -88,5 +103,62 @@ class User extends Authenticatable
          $totalDaysWatched = ($totalEpisodes * 24) / (60 * 24);
 
         return compact('totalCompleted', 'totalEpisodes', 'averageScore', 'animeStatusCounts', 'totalDaysWatched');
+    }
+
+    public function friends()
+    {
+        return $this->belongsToMany(User::class, 'user_friends', 'user_id', 'friend_user_id')
+                    ->withPivot('show_friend_publicly')
+                    ->withTimestamps();
+    }
+
+    public function addFriend($friendId)
+    {
+        if ($this->id == $friendId) {
+            throw new \Exception('You cannot add yourself as a friend.');
+        }
+
+        if ($this->friends()->where('friend_user_id', $friendId)->exists()) {
+            throw new \Exception('This user is already your friend.');
+        }
+
+        $this->friends()->attach($friendId);
+    }
+
+    public function removeFriend($friendId)
+    {
+        if ($this->id == $friendId) {
+            throw new \Exception('You cannot remove yourself as a friend.');
+        }
+
+        if (!$this->friends()->where('friend_user_id', $friendId)->exists()) {
+            throw new \Exception('This user is already not your friend.');
+        }
+
+        $this->friends()->detach($friendId);
+    }
+
+    public function isFriend($userId)
+    {
+        return $this->friends()->where('friend_user_id', $userId)->exists();
+    }
+
+    public function toggleFriendPublicly($friendId)
+    {
+        // Check if the friend ID is the same as the user's ID
+        if ($this->id == $friendId) {
+            throw new \Exception('You cannot toggle yourself.');
+        }
+
+        // Find the friend relationship
+        $friend = $this->friends()->where('friend_user_id', $friendId)->first();
+
+        if (!$friend) {
+            throw new \Exception('This user is not your friend.');
+        }
+
+        // Toggle the 'show_friend_publicly' status
+        $friend->pivot->show_friend_publicly = !$friend->pivot->show_friend_publicly;
+        $friend->pivot->save();
     }
 }

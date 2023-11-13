@@ -21,6 +21,16 @@
                 @if (session()->has('message'))
                     <span class="text-center">{{ session()->get('message') }}</span>
                 @endif
+                @if ($errors->any())
+                    <div class="bg-red-100 border border-red-400 text-white-700 px-4 py-3 rounded relative" role="alert">
+                        <span class="block sm:inline">There were one or more errors:</span>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <div class="p-6 text-gray-900 dark:text-gray-100 flex flex-wrap">
                     <!-- Left Column -->
                     <div class="w-full md:w-56 mb-6 md:mb-0 md:mr-6 flex-none mt-0">
@@ -120,6 +130,15 @@
                                         </select>
                                     </div>
 
+                                    <!-- Show Anime Notes Publicly -->
+                                    <div class="mt-4">
+                                        <label for="show_anime_notes_publicly" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Show Notes Publicly:</label>
+                                        <select name="show_anime_notes_publicly[]" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-select block w-full">
+                                            <option value="1" {{ ($currentUserShowAnimeNotesPublicly === 1) ? 'selected' : '' }}>Yes</option>
+                                            <option value="0" {{ ($currentUserShowAnimeNotesPublicly === 0) ? 'selected' : '' }}>No</option>
+                                        </select>
+                                    </div>
+
                                     <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                         Update My Anime List
                                     </button>
@@ -138,6 +157,27 @@
 
                     <!-- Right Column -->
                     <div class="w-full md:w-3/5 mt-0">
+                        <div class="bg-white dark:bg-gray-700 rounded shadow mb-4 p-4 w-3/5">
+                            <!-- First Row: MAL Score and Users -->
+                            <div class="grid grid-cols-2 gap-1 max-w-md mx-auto">
+                                <!-- First Row -->
+                                <div><strong>MAL Score:</strong> {{ ($anime->mal_mean ?? 0) > 0 ? number_format($anime->mal_mean, 2) : 'N/A' }}</div>
+                                <div><strong>MAL Users:</strong> {{ ($anime->mal_scoring_users ?? 0) > 0 ? number_format($anime->mal_scoring_users) : 'N/A' }}</div>
+
+                                <!-- Second Row -->
+                                <div><a href="{{ route('anime.top', ['sort' => 'highest_rated']) }}"><strong>Ranked:</strong> {{ ($anime->mal_rank ?? 0) > 0 ? '#' . number_format($anime->mal_rank) : 'N/A' }}</a></div>
+                                <div><a href="{{ route('anime.top', ['sort' => 'most_popular']) }}"><strong>MAL Popularity:</strong> {{ ($anime->mal_popularity ?? 0) > 0 ? '#' . number_format($anime->mal_popularity) : 'N/A' }}</a></div>
+
+                                <div><strong>MAL Members:</strong> {{ ($anime->mal_list_members ?? 0) > 0 ? number_format($anime->mal_list_members) : 'N/A' }}</div>
+                                <div><strong>AAT Score:</strong> {{ ($aas ?? 0) > 0 ? $aas : "N/A" }}</div>
+
+                                @if (Auth::user() !== null)
+                                    <div><strong>My Score:</strong> {{ number_format($currentUserScore ?? 0) }}</div>
+                                    <div><strong>My Status:</strong> {{ $currentUserStatus > 0 ? $watchStatuses[$currentUserStatus]->status ?? "N/A" : "N/A" }}</div>
+                                @endif
+                            </div>
+                        </div>
+
 
                         <h4 class="font-bold mb-2">Description:</h4>
                         <p class="mb-4">{!! str_replace("\n", "<br>", $anime->description ?? "This title does not have a description yet.") !!}</p>
@@ -155,6 +195,121 @@
                                 <li><a href="{{ $relation }}" target="_blank" rel="noopener">{{ $relation }}</a></li>
                             @endforeach
                         </ul>
+
+                        <!-- Anime Reviews Section -->
+                        @if (auth()->user() === null || auth()->user()->show_others_reviews === 1)
+                            <div class="mt-8">
+                                <h4 class="font-bold mb-2">Anime Reviews (Total: {{ $totalReviewsCount }}):</h4>
+                                <form action="{{ route('anime.detail', ['id' => $anime->id, 'title' => $anime->title]) }}" method="GET" class="mb-3">
+                                    <input type="checkbox" name="spoilers" value="1" onchange="this.form.submit()" {{ request('spoilers') ? 'checked' : '' }}> Include Spoilers
+                                </form>
+                                @forelse ($reviews as $review)
+                                    <div class="mb-4 border-b pb-4">
+                                        <h5 class="font-semibold">{{ $review->title }}</h5>
+                                        <span id="less-{{ $review->id }}">
+                                            {{ strlen($review->body) > 100 ? substr($review->body, 0, 100) . '...' : $review->body }}
+                                            @if (strlen($review->body) > 100)
+                                                <button onclick="toggleReviewContent({{ $review->id }})" id="button-{{ $review->id }}" class="font-bold">Show More</button>
+                                            @endif
+                                        </span>
+                                        @if (strlen($review->body) > 100)
+                                            <span id="more-{{ $review->id }}" style="display: none;">
+                                                {{ $review->body }}
+                                                <button onclick="toggleReviewContent({{ $review->id }})" id="button-less-{{ $review->id }}" class="font-bold">Show Less</button>
+                                            </span>
+                                        @endif
+                                        <p class="mt-1">By: <a href="{{route('users.detail', $review->user->username)}}"><img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y H:i:s A') }}</a></p>
+                                    </div>
+                                @empty
+                                    <p>No reviews available.</p>
+                                @endforelse
+
+                                <!-- Pagination -->
+                                {{ $reviews->links() }}
+                            </div>
+
+                            <!-- Add/Update Review Button -->
+                            @if(auth()->user() !== null)
+                                <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="toggleReviewForm" onclick="toggleReviewForm()">
+                                    {{ $userHasReview ? 'Update Review' : 'Add Review' }}
+                                </button>
+                                @if (session()->has('reviewmessage'))
+                                    <span class="text-center">{{ session()->get('reviewmessage') }}</span>
+                                @endif
+                            @endif
+
+                            <!-- Review Form -->
+                            <div id="reviewForm" class="hidden bg-white dark:bg-gray-800 p-4 rounded shadow mt-4">
+                                <form action="{{ $userHasReview ? route('anime.updateReview', $anime->id) : route('anime.addReview') }}" method="POST" class="space-y-4">
+                                    @csrf
+                                    @if($userHasReview)
+                                        @method('PUT')
+                                    @endif
+
+                                    <!-- Hidden Input for Anime ID -->
+                                    <input type="hidden" name="anime_id" value="{{ $anime->id }}">
+
+                                    <!-- Review Title -->
+                                    <div>
+                                        <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Review Title:</label>
+                                        <input type="text" id="title" name="title" value="{{ $userReview->title ?? '' }}" class="form-input w-full rounded border-gray-300 dark:bg-gray-700 dark:text-gray-200">
+                                    </div>
+
+                                    <!-- Review Body -->
+                                    <div>
+                                        <label for="body" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Review:</label>
+                                        <textarea id="body" name="body" class="form-textarea w-full rounded border-gray-300 dark:bg-gray-700 dark:text-gray-200" rows="4">{{ $userReview->body ?? '' }}</textarea>
+                                    </div>
+
+                                    <!-- Recommendation Dropdown -->
+                                    <div>
+                                        <label for="recommendation" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Your Recommendation:</label>
+                                        <select id="recommendation" name="recommendation" class="mt-1 form-select w-full rounded border-gray-300 dark:bg-gray-700 dark:text-gray-200">
+                                            <option value="recommended" {{ (empty($userReview->recommendation) || $userReview->recommendation === 'recommended') ? 'selected' : '' }}>Recommended</option>
+                                            <option value="mixed" {{ ($userReview->recommendation ?? '') === 'mixed' ? 'selected' : '' }}>Mixed</option>
+                                            <option value="not_recommended" {{ ($userReview->recommendation ?? '') === 'not_recommended' ? 'selected' : '' }}>Not Recommended</option>
+                                        </select>
+                                    </div>
+
+
+                                    <!-- Spoiler Checkbox -->
+                                    <div class="flex items-center">
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" id="contains_spoilers" name="contains_spoilers" value="1" {{ $userReview->contains_spoilers ?? false ? 'checked' : '' }} class="form-checkbox rounded border-gray-300 dark:bg-gray-700">
+                                            <span class="text-gray-700 dark:text-gray-200">Contains Spoilers</span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Show Review Publicly Checkbox -->
+                                    <div class="flex items-center mt-4">
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" id="show_review_publicly" name="show_review_publicly" value="1" {{ $userReview->show_review_publicly ?? true ? 'checked' : '' }} class="form-checkbox rounded border-gray-300 dark:bg-gray-700">
+                                            <span class="text-gray-700 dark:text-gray-200">Show Review Publicly</span>
+                                        </label>
+                                    </div>
+
+
+                                    <!-- Submit Button -->
+                                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit Review</button>
+
+                                    <!-- Delete Review Button (only if the user has a review) -->
+                                    @if($userHasReview)
+                                        <button form="deleteReviewForm" type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete Review</button>
+                                    @endif
+                                </form>
+
+                                <!-- Delete Review Form -->
+                                @if($userHasReview)
+                                    <form id="deleteReviewForm" action="{{ route('anime.deleteReview', $anime->id) }}" method="POST" class="hidden">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                @endif
+
+                                <!-- Hide Review Form Button -->
+                                <button class="mt-2 bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded" onclick="toggleReviewForm()">Hide Form</button>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -179,6 +334,24 @@
             } else {
                 hiddenSynonyms.classList.add('hidden');
                 toggleButton.innerHTML = '&#x25BC; More';
+            }
+        }
+
+        function toggleReviewForm() {
+            let form = document.getElementById('reviewForm');
+            form.classList.toggle('hidden');
+        }
+
+        function toggleReviewContent(reviewId) {
+            let moreText = document.getElementById("more-" + reviewId);
+            let lessText = document.getElementById("less-" + reviewId);
+
+            if (moreText.style.display === "none") {
+                moreText.style.display = "inline";
+                lessText.style.display = "none";
+            } else {
+                moreText.style.display = "none";
+                lessText.style.display = "inline";
             }
         }
     </script>

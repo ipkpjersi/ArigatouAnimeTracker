@@ -43,23 +43,23 @@
                                     <th>Watch Status</th>
                                     <th>Progress</th>
                                     <th>Score</th>
-                                    {{-- @if (auth()->user() != null && auth()->user()->username === $username) --}}
+                                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                         <th>Sort Order</th>
-                                    {{-- @endif --}}
+                                    @endif
                                     <th>Episodes</th>
                                     <th>Season</th>
                                     <th>Year</th>
-                                    @if (auth()->user() != null && auth()->user()->username === $username)
+                                    <th>Notes</th>
+                                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                         <th>Delete</th>
                                     @endif
-                                    <!-- ... additional headers ... -->
                                 </tr>
                             </thead>
                             <tbody>
                                 <!-- DataTables will auto-populate this section based on the data returned from the server -->
                             </tbody>
                         </table>
-                        @if (auth()->user() != null && auth()->user()->username === $username && $userAnimeCount > 0)
+                        @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username) && $userAnimeCount > 0)
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                                 Save Changes
                             </button>
@@ -68,7 +68,12 @@
                             @endif
                         @endif
                     </form>
-                    @if (auth()->user() != null && auth()->user()->username === $username)
+                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
+                        <form action="{{ route('user.anime.list.v2', ['username' => $username] + request()->query()) }}" method="GET" class="mb-3 mt-4">
+                            <input type="checkbox" name="showallanime" value="1" onchange="this.form.submit()" {{ request('showallanime') ? 'checked' : '' }}> Show All Anime
+                        </form>
+                    @endif
+                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                         <div class="flex flex-col md:flex-row">
                             <a href="{{ route('import.animelist') }}">
                                 <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
@@ -131,7 +136,7 @@
                 { data: 'anime_status.status', name: 'anime_status.status', searchable: 'false' }, // Adjust based on actual returned data structure
                 { data: 'watch_status_id', name: 'watch_status_id', searchable: 'false', render: function(data, type, row) {
                     //console.log("watch_status_id data" + data);
-                    if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
+                    if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                         var options = '';
                         options += options += '<option value="">Pick an option...</option>';
                         options += '@foreach ($watchStatuses as $status) <option value="{{ $status->id }}" ' + (data === {{ $status->id }} ? 'selected' : '') + '>{{ $status->status }}</option> @endforeach';
@@ -145,7 +150,7 @@
                     name: 'progress',
                     searchable: false,
                     render: function(data, type, row) {
-                        if('{{ auth()->user()->username ?? '' }}' === '{{ $username }}') {
+                        if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                             var options = '';
                             options += '<option value="">Pick an option...</option>';
                             for(var i = 1; i <= row.episodes; i++) {
@@ -162,7 +167,7 @@
                     name: 'score',
                     searchable: false,
                     render: function(data, type, row) {
-                        if('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
+                        if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                             var options = '';
                             options += '<option value="">Pick an option...</option>';
                             for(var i = 1; i <= 10; i++) {
@@ -175,16 +180,17 @@
                     }
                 }
             );
-            //if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
+
+            if ('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                 columns.push({
                     data: 'sort_order',
                     name: 'sort_order',
                     searchable: false,
                     render: function(data, type, row) {
-                        return '<input type="number" min="1" name="sort_order[]" value="'+data+'" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">';
+                         return '<input type="number" min="1" name="sort_order[]" value="' + data + '" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">';
                     }
                 });
-            //}
+            }
             columns.push(
                 {
                     data: 'episodes',
@@ -203,7 +209,22 @@
                 },
             );
 
-            if ('{{ optional(auth()->user())->username ?? '' }}' === '{{ $username }}') {
+            columns.push({
+                data: 'notes', // assuming 'notes' is the key that holds the notes data
+                name: 'notes',
+                searchable: false,
+                render: function(data, type, row) {
+                    if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
+                        // If the user matches, make textarea editable
+                        return '<textarea name="notes[]" class="border rounded py-2 px-3 dark:bg-gray-800">' + (data ? data : '') + '</textarea>';
+                    } else {
+                        // If the user doesn't match, make textarea read-only
+                        return '<textarea name="notes[]" class="border rounded py-2 px-3 dark:bg-gray-800" readonly>' + (data ? data : '') + '</textarea>';
+                    }
+                }
+            });
+
+            if ('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
                 columns.push({
                     data: 'anime_id',
                     name: 'delete',
@@ -233,11 +254,21 @@
                 }
             }
             //We cannot use datatables responsive for this because it injects additional rows which breaks updating our user anime list.
+            let urlParams = new URLSearchParams(window.location.search);
+            let showAllAnimeQueryParam = urlParams.get('showallanime') === '1';
+            let isUserAuthenticatedAndMatching = '{{ Auth::check() && strtolower(Auth::user()->username) === strtolower($username) }}' === '1';
+            let showAllAnime = showAllAnimeQueryParam && isUserAuthenticatedAndMatching ? '1' : '0';
+
+            let customUrl = new URL('{{ route('user.anime.list.data.v2', ['username' => $username]) }}', window.location.origin);
+            // Construct the URL with the showallanime parameter
+            if (showAllAnime === '1') {
+                customUrl.searchParams.set('showallanime', '1');
+            }
             $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
                 order: [[7, 'asc'], [6, 'asc'], [1, 'asc']],
-                ajax: '{{ route('user.anime.list.data.v2', ['username' => $username]) }}',
+                ajax: customUrl.toString(),
                 columns: columns,
                 initComplete: function() {
                     let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
@@ -269,31 +300,36 @@
             let firstFocusableElement = clearModal.querySelectorAll(focusableElements)[0];
             let focusableContent = clearModal.querySelectorAll(focusableElements);
             let lastFocusableElement = focusableContent[focusableContent.length - 1];
+            if (clearListBtn) {
+                clearListBtn.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    document.body.style.overflow = 'hidden';
+                    clearModal.classList.remove("hidden");
+                    firstFocusableElement.focus(); // Set focus on the first focusable element
+                });
+            }
 
-            clearListBtn.addEventListener("click", function(event) {
-                event.preventDefault();
-                document.body.style.overflow = 'hidden';
-                clearModal.classList.remove("hidden");
-                firstFocusableElement.focus(); // Set focus on the first focusable element
-            });
+            if (confirmClear) {
+                confirmClear.addEventListener("click", function() {
+                    clearTimeout(errorTimeout); // Clear previous timeout if exists
 
-            confirmClear.addEventListener("click", function() {
-                clearTimeout(errorTimeout); // Clear previous timeout if exists
+                    if (!confirmCheckbox.checked) {
+                        showError("Please check the confirmation box.");
+                        return;
+                    }
 
-                if (!confirmCheckbox.checked) {
-                    showError("Please check the confirmation box.");
-                    return;
-                }
+                    if (confirmUsername.value !== username) {
+                        showError("Username does not match.");
+                        return;
+                    }
 
-                if (confirmUsername.value !== username) {
-                    showError("Username does not match.");
-                    return;
-                }
+                    clearForm.submit();
+                });
+            }
 
-                clearForm.submit();
-            });
-
-            cancelClear.addEventListener("click", closeModalAction);
+            if (cancelClear) {
+                cancelClear.addEventListener("click", closeModalAction);
+            }
 
             window.addEventListener("click", function(event) {
                 if (event.target === clearModal) {
@@ -339,8 +375,9 @@
                     errorText.classList.add("hidden");
                 }, 3000);
             }
-
-            closeModal.addEventListener("click", closeModalAction);
+            if (closeModal) {
+                closeModal.addEventListener("click", closeModalAction);
+            }
         });
     </script>
 </x-app-layout>
