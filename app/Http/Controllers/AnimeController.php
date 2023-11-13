@@ -125,13 +125,21 @@ class AnimeController extends Controller
        $reviews = AnimeReview::where('anime_reviews.anime_id', $id)
                   ->join('users', 'anime_reviews.user_id', '=', 'users.id')
                   ->where('anime_reviews.show_review_publicly', true)
-                  ->where('anime_reviews.contains_spoilers', false)
+                  ->when(!request('spoilers'), function ($query) {
+                        return $query->where('anime_reviews.contains_spoilers', false);
+                  })
                   ->where('users.show_reviews_publicly', true)
                   ->where('users.is_banned', false)
                   ->latest('anime_reviews.created_at')
-                  ->paginate(2);
+                  ->paginate(2, ['*'], 'reviewpage')
+                  ->withQueryString(); //We could manually appends() instead of using withQueryString() but withQueryString() is simpler.
 
-        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview'));
+        $totalReviewsCount = AnimeReview::where('anime_id', $id)
+                  ->join('users', 'anime_reviews.user_id', '=', 'users.id')
+                  ->where('anime_reviews.show_review_publicly', true)
+                  ->where('users.show_reviews_publicly', true)
+                  ->where('users.is_banned', false)->count();
+        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount'));
     }
 
     public function addReview(Request $request)

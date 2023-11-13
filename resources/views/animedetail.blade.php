@@ -178,7 +178,10 @@
                         <!-- Anime Reviews Section -->
                         @if (auth()->user() === null || auth()->user()->show_others_reviews === 1)
                             <div class="mt-8">
-                                <h4 class="font-bold mb-2">Anime Reviews:</h4>
+                                <h4 class="font-bold mb-2">Anime Reviews (Total: {{ $totalReviewsCount }}):</h4>
+                                <form action="{{ route('anime.detail', ['id' => $anime->id, 'title' => $anime->title]) }}" method="GET" class="mb-3">
+                                    <input type="checkbox" name="spoilers" value="1" onchange="this.form.submit()" {{ request('spoilers') ? 'checked' : '' }}> Include Spoilers
+                                </form>
                                 @forelse ($reviews as $review)
                                     <div class="mb-4 border-b pb-4">
                                         <h5 class="font-semibold">{{ $review->title }}</h5>
@@ -194,7 +197,7 @@
                                                 <button onclick="toggleReviewContent({{ $review->id }})" id="button-less-{{ $review->id }}" class="font-bold">Show Less</button>
                                             </span>
                                         @endif
-                                        <p class="mt-1">By: <img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y') }}</p>
+                                        <p class="mt-1">By: <a href="{{route('users.detail', $review->user->username)}}"><img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y') }}</a></p>
                                     </div>
                                 @empty
                                     <p>No reviews available.</p>
