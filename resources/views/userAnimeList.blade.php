@@ -248,6 +248,11 @@
                             {{ $userAnime->links() }}
                         </div>
                     </form>
+                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username) && $userAnime->isNotEmpty())
+                        <form action="{{ route('user.anime.list', ['username' => $username] + request()->query()) }}" method="GET" class="mb-3">
+                            <input type="checkbox" name="showallanime" value="1" onchange="this.form.submit()" {{ request('showallanime') ? 'checked' : '' }}> Show All Anime
+                        </form>
+                    @endif
                     @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                         <div class="md:flex">
                             <a href="{{ route('import.animelist') }}">

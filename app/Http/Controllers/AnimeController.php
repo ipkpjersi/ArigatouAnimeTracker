@@ -372,13 +372,15 @@ class AnimeController extends Controller
 
 
 
-    public function userAnimeList($username) {
+    public function userAnimeList(Request $request, $username) {
         $user = User::where('username', $username)->firstOrFail();
         if ($user->is_banned === 1 && (Auth::user() === null || Auth::user()->is_admin !== 1)) abort(404);
+        $showAllAnime = false;
+        if ($request->has('showallanime') && $request->input('showallanime') === '1' && Auth::user() !== null && strtolower(Auth::user()->username) === strtolower($user->username)) $showAllAnime = true;
         $show_anime_list_number = $user->show_anime_list_number;
         $watchStatuses = DB::table('watch_status')->get();
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
-        $userAnime = $user->anime()
+        $query = $user->anime()
                           ->join('users', 'anime_user.user_id', '=', 'users.id')
                           ->with(['anime_type', 'anime_status'])
                           ->selectRaw('
@@ -394,9 +396,11 @@ class AnimeController extends Controller
                                 ELSE NULL
                               END as notes
                          ')
-                          ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC')
-                          ->where('anime_user.display_in_list', '=', 1)
-                          ->paginate($user->anime_list_pagination_size ?? 15);
+                          ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC');
+        if (!$showAllAnime) {
+            $query = $query->where('anime_user.display_in_list', '=', 1);
+        }
+        $userAnime= $query->paginate($user->anime_list_pagination_size ?? 15)->withQueryString();
 
         return view('userAnimeList', ['userAnime' => $userAnime, 'username' => $username, 'show_anime_list_number' => $show_anime_list_number, 'watchStatuses' => $watchStatuses, 'watchStatusMap' => $watchStatusMap]);
     }
