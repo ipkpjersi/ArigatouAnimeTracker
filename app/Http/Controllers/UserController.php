@@ -54,6 +54,19 @@ class UserController extends Controller
             }
         }
 
+        if ($isOwnProfile) {
+            //User is viewing their own profile
+            $canViewReviews = $user->show_reviews_when_logged_in === 1;
+        } else {
+            //Viewing someone else's profile, check if we are logged in first
+            if ($currentUser) {
+                //Current user needs to have enabled viewing reviews on other profiles
+                $canViewReviews = $currentUser->show_others_reviews === 1 && $user->show_reviews_publicly === 1;
+            } else {
+                $canViewReviews = $user->show_reviews_publicly === 1;
+            }
+        }
+
         $enableFriendsSystem = auth()->user()->enable_friends_system === 1;
 
         $reviews = AnimeReview::where('user_id', $user->id)
@@ -73,7 +86,7 @@ class UserController extends Controller
                   ->where('users.show_reviews_publicly', true)
                   ->where('users.is_banned', false)->count();
 
-        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount'));
+        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount', 'canViewReviews'));
     }
 
     public function banUser(Request $request, $userId)
