@@ -365,6 +365,7 @@ class AnimeController extends Controller
 
     public function userAnimeList($username) {
         $user = User::where('username', $username)->firstOrFail();
+        if ($user->is_banned === 1 && (Auth::user() === null || Auth::user()->is_admin !== 1)) abort(404);
         $show_anime_list_number = $user->show_anime_list_number;
         $watchStatuses = DB::table('watch_status')->get();
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
@@ -394,6 +395,7 @@ class AnimeController extends Controller
     public function userAnimeListV2($username)
     {
         $user = User::where('username', $username)->firstOrFail();
+        if ($user->is_banned === 1 && (Auth::user() === null || Auth::user()->is_admin !== 1)) abort(404);
         $show_anime_list_number = $user->show_anime_list_number;
         $watchStatuses = WatchStatus::all();
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();

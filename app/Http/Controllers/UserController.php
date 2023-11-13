@@ -18,7 +18,9 @@ class UserController extends Controller
             return response()->json(['error' => 'Invalid request'], 400);
         }
         $query = User::select('id', 'avatar', 'username', 'is_admin', 'is_banned', 'created_at');
-
+        if (Auth::user() === null || Auth::user()->is_admin !== 1) {
+            $query->where('is_banned', '0');
+        }
         return DataTables::of($query)
             ->editColumn('created_at', function($user) {
                 return Carbon::parse($user->created_at)->format('M d, Y');
@@ -33,6 +35,7 @@ class UserController extends Controller
     public function detail(Request $request, $username)
     {
         $user = User::where(['username' => $username])->firstOrFail();
+        if ($user->is_banned === 1 && (Auth::user() === null || Auth::user()->is_admin !== 1)) abort(404);
         $stats = $user->animeStatistics();
         $showPubliclyOnly = true;
         if ($request->has('showallfriends') && $request->input('showallfriends') === '1' && Auth::user() !== null && strtolower(Auth::user()->username) === strtolower($user->username)) $showPubliclyOnly = false;
