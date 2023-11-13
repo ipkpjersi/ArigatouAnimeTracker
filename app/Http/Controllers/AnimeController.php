@@ -157,6 +157,7 @@ class AnimeController extends Controller
             'body' => 'required|string',
             'contains_spoilers' => 'boolean',
             'show_review_publicly' => 'boolean',
+            'recommendation' => 'required|in:recommended,mixed,not_recommended',
         ]);
 
         $review = new AnimeReview($validatedData);
@@ -175,6 +176,7 @@ class AnimeController extends Controller
             'body' => 'required|string',
             'contains_spoilers' => 'boolean',
             'show_review_publicly' => 'boolean',
+            'recommendation' => 'required|in:recommended,mixed,not_recommended',
         ]);
 
         $review = AnimeReview::where('anime_id', $id)->where('user_id', auth()->id())->firstOrFail();
