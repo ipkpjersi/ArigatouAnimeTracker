@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnimeReview;
 use App\Models\StaffActionLog;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -54,7 +55,25 @@ class UserController extends Controller
         }
 
         $enableFriendsSystem = auth()->user()->enable_friends_system === 1;
-        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile'));
+
+        $reviews = AnimeReview::where('user_id', $user->id)
+                ->join('users', 'anime_reviews.user_id', '=', 'users.id')
+                ->where('anime_reviews.show_review_publicly', true)
+                ->when(!request('spoilers'), function ($query) {
+                        return $query->where('anime_reviews.contains_spoilers', false);
+                })
+                ->where('users.show_reviews_publicly', true)
+                ->where('users.is_banned', false)
+                ->latest('anime_reviews.created_at')
+                ->paginate(2, ['anime_reviews.*', 'users.username', 'users.avatar', 'users.id as user_id'], 'reviewpage');
+
+        $totalReviewsCount = AnimeReview::where('user_id', $user->id)
+                  ->join('users', 'anime_reviews.user_id', '=', 'users.id')
+                  ->where('anime_reviews.show_review_publicly', true)
+                  ->where('users.show_reviews_publicly', true)
+                  ->where('users.is_banned', false)->count();
+
+        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount'));
     }
 
     public function banUser(Request $request, $userId)

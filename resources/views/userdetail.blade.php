@@ -56,16 +56,66 @@
                                 @endif
                             @endif
                         @endif
+                        <div class="flex justify-between mb-4">
+                            <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}" class="text-blue-500 hover:text-blue-700">All Reviews ({{ $totalReviewsCount }})</a>
+                        </div>
                     </div>
 
                     <!-- Right Column -->
                     <div class="w-full md:w-3/5 mt-0 flex flex-row flex-wrap">
-                        @if(request('view') == 'friends')
+                        @if(request('view') == 'reviews')
                             <div class="mb-4 flex border-b items-end">
                                 <!-- Home Tab -->
                                 <a href="{{ route('users.detail', $user->username) }}" class="tab-button {{ !request()->get('view') ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Home</a>
                                 <!-- Friends Tab -->
                                 <a href="{{ route('users.detail', [$user->username, 'view' => 'friends']) }}" class="tab-button {{ request()->get('view') == 'friends' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Friends</a>
+                                <!-- Reviews Tab -->
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}" class="tab-button {{ request()->get('view') == 'reviews' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Reviews</a>
+                            </div>
+
+                            {{-- Display Reviews --}}
+                            <div class="grid grid-cols-1 gap-4 w-full">
+                                @foreach ($reviews as $review)
+                                    <div class="mb-4 border-b pb-4">
+                                        <h4 class="font-bold"> {{ $review->anime->title }}</h4>
+                                        <h5 class="font-semibold">{{ $review->title }}</h5>
+                                        <span id="less-{{ $review->id }}">
+                                            {{ strlen($review->body) > 100 ? substr($review->body, 0, 100) . '...' : $review->body }}
+                                            @if (strlen($review->body) > 100)
+                                                <button onclick="toggleReviewContent({{ $review->id }})" id="button-{{ $review->id }}" class="font-bold">Show More</button>
+                                            @endif
+                                        </span>
+                                        @if (strlen($review->body) > 100)
+                                            <span id="more-{{ $review->id }}" style="display: none;">
+                                                {{ $review->body }}
+                                                <button onclick="toggleReviewContent({{ $review->id }})" id="button-less-{{ $review->id }}" class="font-bold">Show Less</button>
+                                            </span>
+                                        @endif
+                                        <p class="mt-1">By: <img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y H:i:s A') }}</p>
+                                    </div>
+                                @endforeach
+                                {{-- Include Spoilers Checkbox --}}
+                                <form action="{{ route('users.detail', $user->username) }}" method="GET">
+                                    <input type="hidden" name="view" value="reviews">
+                                    <label for="spoilers" class="inline-flex items-center">
+                                        <input type="checkbox" id="spoilers" name="spoilers" value="1" {{ request('spoilers') ? 'checked' : '' }} onchange="this.form.submit()">
+                                        <span class="ml-2">Include Spoilers</span>
+                                    </label>
+                                </form>
+                            </div>
+
+                            {{-- Pagination Links --}}
+                            <div class="mt-4 flex-grow">
+                                {{ $reviews->appends(['view' => 'reviews', 'spoilers' => request('spoilers')])->links() }}
+                            </div>
+                        @elseif(request('view') == 'friends')
+                            <div class="mb-4 flex border-b items-end">
+                                <!-- Home Tab -->
+                                <a href="{{ route('users.detail', $user->username) }}" class="tab-button {{ !request()->get('view') ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Home</a>
+                                <!-- Friends Tab -->
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'friends']) }}" class="tab-button {{ request()->get('view') == 'friends' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Friends</a>
+                                <!-- Reviews Tab -->
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}" class="tab-button {{ request()->get('view') == 'reviews' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Reviews</a>
                             </div>
 
                             <!-- Grid View for Friends -->
