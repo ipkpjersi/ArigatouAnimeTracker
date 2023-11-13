@@ -427,10 +427,11 @@ class AnimeController extends Controller
     public function getUserAnimeDataV2($username, Request $request)
     {
         $user = User::where('username', $username)->firstOrFail();
+        $showAllAnime = false;
+        if ($request->has('showallanime') && $request->input('showallanime') === '1' && Auth::user() !== null && strtolower(Auth::user()->username) === strtolower($user->username)) $showAllAnime = true;
         $query = $user->anime()
           ->join('users', 'anime_user.user_id', '=', 'users.id')
           ->with(['anime_type', 'anime_status', 'watch_status'])
-          ->where('anime_user.display_in_list', '=', 1)
           ->selectRaw('
               anime.*,
               anime_user.watch_status_id,
@@ -444,7 +445,9 @@ class AnimeController extends Controller
                 ELSE NULL
               END as notes
           ');
-
+        if (!$showAllAnime) {
+            $query = $query->where('anime_user.display_in_list', '=', 1);
+        }
         $defaultOrder = [
             ['column' => 7, 'dir' => 'asc'],
             ['column' => 6, 'dir' => 'asc'],

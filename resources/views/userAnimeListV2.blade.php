@@ -69,6 +69,11 @@
                         @endif
                     </form>
                     @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
+                        <form action="{{ route('user.anime.list.v2', ['username' => $username] + request()->query()) }}" method="GET" class="mb-3 mt-4">
+                            <input type="checkbox" name="showallanime" value="1" onchange="this.form.submit()" {{ request('showallanime') ? 'checked' : '' }}> Show All Anime
+                        </form>
+                    @endif
+                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                         <div class="flex flex-col md:flex-row">
                             <a href="{{ route('import.animelist') }}">
                                 <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
@@ -249,11 +254,21 @@
                 }
             }
             //We cannot use datatables responsive for this because it injects additional rows which breaks updating our user anime list.
+            let urlParams = new URLSearchParams(window.location.search);
+            let showAllAnimeQueryParam = urlParams.get('showallanime') === '1';
+            let isUserAuthenticatedAndMatching = '{{ Auth::check() && strtolower(Auth::user()->username) === strtolower($username) }}' === '1';
+            let showAllAnime = showAllAnimeQueryParam && isUserAuthenticatedAndMatching ? '1' : '0';
+
+            let customUrl = new URL('{{ route('user.anime.list.data.v2', ['username' => $username]) }}', window.location.origin);
+            // Construct the URL with the showallanime parameter
+            if (showAllAnime === '1') {
+                customUrl.searchParams.set('showallanime', '1');
+            }
             $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
                 order: [[7, 'asc'], [6, 'asc'], [1, 'asc']],
-                ajax: '{{ route('user.anime.list.data.v2', ['username' => $username]) }}',
+                ajax: customUrl.toString(),
                 columns: columns,
                 initComplete: function() {
                     let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
