@@ -161,14 +161,14 @@
                             <!-- First Row: MAL Score and Users -->
                             <div class="grid grid-cols-2 gap-1 max-w-md mx-auto">
                                 <!-- First Row -->
-                                <div><strong>MAL Score:</strong> {{ number_format($anime->mal_mean ?? 0, 2) }}</div>
-                                <div><strong>MAL Users:</strong> {{ number_format($anime->mal_scoring_users ?? 0) }}</div>
+                                <div><strong>MAL Score:</strong> {{ ($anime->mal_mean ?? 0) > 0 ? number_format($anime->mal_mean, 2) : 'N/A' }}</div>
+                                <div><strong>MAL Users:</strong> {{ ($anime->mal_scoring_users ?? 0) > 0 ? number_format($anime->mal_scoring_users) : 'N/A' }}</div>
 
                                 <!-- Second Row -->
-                                <div><a href="{{ route('anime.top', ['sort' => 'highest_rated']) }}"><strong>Ranked:</strong> #{{ number_format($anime->mal_rank ?? 0) }}</a></div>
-                                <div><a href="{{ route('anime.top', ['sort' => 'most_popular']) }}"><strong>MAL Popularity:</strong> #{{ number_format($anime->mal_popularity ?? 0) }}</a></div>
+                                <div><a href="{{ route('anime.top', ['sort' => 'highest_rated']) }}"><strong>Ranked:</strong> {{ ($anime->mal_rank ?? 0) > 0 ? '#' . number_format($anime->mal_rank) : 'N/A' }}</a></div>
+                                <div><a href="{{ route('anime.top', ['sort' => 'most_popular']) }}"><strong>MAL Popularity:</strong> {{ ($anime->mal_popularity ?? 0) > 0 ? '#' . number_format($anime->mal_popularity) : 'N/A' }}</a></div>
 
-                                <div><strong>MAL Members:</strong> {{ number_format($anime->mal_list_members ?? 0) }}</div>
+                                <div><strong>MAL Members:</strong> {{ ($anime->mal_list_members ?? 0) > 0 ? number_format($anime->mal_list_members) : 'N/A' }}</div>
                                 <div><strong>AAT Score:</strong> {{ ($aas ?? 0) > 0 ? $aas : "N/A" }}</div>
 
                                 @if (Auth::user() !== null)
