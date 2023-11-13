@@ -131,7 +131,7 @@ class AnimeController extends Controller
                   ->where('users.show_reviews_publicly', true)
                   ->where('users.is_banned', false)
                   ->latest('anime_reviews.created_at')
-                  ->paginate(2, ['*'], 'reviewpage')
+                   ->paginate(2, ['anime_reviews.*', 'users.username', 'users.avatar', 'users.id as user_id'], 'reviewpage')
                   ->withQueryString(); //We could manually appends() instead of using withQueryString() but withQueryString() is simpler.
 
         $totalReviewsCount = AnimeReview::where('anime_id', $id)
