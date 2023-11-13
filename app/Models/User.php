@@ -108,6 +108,7 @@ class User extends Authenticatable
     public function friends()
     {
         return $this->belongsToMany(User::class, 'user_friends', 'user_id', 'friend_user_id')
+                    ->withPivot('show_friend_publicly')
                     ->withTimestamps();
     }
 
@@ -131,7 +132,7 @@ class User extends Authenticatable
         }
 
         if (!$this->friends()->where('friend_user_id', $friendId)->exists()) {
-            throw new \Exception('This user is already your friend.');
+            throw new \Exception('This user is already not your friend.');
         }
 
         $this->friends()->detach($friendId);
@@ -140,5 +141,24 @@ class User extends Authenticatable
     public function isFriend($userId)
     {
         return $this->friends()->where('friend_user_id', $userId)->exists();
+    }
+
+    public function toggleFriendPublicly($friendId)
+    {
+        // Check if the friend ID is the same as the user's ID
+        if ($this->id == $friendId) {
+            throw new \Exception('You cannot toggle yourself.');
+        }
+
+        // Find the friend relationship
+        $friend = $this->friends()->where('friend_user_id', $friendId)->first();
+
+        if (!$friend) {
+            throw new \Exception('This user is not your friend.');
+        }
+
+        // Toggle the 'show_friend_publicly' status
+        $friend->pivot->show_friend_publicly = !$friend->pivot->show_friend_publicly;
+        $friend->pivot->save();
     }
 }

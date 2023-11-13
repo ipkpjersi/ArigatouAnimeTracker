@@ -30,11 +30,16 @@ class UserController extends Controller
         return view("userlist");
     }
 
-    public function detail($username)
+    public function detail(Request $request, $username)
     {
         $user = User::where(['username' => $username])->firstOrFail();
         $stats = $user->animeStatistics();
-        $friends = $user->friends()->paginate(4);
+        $showPubliclyOnly = true;
+        if ($request->has('showallfriends') && $request->input('showallfriends') === '1' && Auth::user() !== null && strtolower(Auth::user()->username) === strtolower($user->username)) $showPubliclyOnly = false;
+
+        $friends = $user->friends()->when($showPubliclyOnly, function ($query) {
+                return $query->where('user_friends.show_friend_publicly', true);
+        })->paginate(2, ['*'], 'friendpage')->withQueryString();
         $currentUser = auth()->user();
 
         //Check if the user is viewing their own profile
@@ -86,8 +91,14 @@ class UserController extends Controller
                   ->where('anime_reviews.show_review_publicly', true)
                   ->where('users.show_reviews_publicly', true)
                   ->where('users.is_banned', false)->count();
+        $friendUser = null;
+        if (!$isOwnProfile && $currentUser) {
+            $friendUser = $currentUser->friends()
+                            ->where('users.id', $user->id)
+                            ->first();
+        }
 
-        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount', 'canViewReviews', 'enableReviewsSystem'));
+        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount', 'canViewReviews', 'enableReviewsSystem', 'friendUser'));
     }
 
     public function banUser(Request $request, $userId)
@@ -176,6 +187,17 @@ class UserController extends Controller
             $user = Auth::user();
             $user->removeFriend($friendId);
             return redirect()->back()->with('success', 'Friend removed successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function toggleFriendPublicly(Request $request, $friendId)
+    {
+        try {
+            $user = Auth::user();
+            $user->toggleFriendPublicly($friendId);
+            return redirect()->back()->with('success', 'Friend visibility toggled successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

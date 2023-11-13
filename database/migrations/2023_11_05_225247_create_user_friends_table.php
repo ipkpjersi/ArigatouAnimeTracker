@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('friend_user_id')->constrained('users')->onDelete('cascade');
+            $table->boolean('show_friend_publicly')->default('true');
             $table->timestamps();
 
             // Unique constraint to ensure a user cannot add the same friend multiple times

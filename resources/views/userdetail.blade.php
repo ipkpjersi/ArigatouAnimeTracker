@@ -46,12 +46,26 @@
                                 @if (auth()->user()->isFriend($user->id))
                                     <form action="/remove-friend/{{ $user->id }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="p-2 bg-red-500 hover:bg-red-700 text-white rounded-md mt-2">Remove Friend</button>
+                                        <button type="submit" class="p-2 bg-red-500 hover:bg-red-700 text-white rounded-md mt-2 mb-4">Remove Friend</button>
+                                    </form>
+                                    <form action="{{ route('toggle-friend-publicly', $user->id) }}" method="POST" id="toggle-friend-publicly-form-{{ $user->id }}">
+                                        @csrf
+                                        <div class="flex items-center mt-4">
+                                            <label class="flex items-center space-x-2">
+                                                <input type="checkbox"
+                                                       name="show_friend_publicly"
+                                                       value="1"
+                                                       onchange="document.getElementById('toggle-friend-publicly-form-{{ $user->id }}').submit();"
+                                                       {{ $friendUser->pivot->show_friend_publicly === 1 ? 'checked' : '' }}
+                                                       class="form-checkbox rounded border-gray-300 dark:bg-gray-700">
+                                                <span class="text-gray-700 dark:text-gray-200">Show Friend Publicly</span>
+                                            </label>
+                                        </div>
                                     </form>
                                 @else
                                     <form action="/add-friend/{{ $user->id }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2">Add Friend</button>
+                                        <button type="submit" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2 mb-4">Add Friend</button>
                                     </form>
                                 @endif
                             @endif
@@ -137,6 +151,18 @@
                                         </div>
                                     </div>
                                 @endforeach
+                                @if ($isOwnProfile)
+                                    {{-- Show All Friends Checkbox --}}
+                                    <div class="mt-4 col-span-full">
+                                        <form action="{{ route('users.detail', $user->username) }}" method="GET">
+                                            <input type="hidden" name="view" value="friends">
+                                            <label for="showallfriends" class="inline-flex items-center">
+                                                <input type="checkbox" id="showallfriends" name="showallfriends" value="1" {{ request('showallfriends') ? 'checked' : '' }} onchange="this.form.submit()">
+                                                <span class="ml-2">Show All Friends</span>
+                                            </label>
+                                        </form>
+                                    </div>
+                                @endif
                             </div>
                             {{-- We need flex-grow because the parent is a flex container/element. --}}
                             <div class="mt-4 flex-grow">
@@ -182,4 +208,18 @@
             </div>
         </div>
     </div>
+    <script>
+        function toggleReviewContent(reviewId) {
+            let moreText = document.getElementById("more-" + reviewId);
+            let lessText = document.getElementById("less-" + reviewId);
+
+            if (moreText.style.display === "none") {
+                moreText.style.display = "inline";
+                lessText.style.display = "none";
+            } else {
+                moreText.style.display = "none";
+                lessText.style.display = "inline";
+            }
+        }
+    </script>
 </x-app-layout>
