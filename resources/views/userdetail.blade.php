@@ -77,8 +77,12 @@
                             <div class="grid grid-cols-1 gap-4 w-full">
                                 @foreach ($reviews as $review)
                                     <div class="mb-4 border-b pb-4">
-                                        <h4 class="font-bold"> {{ $review->anime->title }}</h4>
-                                        <h5 class="font-semibold">{{ $review->title }}</h5>
+                                        <h4 class="font-bold mb-2">
+                                            <a href="{{ route('anime.detail', $review->anime->id) }}">
+                                                {{ $review->anime->title }}
+                                                <img src="{{ $review->anime->thumbnail }}" alt="{{ $review->anime->title }}" style="width:50px; height:70px; margin-right:10px; vertical-align:middle;" onerror="this.onerror=null; this.src='/img/notfound.gif';">
+                                            </a>
+                                        </h4>
                                         <span id="less-{{ $review->id }}">
                                             {{ strlen($review->body) > 100 ? substr($review->body, 0, 100) . '...' : $review->body }}
                                             @if (strlen($review->body) > 100)
