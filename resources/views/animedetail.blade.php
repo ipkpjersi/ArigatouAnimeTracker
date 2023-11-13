@@ -161,15 +161,20 @@
                             <!-- First Row: MAL Score and Users -->
                             <div class="grid grid-cols-2 gap-1 max-w-md mx-auto">
                                 <!-- First Row -->
-                                <div><strong>MAL Score:</strong> {{ number_format($anime->mal_mean) }}</div>
-                                <div><strong>MAL Users:</strong> {{ number_format($anime->mal_scoring_users) }}</div>
+                                <div><strong>MAL Score:</strong> {{ number_format($anime->mal_mean ?? 0, 2) }}</div>
+                                <div><strong>MAL Users:</strong> {{ number_format($anime->mal_scoring_users ?? 0) }}</div>
 
                                 <!-- Second Row -->
-                                <div><strong>Ranked:</strong> #{{ number_format($anime->mal_rank) }}</div>
-                                <div><strong>MAL Popularity:</strong> #{{ number_format($anime->mal_popularity) }}</div>
+                                <div><a href="{{ route('anime.top', ['sort' => 'highest_rated']) }}"><strong>Ranked:</strong> #{{ number_format($anime->mal_rank ?? 0) }}</a></div>
+                                <div><a href="{{ route('anime.top', ['sort' => 'most_popular']) }}"><strong>MAL Popularity:</strong> #{{ number_format($anime->mal_popularity ?? 0) }}</a></div>
 
-                                <div><strong>MAL Members:</strong> {{ number_format($anime->mal_list_members) }}</div>
+                                <div><strong>MAL Members:</strong> {{ number_format($anime->mal_list_members ?? 0) }}</div>
                                 <div><strong>AAT Score:</strong> {{ ($aas ?? 0) > 0 ? $aas : "N/A" }}</div>
+
+                                @if (Auth::user() !== null)
+                                    <div><strong>My Score:</strong> {{ number_format($currentUserScore ?? 0) }}</div>
+                                    <div><strong>My Status:</strong> {{ $currentUserStatus > 0 ? $watchStatuses[$currentUserStatus]->status ?? "N/A" : "N/A" }}</div>
+                                @endif
                             </div>
                         </div>
 
