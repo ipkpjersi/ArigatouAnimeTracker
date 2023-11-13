@@ -157,6 +157,22 @@
 
                     <!-- Right Column -->
                     <div class="w-full md:w-3/5 mt-0">
+                        <div class="bg-white dark:bg-gray-700 rounded shadow mb-4 p-4 w-3/5">
+                            <!-- First Row: MAL Score and Users -->
+                            <div class="grid grid-cols-2 gap-1 max-w-md mx-auto">
+                                <!-- First Row -->
+                                <div><strong>MAL Score:</strong> {{ number_format($anime->mal_mean) }}</div>
+                                <div><strong>MAL Users:</strong> {{ number_format($anime->mal_scoring_users) }}</div>
+
+                                <!-- Second Row -->
+                                <div><strong>Ranked:</strong> #{{ number_format($anime->mal_rank) }}</div>
+                                <div><strong>MAL Popularity:</strong> #{{ number_format($anime->mal_popularity) }}</div>
+
+                                <div><strong>MAL Members:</strong> {{ number_format($anime->mal_list_members) }}</div>
+                                <div><strong>AAT Score:</strong> {{ ($aas ?? 0) > 0 ? $aas : "N/A" }}</div>
+                            </div>
+                        </div>
+
 
                         <h4 class="font-bold mb-2">Description:</h4>
                         <p class="mb-4">{!! str_replace("\n", "<br>", $anime->description ?? "This title does not have a description yet.") !!}</p>

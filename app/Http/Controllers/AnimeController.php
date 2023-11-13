@@ -139,7 +139,14 @@ class AnimeController extends Controller
                   ->where('anime_reviews.show_review_publicly', true)
                   ->where('users.show_reviews_publicly', true)
                   ->where('users.is_banned', false)->count();
-        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount'));
+
+        $aas = DB::table('anime_user')
+        ->where('anime_id', $id)
+        ->whereNotNull('score')
+        ->where('score', '>', 0)
+        ->avg('score');
+        $aas = round($aas, 2);
+        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aas'));
     }
 
     public function addReview(Request $request)
