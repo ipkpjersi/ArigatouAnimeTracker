@@ -68,6 +68,7 @@ class UserController extends Controller
         }
 
         $enableFriendsSystem = auth()->user()->enable_friends_system === 1;
+        $enableReviewsSystem = auth()->user()->enable_reviews_system === 1;
 
         $reviews = AnimeReview::where('user_id', $user->id)
                 ->join('users', 'anime_reviews.user_id', '=', 'users.id')
@@ -86,7 +87,7 @@ class UserController extends Controller
                   ->where('users.show_reviews_publicly', true)
                   ->where('users.is_banned', false)->count();
 
-        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount', 'canViewReviews'));
+        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount', 'canViewReviews', 'enableReviewsSystem'));
     }
 
     public function banUser(Request $request, $userId)

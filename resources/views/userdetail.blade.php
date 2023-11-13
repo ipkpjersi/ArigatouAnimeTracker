@@ -56,9 +56,11 @@
                                 @endif
                             @endif
                         @endif
-                        <div class="flex justify-between mb-4">
-                            <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}" class="text-blue-500 hover:text-blue-700">All Reviews ({{ $totalReviewsCount }})</a>
-                        </div>
+                        @if ($enableReviewsSystem)
+                            <div class="flex justify-between mb-4">
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}" class="text-blue-500 hover:text-blue-700">All Reviews ({{ $totalReviewsCount }})</a>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Right Column -->

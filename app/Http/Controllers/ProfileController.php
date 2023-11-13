@@ -46,6 +46,19 @@ class ProfileController extends Controller
             $request->user()->show_friends_on_profile_publicly = false;
         }
 
+        // If enabling the friends system is turned off, turn off all related settings
+        if ($request->input('enable_reviews_system') == false) {
+            $request->user()->show_reviews_publicly = false;
+            $request->user()->show_reviews_when_logged_in = false;
+            $request->user()->show_reviews_in_nav_dropdown = false;
+            $request->user()->show_others_reviews = false;
+        }
+
+        // If show_friends_on_profile_when_logged_in is turned off, turn off show_friends_on_profile_publicly too
+        if ($request->input('show_reviews_when_logged_in') == false) {
+            $request->user()->show_reviews_publicly = false;
+        }
+
 
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
