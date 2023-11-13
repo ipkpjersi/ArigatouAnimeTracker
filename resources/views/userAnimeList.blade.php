@@ -350,31 +350,36 @@
             let firstFocusableElement = clearModal.querySelectorAll(focusableElements)[0];
             let focusableContent = clearModal.querySelectorAll(focusableElements);
             let lastFocusableElement = focusableContent[focusableContent.length - 1];
+            if (clearListBtn) {
+                clearListBtn.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    document.body.style.overflow = 'hidden';
+                    clearModal.classList.remove("hidden");
+                    firstFocusableElement.focus(); // Set focus on the first focusable element
+                });
+            }
 
-            clearListBtn.addEventListener("click", function(event) {
-                event.preventDefault();
-                document.body.style.overflow = 'hidden';
-                clearModal.classList.remove("hidden");
-                firstFocusableElement.focus(); // Set focus on the first focusable element
-            });
+            if (confirmClear) {
+                confirmClear.addEventListener("click", function() {
+                    clearTimeout(errorTimeout); // Clear previous timeout if exists
 
-            confirmClear.addEventListener("click", function() {
-                clearTimeout(errorTimeout); // Clear previous timeout if exists
+                    if (!confirmCheckbox.checked) {
+                        showError("Please check the confirmation box.");
+                        return;
+                    }
 
-                if (!confirmCheckbox.checked) {
-                    showError("Please check the confirmation box.");
-                    return;
-                }
+                    if (confirmUsername.value !== username) {
+                        showError("Username does not match.");
+                        return;
+                    }
 
-                if (confirmUsername.value !== username) {
-                    showError("Username does not match.");
-                    return;
-                }
+                    clearForm.submit();
+                });
+            }
 
-                clearForm.submit();
-            });
-
-            cancelClear.addEventListener("click", closeModalAction);
+            if (cancelClear) {
+                cancelClear.addEventListener("click", closeModalAction);
+            }
 
             window.addEventListener("click", function(event) {
                 if (event.target === clearModal) {
@@ -421,7 +426,9 @@
                 }, 3000);
             }
 
-            closeModal.addEventListener("click", closeModalAction);
+            if (closeModal) {
+                closeModal.addEventListener("click", closeModalAction);
+            }
         });
     </script>
 </x-app-layout>
