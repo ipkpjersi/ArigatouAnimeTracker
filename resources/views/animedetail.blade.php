@@ -54,7 +54,7 @@
                                     </span>
                                 </span>
                                 @if (count($synonyms) > 4)
-                                    <button id="toggle-button" onclick="toggleSynonyms()">&#x25BC; More</button>
+                                    <button id="toggle-button" onclick="toggleSynonyms()">&#x25BC; Show More</button>
                                 @endif
                             </div>
                         @endif
@@ -209,13 +209,13 @@
                                         <span id="less-{{ $review->id }}">
                                             {{ strlen($review->body) > 100 ? substr($review->body, 0, 100) . '...' : $review->body }}
                                             @if (strlen($review->body) > 100)
-                                                <button onclick="toggleReviewContent({{ $review->id }})" id="button-{{ $review->id }}" class="font-bold">Show More</button>
+                                                <button onclick="toggleReviewContent({{ $review->id }})" id="button-{{ $review->id }}" class="font-bold">&#x25BC; Show More</button>
                                             @endif
                                         </span>
                                         @if (strlen($review->body) > 100)
                                             <span id="more-{{ $review->id }}" style="display: none;">
                                                 {{ $review->body }}
-                                                <button onclick="toggleReviewContent({{ $review->id }})" id="button-less-{{ $review->id }}" class="font-bold">Show Less</button>
+                                                <button onclick="toggleReviewContent({{ $review->id }})" id="button-less-{{ $review->id }}" class="font-bold">&#x25B2; Show Less</button>
                                             </span>
                                         @endif
                                         <p class="mt-2">
@@ -346,10 +346,10 @@
             const toggleButton = document.getElementById('toggle-button');
             if (hiddenSynonyms.classList.contains('hidden')) {
                 hiddenSynonyms.classList.remove('hidden');
-                toggleButton.innerHTML = '&#x25B2; Less';
+                toggleButton.innerHTML = '&#x25B2; Show Less';
             } else {
                 hiddenSynonyms.classList.add('hidden');
-                toggleButton.innerHTML = '&#x25BC; More';
+                toggleButton.innerHTML = '&#x25BC; Show More';
             }
         }
 
