@@ -113,6 +113,16 @@
                                         @endif
                                         <p class="mt-2">
                                             <strong>Recommendation:</strong>
+                                            <span class="inline-block rounded-full h-4 w-4"
+                                                  style="background-color: {{
+                                                      match($review->recommendation) {
+                                                          'recommended' => '#3A8E40', // Green
+                                                          'mixed' => '#DAA005',       // Yellow
+                                                          'not_recommended' => '#A93226', // Red
+                                                          default => '#000'          // Default color if none of the above
+                                                      }
+                                                  }};">
+                                            </span>
                                             @switch($review->recommendation)
                                                 @case('recommended')
                                                     Recommended
