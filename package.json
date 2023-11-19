@@ -17,6 +17,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "chart.js": "^4.4.0",
         "datatables.net": "^1.13.6",
         "datatables.net-dt": "^1.13.6",
         "datatables.net-responsive": "^2.5.0",

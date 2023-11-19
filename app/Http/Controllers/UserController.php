@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -100,8 +101,20 @@ class UserController extends Controller
                             ->where('users.id', $user->id)
                             ->first();
         }
+        $userScoreDistribution = [];
+        if ($user) {
+            $userScoreDistribution = DB::table('anime_user')
+                ->selectRaw('score, COUNT(*) as count')
+                ->where('user_id', $user->id)
+                ->whereNotNull('score')
+                ->where('score', '>', '0')
+                ->orderBy('score', 'desc')
+                ->groupBy('score')
+                ->pluck('count', 'score')
+                ->toArray();
+        }
 
-        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount', 'canViewReviews', 'enableReviewsSystem', 'friendUser'));
+        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount', 'canViewReviews', 'enableReviewsSystem', 'friendUser', 'userScoreDistribution'));
     }
 
     public function banUser(Request $request, $userId)

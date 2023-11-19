@@ -219,6 +219,7 @@
                                         </li>
                                     @endforeach
                                 </ul>
+                                <canvas id="userScoreChart" width="400" height="400" class="mt-4"></canvas>
                             </div>
 
                             <!-- Right sub-column for total completed, total episodes watched, and average score -->
@@ -247,5 +248,55 @@
                 lessText.style.display = "inline";
             }
         }
+    </script>
+    <script type="module">
+        import '/js/chart.js';
+        document.addEventListener('DOMContentLoaded', function () {
+            let ctx = document.getElementById('userScoreChart').getContext('2d');
+            let userScoreDistribution = @json($userScoreDistribution);
+            const scoreToColorMap = {
+                1: '#FF0000', // red
+                2: '#FF4500', // orange-red
+                3: '#FFA500', // orange
+                4: '#FFD700', // yellow
+                5: '#005600', // lime green
+                6: '#006a00', // dark green
+                7: '#218c21', // green
+                8: '#0bb9b1', // light sea green
+                9: '#0079eb', // dodger blue
+                10: '#1E90FF', // dodger blue
+            };
+            let dynamicScoreColors = Object.keys(userScoreDistribution).map(score => scoreToColorMap[score]);
+
+            let data = {
+                labels: Object.keys(userScoreDistribution),
+                datasets: [{
+                    label: 'Score Distribution',
+                    data: Object.values(userScoreDistribution),
+                    backgroundColor: dynamicScoreColors,
+                    borderWidth: 1
+                }]
+            };
+            function getLabelTextColor() {
+                const isLightMode = document.documentElement.classList.contains('light');
+                return isLightMode ? '#000000' : '#FFFFFF';
+            }
+            let options = {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: getLabelTextColor() // set label text color
+                        }
+                    }
+                }
+                // other options...
+            };
+
+            let chart = new Chart(ctx, {
+                type: 'pie',
+                data: data,
+                options: options
+            });
+        });
     </script>
 </x-app-layout>
