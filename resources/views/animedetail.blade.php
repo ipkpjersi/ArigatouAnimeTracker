@@ -172,7 +172,7 @@
                                 <div><strong>AAT Score:</strong> {{ ($aas ?? 0) > 0 ? $aas : "N/A" }}</div>
 
                                 @if (Auth::user() !== null)
-                                    <div><strong>My Score:</strong> {{ number_format($currentUserScore ?? 0) }}</div>
+                                    <div><strong>My Score:</strong> {{ $currentUserScore > 0 ? number_format($currentUserScore) : 'N/A' }}</div>
                                     <div><strong>My Status:</strong> {{ $currentUserStatus > 0 ? $watchStatuses[$currentUserStatus]->status ?? "N/A" : "N/A" }}</div>
                                 @endif
                             </div>
