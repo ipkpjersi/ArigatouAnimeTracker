@@ -111,7 +111,23 @@
                                                 <button onclick="toggleReviewContent({{ $review->id }})" id="button-less-{{ $review->id }}" class="font-bold">Show Less</button>
                                             </span>
                                         @endif
-                                        <p class="mt-1">By: <img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y H:i:s A') }}</p>
+                                        <p class="mt-2">
+                                            <strong>Recommendation:</strong>
+                                            @switch($review->recommendation)
+                                                @case('recommended')
+                                                    Recommended
+                                                    @break
+                                                @case('mixed')
+                                                    Mixed
+                                                    @break
+                                                @case('not_recommended')
+                                                    Not Recommended
+                                                    @break
+                                                @default
+                                                    Not Specified
+                                            @endswitch
+                                        </p>
+                                        <p class="mt-1"><strong>By:</strong> <img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y H:i:s A') }}</p>
                                     </div>
                                 @endforeach
                                 {{-- Include Spoilers Checkbox --}}
