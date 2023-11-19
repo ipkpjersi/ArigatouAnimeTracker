@@ -289,6 +289,66 @@
                 </label>
             </div>
 
+            <!-- Enable Score Charts System -->
+            <x-input-label class="mt-4" for="enable_score_charts_system" :value="__('Enable Score Charts System')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="enable_score_charts_system" type="radio" name="enable_score_charts_system" value="1" class="form-radio"
+                           @if (old('enable_score_charts_system', $user->enable_score_charts_system) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="enable_score_charts_system" type="radio" name="enable_score_charts_system" value="0" class="form-radio"
+                           @if (old('enable_score_charts_system', $user->enable_score_charts_system) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+
+            <!-- Enable Score Charts on Own Profile When Logged In -->
+            <x-input-label class="mt-4" for="enable_score_charts_own_profile_when_logged_in" :value="__('Enable Score Charts on Own Profile When Logged In')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="enable_score_charts_own_profile_when_logged_in" type="radio" name="enable_score_charts_own_profile_when_logged_in" value="1" class="form-radio"
+                           @if (old('enable_score_charts_own_profile_when_logged_in', $user->enable_score_charts_own_profile_when_logged_in) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="enable_score_charts_own_profile_when_logged_in" type="radio" name="enable_score_charts_own_profile_when_logged_in" value="0" class="form-radio"
+                           @if (old('enable_score_charts_own_profile_when_logged_in', $user->enable_score_charts_own_profile_when_logged_in) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+
+            <!-- Enable Score Charts on Own Profile Publicly -->
+            <x-input-label class="mt-4" for="enable_score_charts_own_profile_publicly" :value="__('Enable Score Charts on Own Profile Publicly')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="enable_score_charts_own_profile_publicly" type="radio" name="enable_score_charts_own_profile_publicly" value="1" class="form-radio"
+                           @if (old('enable_score_charts_own_profile_publicly', $user->enable_score_charts_own_profile_publicly) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="enable_score_charts_own_profile_publicly" type="radio" name="enable_score_charts_own_profile_publicly" value="0" class="form-radio"
+                           @if (old('enable_score_charts_own_profile_publicly', $user->enable_score_charts_own_profile_publicly) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+
+            <!-- Enable Score Charts on Other Profiles -->
+            <x-input-label class="mt-4" for="enable_score_charts_other_profiles" :value="__('Enable Score Charts on Other Profiles')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="enable_score_charts_other_profiles" type="radio" name="enable_score_charts_other_profiles" value="1" class="form-radio"
+                           @if (old('enable_score_charts_other_profiles', $user->enable_score_charts_other_profiles) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="enable_score_charts_other_profiles" type="radio" name="enable_score_charts_other_profiles" value="0" class="form-radio"
+                           @if (old('enable_score_charts_other_profiles', $user->enable_score_charts_other_profiles) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+
 
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
@@ -439,6 +499,39 @@
 
             // Initialize review settings on load
             setReviewFieldsDisabled(document.querySelector('input[name="enable_reviews_system"]:checked').value === '0');
+
+            function setScoreChartsFieldsDisabled(disabled) {
+                ['enable_score_charts_own_profile_when_logged_in', 'enable_score_charts_own_profile_publicly', 'enable_score_charts_other_profiles'].forEach(name => {
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+                        radio.disabled = disabled;
+                        if (disabled) {
+                            radio.checked = radio.value === '0';
+                        }
+                    });
+                });
+            }
+
+            document.querySelectorAll('input[name="enable_score_charts"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    setScoreChartsFieldsDisabled(this.value === '0');
+                });
+            });
+
+            function adjustScoreChartsPubliclySetting() {
+                const showWhenLoggedIn = document.querySelector('input[name="enable_score_charts_own_profile_when_logged_in"]:checked').value;
+                const showPubliclyRadios = document.querySelectorAll('input[name="enable_score_charts_own_profile_publicly"]');
+                if (showWhenLoggedIn === '0') {
+                    showPubliclyRadios.forEach(radio => radio.checked = radio.value === '0');
+                }
+                showPubliclyRadios.forEach(radio => radio.disabled = showWhenLoggedIn === '0');
+            }
+
+            document.querySelectorAll('input[name="enable_score_charts_own_profile_when_logged_in"]').forEach(radio => {
+                radio.addEventListener('change', adjustScoreChartsPubliclySetting);
+            });
+
+            setScoreChartsFieldsDisabled(document.querySelector('input[name="enable_score_charts"]:checked').value === '0');
+            adjustScoreChartsPubliclySetting();
         });
 
     </script>
