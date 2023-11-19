@@ -49,35 +49,28 @@ class UserController extends Controller
         //Check if the user is viewing their own profile
         $isOwnProfile = strtolower($currentUser->username ?? '') === strtolower($user->username);
 
-        //Determine if the friends section should be displayed
         if ($isOwnProfile) {
             //User is viewing their own profile
             $canViewFriends = $user->show_friends_on_profile_when_logged_in === 1;
+            $canViewReviews = $user->show_reviews_when_logged_in === 1;
+            $showChart = $user->enable_score_charts_own_profile_when_logged_in === 1;
         } else {
             //Viewing someone else's profile, check if we are logged in first
             if ($currentUser) {
-                //Current user needs to have enabled viewing friends on other profiles
+                //Current user needs to have enabled viewing  on other profiles
                 $canViewFriends = $currentUser->show_friends_on_others_profiles === 1 && $user->show_friends_on_profile_publicly === 1;
+                $canViewReviews = $currentUser->show_others_reviews === 1 && $user->show_reviews_publicly === 1;
+                $showChart = $currentUser->enable_score_charts_other_profiles === 1 && $user->enable_score_charts_own_profile_publicly === 1;
             } else {
                 $canViewFriends = $user->show_friends_on_profile_publicly === 1;
-            }
-        }
-
-        if ($isOwnProfile) {
-            //User is viewing their own profile
-            $canViewReviews = $user->show_reviews_when_logged_in === 1;
-        } else {
-            //Viewing someone else's profile, check if we are logged in first
-            if ($currentUser) {
-                //Current user needs to have enabled viewing reviews on other profiles
-                $canViewReviews = $currentUser->show_others_reviews === 1 && $user->show_reviews_publicly === 1;
-            } else {
                 $canViewReviews = $user->show_reviews_publicly === 1;
+                $showChart = $user->enable_score_charts_own_profile_publicly === 1;
             }
         }
 
         $enableFriendsSystem = auth()->user()->enable_friends_system === 1;
         $enableReviewsSystem = auth()->user()->enable_reviews_system === 1;
+        $enableScoreCharts = auth()->user()->enable_score_charts_system === 1;
 
         $reviews = AnimeReview::where('user_id', $user->id)
                 ->join('users', 'anime_reviews.user_id', '=', 'users.id')
@@ -114,7 +107,7 @@ class UserController extends Controller
                 ->toArray();
         }
 
-        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount', 'canViewReviews', 'enableReviewsSystem', 'friendUser', 'userScoreDistribution'));
+        return view('userdetail', compact('user', 'stats', 'friends', 'canViewFriends', 'enableFriendsSystem', 'isOwnProfile', 'reviews', 'totalReviewsCount', 'canViewReviews', 'enableReviewsSystem', 'friendUser', 'userScoreDistribution', 'enableScoreCharts', 'showChart'));
     }
 
     public function banUser(Request $request, $userId)

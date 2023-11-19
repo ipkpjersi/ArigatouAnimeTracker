@@ -59,6 +59,17 @@ class ProfileController extends Controller
             $request->user()->show_reviews_publicly = false;
         }
 
+        // If enabling the score charts system is turned off, turn off all related settings
+        if ($request->input('enable_score_charts_system') == false) {
+            $request->user()->enable_score_charts_own_profile_when_logged_in = false;
+            $request->user()->enable_score_charts_own_profile_publicly = false;
+            $request->user()->enable_score_charts_other_profiles = false;
+        }
+
+        // If enable_score_charts_own_profile_when_logged_in is turned off, turn off enable_score_charts_own_profile_publicly too
+        if ($request->input('enable_score_charts_own_profile_when_logged_in') == false) {
+            $request->user()->enable_score_charts_own_profile_publicly = false;
+        }
 
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');

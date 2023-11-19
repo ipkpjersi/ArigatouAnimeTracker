@@ -39,6 +39,10 @@ class User extends Authenticatable
         'show_reviews_publicly',
         'show_others_reviews',
         'show_reviews_in_nav_dropdown',
+        'enable_score_charts_system',
+        'enable_score_charts_own_profile_when_logged_in',
+        'enable_score_charts_own_profile_publicly',
+        'enable_score_charts_other_profiles'
     ];
 
     /**

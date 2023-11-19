@@ -219,7 +219,9 @@
                                         </li>
                                     @endforeach
                                 </ul>
-                                <canvas id="userScoreChart" width="400" height="400" class="mt-4"></canvas>
+                                @if ($enableScoreCharts && $showChart)
+                                    <canvas id="userScoreChart" width="400" height="400" class="mt-4"></canvas>
+                                @endif
                             </div>
 
                             <!-- Right sub-column for total completed, total episodes watched, and average score -->
