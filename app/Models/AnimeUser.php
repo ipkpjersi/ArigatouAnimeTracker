@@ -20,7 +20,8 @@ class AnimeUser extends Model
         'sort_order',
         'progress',
         'notes',
-        'display_in_list'
+        'display_in_list',
+        'show_anime_notes_publicly',
     ];
 
     public function anime()
