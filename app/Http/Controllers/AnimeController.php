@@ -392,10 +392,10 @@ class AnimeController extends Controller
                               anime_user.display_in_list,
                               anime_user.show_anime_notes_publicly,
                               CASE
-                                WHEN anime_user.show_anime_notes_publicly = 1 AND users.show_anime_notes_publicly = 1 THEN  anime_user.notes
+                                WHEN (anime_user.show_anime_notes_publicly = 1 AND users.show_anime_notes_publicly = 1) OR anime_user.user_id = ? THEN  anime_user.notes
                                 ELSE NULL
                               END as notes
-                         ')
+                         ', [Auth::user()->id ?? -1])
                           ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC');
         if (!$showAllAnime) {
             $query = $query->where('anime_user.display_in_list', '=', 1);
@@ -441,10 +441,10 @@ class AnimeController extends Controller
               anime_user.display_in_list,
               anime_user.show_anime_notes_publicly,
               CASE
-                WHEN anime_user.show_anime_notes_publicly = 1 AND users.show_anime_notes_publicly = 1 THEN anime_user.notes
+                WHEN (anime_user.show_anime_notes_publicly = 1 AND users.show_anime_notes_publicly = 1) OR anime_user.user_id = ? THEN anime_user.notes
                 ELSE NULL
               END as notes
-          ');
+          ', [Auth::user()->id ?? -1]);
         if (!$showAllAnime) {
             $query = $query->where('anime_user.display_in_list', '=', 1);
         }
