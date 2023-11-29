@@ -1,6 +1,6 @@
 # 🎥 Arigatou Anime Tracker 🎥
 
-**Arigatou Anime Tracker** is a completely free and open-source platform where anime enthusiasts can track their favourite anime, discover new series, and create personalized anime lists. Whether you are new to anime or a seasoned veteran, our platform caters to all. Sign up or clone our repository today and start your anime adventure!
+**Arigatou Anime Tracker** is a completely free and open-source platform where anime enthusiasts can track their favourite anime, discover new series, and create personalized anime lists. Whether you are new to anime or a seasoned veteran, our platform caters to all. Clone our repository today and start your anime adventure!
 
 ## 🛠️ Technology Stack
 
