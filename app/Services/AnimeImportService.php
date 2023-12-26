@@ -35,11 +35,11 @@ class AnimeImportService
                 continue;
             }
 
-            $type = AnimeType::where('type', $animeData['type'])->firstOrCreate(['type' => $animeData['type']]);
+            $type = AnimeType::where('type', $animeData['type'] ?? 'UNKNOWN')->firstOrCreate(['type' => $animeData['type'] ?? 'UNKNOWN']);
             if ($type->wasRecentlyCreated) {
                 $logger && $logger("New anime type created: " . $type->type);
             }
-            $status = AnimeStatus::where('status', $animeData['status'])->firstOrCreate(['status' => $animeData['status']]);
+            $status = AnimeStatus::where('status', $animeData['status'] ?? 'UNKNOWN')->firstOrCreate(['status' => $animeData['status'] ?? 'UNKNOWN']);
             if ($status->wasRecentlyCreated) {
                 $logger && $logger("New anime status created: " . $status->status);
             }
