@@ -279,7 +279,16 @@
                 "bScrollCollapse": true,
                 colReorder: {
                     order: colReorder
-                }
+                },
+                createdRow: function(row, data, dataIndex) {
+                    // Calculate the overall index based on the current page and data index
+                    let pageIndex = $('#userAnimeTable').DataTable().page.info().page;
+                    let pageSize = $('#userAnimeTable').DataTable().page.info().length;
+                    let overallIndex = pageIndex * pageSize + dataIndex + 1;
+
+                    // Assign the ID to the row
+                    $(row).attr('id', 'row-' + overallIndex);
+                },
             });
         });
         document.addEventListener("DOMContentLoaded", function() {

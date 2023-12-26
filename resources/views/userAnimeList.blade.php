@@ -83,7 +83,7 @@
                                 <tbody>
                                     <!-- desktop design -->
                                     @foreach ($userAnime as $anime)
-                                        <tr class="hidden md:table-row">
+                                        <tr id="desktop-row-{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}" class="hidden md:table-row">
                                             <input type="hidden" class="desktop-anime-ids desktop-only" name="anime_ids[]" value="{{ $anime->id }}">
                                             @if ($show_anime_list_number)
                                                 <td class="py-2 px-4 border-b border-gray-200">{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}</td>
@@ -159,7 +159,7 @@
                                     @endforeach
                                     <!-- mobile design -->
                                     @foreach ($userAnime as $anime)
-                                        <tr class="md:hidden mobile-only">
+                                        <tr id="mobile-row-{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}" class="md:hidden mobile-only">
                                             <input type="hidden" class="mobile-anime-ids mobile-only" name="anime_ids[]" value="{{ $anime->id }}">
                                             @if ($show_anime_list_number)
                                                 <td class="py-2 px-4 border-b border-gray-200">{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}</td>
