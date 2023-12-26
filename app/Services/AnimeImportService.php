@@ -19,6 +19,9 @@ class AnimeImportService
 
         foreach ($data['data'] as $animeData) {
             $title = str_replace('"', '', $animeData['title']);
+            //We have to be very careful with incremental imports. It's very easy to not be able to uniquely identify anime,
+            //since anime could have an unknown season in the current year, then get updated with a season,
+            //then it won't match. That's one example. There's so many other examples.
             $existingAnime = Anime::where('title', $title)
                 ->where('year', $animeData['animeSeason']['year'])
                 ->whereHas('anime_type', function ($query) use ($animeData) {
@@ -26,8 +29,8 @@ class AnimeImportService
                 })
                 ->where('episodes', $animeData['episodes'])
                 ->where('season', $animeData['animeSeason']['season'])
-                ->where('thumbnail', $animeData['thumbnail'])
-                ->where('sources', implode(', ', $animeData['sources']))
+                //->where('thumbnail', $animeData['thumbnail'])
+                //->where('sources', implode(', ', $animeData['sources']))
                 ->first();
 
             if ($existingAnime) {
