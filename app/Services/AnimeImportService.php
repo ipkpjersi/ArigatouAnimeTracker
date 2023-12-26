@@ -58,6 +58,13 @@ class AnimeImportService
                 'sources' => implode(', ', $animeData['sources']),
                 'tags' => implode(', ', $animeData['tags']),
             ]);
+            $episodes = $animeData['episodes'];
+            $type = $type->type;
+            $status = $status->status;
+            $season = $animeData['animeSeason']['season'];
+            $year = $animeData['animeSeason']['year'];
+            //Technically, we could check if there's any anime with a title match, although there would likely be many false positive matches if we're not careful.
+            $logger && $logger("New anime created: $title, Episodes: $episodes, Type: $type, Status ID: $status, Season: $season, Year: $year");
             $count++;
         }
 
