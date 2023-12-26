@@ -65,6 +65,8 @@ class AnimeImportService
             $year = $animeData['animeSeason']['year'];
             //Technically, we could check if there's any anime with a title match, although there would likely be many false positive matches if we're not careful.
             $logger && $logger("New anime created: $title, Episodes: $episodes, Type: $type, Status ID: $status, Season: $season, Year: $year");
+            //Let's also log this to a file since it's important.
+            Log::channel('anime_import')->info("New anime imported: $title, Episodes: $episodes, Type: $type, Status: $status, Season: $season, Year: $year");
             $count++;
         }
 
