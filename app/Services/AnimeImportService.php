@@ -19,7 +19,7 @@ class AnimeImportService
 
         foreach ($data['data'] as $animeData) {
             $title = str_replace('"', '', $animeData['title']);
-            //TODO: determine what to do about incremental updates. maybe update existing for year, type, episodes, title? is title unique irregardless of year?
+            //TODO: determine what to do about incremental updates. maybe update existing for year, type, episodes, title? is title unique irregardless of year, is title unique for every entry, can we trust titles won't change over time?
             //We have to be very careful with incremental imports. It's very easy to not be able to uniquely identify anime,
             //since anime could have an unknown season in the current year, then get updated with a season,
             //then it won't match. That's one example. There's so many other examples.
