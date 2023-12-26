@@ -48,7 +48,13 @@ class ImportAnimeData extends Command
             if ($forceDownload || !file_exists($filePath)) {
                 $this->info("Anime database file not found or force download is enabled. Downloading from source...");
                 $fileData = file_get_contents('https://raw.githubusercontent.com/manami-project/anime-offline-database/master/anime-offline-database.json');
-                Storage::put($filePath, $fileData);
+                $directory = dirname($filePath);
+                if (!file_exists($directory)) {
+                    if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
+                        throw new \RuntimeException(sprintf('Directory "%s" was not created', $directory));
+                    }
+                }
+                file_put_contents($filePath, $fileData);
             }
 
             if (!$skipBackup) {
