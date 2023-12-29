@@ -49,7 +49,7 @@ class AnimeImportService
 
                     // Perform update if there are changes
                     if (!empty($updateData)) {
-                        // It was updated, so let's force a re-download of the descriptions etc just in case.
+                        // It was updated, so let's force a re-download of the descriptions etc just in case by setting api_descriptions_empty to false.
                         // We're not even emptying out descriptions so if it already has a description when downloading descriptions, it will keep this false because it's not true (the description technically isn't empty), otherwise it will set it to true again (if it fails to download the description again).
                         // Either way, both scenarios are fine and shouldn't cause problems.
                         $updateData['api_descriptions_empty'] = false;
