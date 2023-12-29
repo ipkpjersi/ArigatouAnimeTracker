@@ -19,7 +19,7 @@ class AnimeImportService
         $dbIdCounter = 1;
         foreach ($data['data'] as $animeData) {
             $title = str_replace('"', '', $animeData['title']);
-            //It's unlikely that full updates will ever be as good as clean database setup since anime can be deleted which we don't really handle and possibly also updated in ways we might not expect, but it's better than not having it, especially with all of our logging for full updates.
+            //It's unlikely that full updates will ever be as good as clean database setup since anime can be deleted which we don't really handle and possibly also updated in ways we might not expect, but it's better than not having it, especially with all of our logging for full updates. Full updates are important since re-creating the entire database isn't feasible because the anime data is very relational and used in reviews, user anime lists, etc.
             if ($fullUpdate) {
                 //We can use dbIdCounter for testing purposes.
                 //$dbIdCounter++;
