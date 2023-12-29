@@ -53,7 +53,7 @@ class AnimeImportService
                         // We're not even emptying out descriptions so if it already has a description when downloading descriptions, it will keep this false because it's not true (the description technically isn't empty), otherwise it will set it to true again (if it fails to download the description again).
                         // Either way, both scenarios are fine and shouldn't cause problems.
                         $updateData['api_descriptions_empty'] = false;
-
+                        // It's also worth noting images shouldn't change over time, so we probably don't need to set image_downloaded to false.
                         $existingAnime->update($updateData);
                         $updatedData = $existingAnime->refresh()->toArray(); // Refresh and get updated data
 
