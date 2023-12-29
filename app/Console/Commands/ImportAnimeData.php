@@ -18,7 +18,7 @@ class ImportAnimeData extends Command
      *
      * @var string
      */
-    protected $signature = 'app:import-anime-data {filePath?} {--forceDownload} {--skipBackup}';
+    protected $signature = 'app:import-anime-data {filePath?} {--forceDownload} {--skipBackup} {--fullUpdate}';
 
     /**
      * The console command description.
@@ -40,6 +40,7 @@ class ImportAnimeData extends Command
         $filePath = $this->argument('filePath') ?? storage_path('app/imports/anime-offline-database.json');
         $forceDownload = $this->option('forceDownload');
         $skipBackup = $this->option('skipBackup');
+        $fullUpdate = $this->option('fullUpdate');
         try {
             $logger = function($message) {
                 $this->info($message);
@@ -65,7 +66,7 @@ class ImportAnimeData extends Command
                 Artisan::call('backup:run', [], new ConsoleOutput);
             }
 
-            $result = $animeImportService->importFromJsonFile($filePath, $logger);
+            $result = $animeImportService->importFromJsonFile($filePath, $fullUpdate, $logger);
             $duration = round($result['duration'], 2);
 
             $this->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");

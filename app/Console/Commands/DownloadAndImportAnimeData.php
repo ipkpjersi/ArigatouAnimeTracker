@@ -34,11 +34,11 @@ class DownloadAndImportAnimeData extends Command
         try {
             // Download and Import Anime Data
             $this->info("Downloading and importing anime data...");
-            Artisan::call('app:import-anime-data', ['--forceDownload'], new ConsoleOutput);
+            Artisan::call('app:import-anime-data', ['--forceDownload' => true, '--fullUpdate' => true], new ConsoleOutput);
 
             // Download Additional Anime Data
             $this->info("Downloading additional anime data...");
-            Artisan::call('app:download-anime-additional-data', [true], new ConsoleOutput);
+            Artisan::call('app:download-anime-additional-data', ['generateSqlFile' => true, 'apiDescriptionsEmptyOnly' => true], new ConsoleOutput);
 
             // Download Anime Images
             $this->info("Downloading anime images...");
