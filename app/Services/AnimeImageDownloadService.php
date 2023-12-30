@@ -142,7 +142,10 @@ class AnimeImageDownloadService
                 $zipPath = dirname($filePath) . DIRECTORY_SEPARATOR . $rot19Filename;
                 $zip = new ZipArchive();
                 if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-                    $zip->addFile($filePath, $iterator->getSubPathName());
+                    //We probably don't want to maintain the subfolder inside the zips
+                    //$zip->addFile($filePath, $iterator->getSubPathName());
+                    //Add the file to the zip without subfolders
+                    $zip->addFile($filePath, basename($filePath));
                     $zip->close();
                 } else {
                     throw new \RuntimeException(sprintf('Failed to create ZIP archive: %s', $zipPath));
