@@ -69,8 +69,15 @@ return [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
-            'days' => 14,
+            'days' => 365,
             'replace_placeholders' => true,
+        ],
+
+        'anime_import' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/anime_import.log'),
+            'level' => 'info',
+            'days' => 365,
         ],
 
         'slack' => [

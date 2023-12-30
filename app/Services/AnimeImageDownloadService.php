@@ -37,19 +37,24 @@ class AnimeImageDownloadService
         $logger && $logger("Downloading images for $remaining out of $total anime.");
         foreach ($anime as $current) {
             $imageDownloaded = false;
-            if ($current->thumbnail) {
-                if ($this->downloadImageFromUrl($current->thumbnail, 'thumbnail', $logger)) {
-                    $imageDownloaded = true;
-                } else {
-                    $imageFailed++;
+            try {
+                if ($current->thumbnail) {
+                    if ($this->downloadImageFromUrl($current->thumbnail, 'thumbnail', $logger)) {
+                        $imageDownloaded = true;
+                    } else {
+                        $imageFailed++;
+                    }
                 }
-            }
-            if ($current->picture) {
-                if ($this->downloadImageFromUrl($current->picture, 'picture', $logger)) {
-                    $imageDownloaded = true;
-                } else {
-                    $imageFailed++;
+                if ($current->picture) {
+                    if ($this->downloadImageFromUrl($current->picture, 'picture', $logger)) {
+                        $imageDownloaded = true;
+                    } else {
+                        $imageFailed++;
+                    }
                 }
+            } catch (\Exception $e) {
+                $logger && $logger('An error occurred during downloading an image: ' . $e->getMessage());
+                continue;
             }
             if ($imageDownloaded) {
                 DB::table('anime')

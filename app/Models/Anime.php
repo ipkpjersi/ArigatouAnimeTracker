@@ -23,8 +23,11 @@ class Anime extends Model
         'thumbnail',
         'synonyms',
         'relations',
+        'sources',
         'tags',
-        'image_downloaded'
+        'image_downloaded',
+        'anime_type_id',
+        'anime_status_id',
     ];
 
     public function anime_type()

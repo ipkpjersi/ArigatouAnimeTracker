@@ -43,6 +43,9 @@ class AnimeAdditionalDataImportService
                         $kitsuId = explode('/', rtrim($source, '/'))[4];
                     }
                 }
+            } else {
+                //This probably shouldn't ever happen, sources should probably always be set, or maybe not.
+                $logger && $logger("Sources not set for anime: " . $row->title . " row: " . print_r($row, true));
             }
 
             $description = null;
@@ -73,7 +76,13 @@ class AnimeAdditionalDataImportService
                     $malMembers = $data['num_list_users'] ?? null; //The members with this anime on their list.
 
                     $logger && $logger("Update data for anime: " . $row->title . " from MAL");
+                } elseif ($response) {
+                    $data = $response->json();
+                    $logger && $logger("Failed update response from MAL for anime: " . $row->title . " " . $data);
                 }
+            } else {
+                //Optional logging, we likely don't need this logging unless we know it's not fetching descriptions from MAL when it should be.
+                //$logger && $logger("No MAL ID for anime: " . $row->title . ", verify versus DB to see if MAL source exists for this anime");
             }
 
             // Then try notify.moe if MAL fails
