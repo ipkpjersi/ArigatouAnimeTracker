@@ -39,6 +39,7 @@ class AnimeImageDownloadService
             $imageDownloaded = false;
             try {
                 if ($current->thumbnail) {
+                    $count++;
                     if ($this->downloadImageFromUrl($current->thumbnail, 'thumbnail', $logger)) {
                         $imageDownloaded = true;
                     } else {
@@ -46,6 +47,7 @@ class AnimeImageDownloadService
                     }
                 }
                 if ($current->picture) {
+                    $count++;
                     if ($this->downloadImageFromUrl($current->picture, 'picture', $logger)) {
                         $imageDownloaded = true;
                     } else {
