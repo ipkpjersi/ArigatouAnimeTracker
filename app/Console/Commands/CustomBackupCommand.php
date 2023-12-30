@@ -12,6 +12,7 @@ class CustomBackupCommand extends BackupCommand
 
     public function handle(): int
     {
+        $this->info("Running custom backup command...");
         //Interpret the value of the --disable-notifications option as a string.
         //This is necessary because we set a default for a boolean option.
         //In Laravel, boolean options typically check for presence, not value.
