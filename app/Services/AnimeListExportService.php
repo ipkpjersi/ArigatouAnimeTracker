@@ -30,17 +30,34 @@ class AnimeListExportService
         $total = count($animeList);
         $xml = new SimpleXMLElement('<myanimelist></myanimelist>');
         $myinfo = $xml->addChild('myinfo');
-        //$myinfo->addChild('user_id', $userId);
-        //$myinfo->addChild('user_name', Auth::user()->username);
         $myinfo->addChild('user_id', ""); //TODO: maybe fill these in from some user profile settings?
         $myinfo->addChild('user_name', ""); //TODO: maybe fill these in from some user profile settings?
         $myinfo->addChild('user_export_type', '1');
         $myinfo->addChild('user_total_anime', $animeList->count());
 
+        $dom = new \DOMDocument("1.0");
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+
         foreach ($animeList as $animeUser) {
             $anime = $xml->addChild('anime');
             $anime->addChild('series_animedb_id', '');
-            $anime->addChild('series_title', htmlspecialchars($animeUser->anime->title));
+
+            // Create 'series_title' element with CDATA content
+            $seriesTitle = $dom->createElement('series_title');
+            $titleCdata = $dom->createCDATASection($animeUser->anime->title);
+            $seriesTitle->appendChild($titleCdata);
+
+            // Create 'my_comments' element and add CDATA content
+            $myComments = $dom->createElement('my_comments');
+            $commentsCdata = $dom->createCDATASection($animeUser->notes ?? '');
+            $myComments->appendChild($commentsCdata);
+
+            // Import 'series_title' and 'my_comments' nodes
+            $animeNode = dom_import_simplexml($anime);
+            $animeNode->appendChild($animeNode->ownerDocument->importNode($seriesTitle, true));
+
+            // Add other children to $anime
             $anime->addChild('series_type', $animeUser->anime->anime_type->type);
             $anime->addChild('series_episodes', $animeUser->anime->episodes);
             $anime->addChild('my_id', 0);
@@ -51,8 +68,8 @@ class AnimeListExportService
             $anime->addChild('my_score', $animeUser->score);
             $anime->addChild('my_storage', '');
             $anime->addChild('my_storage_value', '0.00');
-            $anime->addChild('my_status', str_replace("-", " ", strtolower($animeUser->watch_status?->status ?? $animeUser->watch_status?->status ?? 'PLAN-TO-WATCH')));
-            $anime->addChild('my_comments', '');
+            $anime->addChild('my_status', str_replace("-", " ", strtolower($animeUser->watch_status?->status ?? 'PLAN-TO-WATCH')));
+            $animeNode->appendChild($animeNode->ownerDocument->importNode($myComments, true));
             $anime->addChild('my_times_watched', 0);
             $anime->addChild('my_rewatch_value', '');
             $anime->addChild('my_priority', 'LOW');
@@ -63,10 +80,8 @@ class AnimeListExportService
             $anime->addChild('my_sns', 'default');
             $anime->addChild('update_on_import', 0);
         }
-        $dom = new \DOMDocument("1.0");
-        $dom->preserveWhiteSpace = false;
-        $dom->formatOutput = true;
-        $dom->loadXML($xml->asXML()); // this line loads your existing XML string
+
+        $dom->loadXML($xml->asXML()); // Reload the XML with the newly added nodes
         $formattedXml = $dom->saveXML();
         $duration = microtime(true) - $startTime;
         return ["total" => $total, "duration" => $duration, "output" => $formattedXml];
