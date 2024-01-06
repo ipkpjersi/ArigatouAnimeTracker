@@ -39,6 +39,7 @@ class AnimeListImportService
             $watchStatus = strtoupper(str_replace(" ", "-", (string)$animeData->my_status));
             $score = (int)$animeData->my_score;
             $progress = (int)$animeData->my_watched_episodes;
+            $comments = (string)$animeData->my_comments;
             $animeType = AnimeType::firstOrCreate(['type' => $type]);
             // Check for existing anime
             $existingAnime = Anime::where('title', $title)
@@ -74,6 +75,7 @@ class AnimeListImportService
                 'watch_status_id' => $watchStatusModel->id,
                 'score' => $score,
                 'progress' => $progress,
+                'notes' => $comments
             ]);
 
             $count++;
@@ -98,6 +100,8 @@ class AnimeListImportService
             $watchStatus = strtoupper($animeData['watch_status']);
             $score = $animeData['score'];
             $progress = $animeData['progress'];
+            $notes = $animeData['notes'] ?? '';
+            $showAnimeNotesPublicly = $animeData['show_anime_notes_publicly'] ?? '';
 
             $animeType = AnimeType::firstOrCreate(['type' => $type]);
 
@@ -134,6 +138,8 @@ class AnimeListImportService
                 'watch_status_id' => $watchStatusModel->id,
                 'score' => $score,
                 'progress' => $progress,
+                'notes' => $notes,
+                'show_anime_notes_publicly' => $showAnimeNotesPublicly
             ]);
 
             $count++;

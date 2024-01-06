@@ -88,7 +88,9 @@ class AnimeListExportService
                 'episodes' => $animeUser->anime->episodes,
                 'watch_status' => $animeUser->watch_status?->status ?? 'PLAN-TO-WATCH',
                 'score' => $animeUser->score,
-                'progress' => $animeUser->progress
+                'progress' => $animeUser->progress,
+                'notes' => $animeUser->notes,
+                'show_anime_notes_publicly' => $animeUser->show_anime_notes_publicly
             ];
         }
 
