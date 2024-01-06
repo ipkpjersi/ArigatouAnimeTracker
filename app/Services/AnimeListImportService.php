@@ -101,7 +101,8 @@ class AnimeListImportService
             $score = $animeData['score'];
             $progress = $animeData['progress'];
             $notes = $animeData['notes'] ?? '';
-            $showAnimeNotesPublicly = $animeData['show_anime_notes_publicly'] ?? '';
+            $showAnimeNotesPublicly = $animeData['show_anime_notes_publicly'] ?? 1;
+            $displayInList = $animeData['display_in_list'] ?? 1;
 
             $animeType = AnimeType::firstOrCreate(['type' => $type]);
 
@@ -139,7 +140,8 @@ class AnimeListImportService
                 'score' => $score,
                 'progress' => $progress,
                 'notes' => $notes,
-                'show_anime_notes_publicly' => $showAnimeNotesPublicly
+                'show_anime_notes_publicly' => $showAnimeNotesPublicly,
+                'display_in_list' => $displayInList
             ]);
 
             $count++;

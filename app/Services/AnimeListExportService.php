@@ -105,6 +105,7 @@ class AnimeListExportService
                 'score' => $animeUser->score,
                 'progress' => $animeUser->progress,
                 'notes' => $animeUser->notes,
+                'display_in_list' => $animeUser->display_in_list,
                 'show_anime_notes_publicly' => $animeUser->show_anime_notes_publicly
             ];
         }
