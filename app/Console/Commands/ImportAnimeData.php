@@ -63,7 +63,7 @@ class ImportAnimeData extends Command
                 $this->info("Backing up data before import...");
                 //This would be fine, but we might as well back up all the images etc too so everything matches.
                 //Artisan::call('app:backup-database', [], new ConsoleOutput);
-                Artisan::call('backup:run', [], new ConsoleOutput);
+                Artisan::call('app:backup:run', [], new ConsoleOutput);
             }
 
             $result = $animeImportService->importFromJsonFile($filePath, $fullUpdate, $logger);

@@ -30,7 +30,7 @@ class AnimeImageDownloadService
                     })
                     ->get();
         $startTime = microtime(true);
-        $count = 0;
+        $successful = 0;
         $imageFailed = 0;
         $total = $anime->count() + $downloaded->count();
         $remaining = $anime->count();
@@ -40,6 +40,7 @@ class AnimeImageDownloadService
             try {
                 if ($current->thumbnail) {
                     if ($this->downloadImageFromUrl($current->thumbnail, 'thumbnail', $logger)) {
+                        $successful++;
                         $imageDownloaded = true;
                     } else {
                         $imageFailed++;
@@ -47,6 +48,7 @@ class AnimeImageDownloadService
                 }
                 if ($current->picture) {
                     if ($this->downloadImageFromUrl($current->picture, 'picture', $logger)) {
+                        $successful++;
                         $imageDownloaded = true;
                     } else {
                         $imageFailed++;
@@ -68,10 +70,10 @@ class AnimeImageDownloadService
         }
         $duration = microtime(true) - $startTime;
         return [
-            'count' => $count,
+            'successful' => $successful,
             'total' => $total,
             'failed' => $imageFailed,
-            'totalImages' => $count + $imageFailed,
+            'totalImages' => $successful + $imageFailed,
             'duration' => $duration,
         ];
     }
