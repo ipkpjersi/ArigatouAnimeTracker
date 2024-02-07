@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class AppBackupRunCommand extends Command
 {
     protected $signature = 'app:backup:run';
-    protected $description = 'Alias for backup:run command';
+    protected $description = 'Alias for backup:run command. This is the recommended backup command.';
 
     public function handle()
     {
