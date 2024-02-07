@@ -199,7 +199,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_friends_on_others_profiles')" />
 
-             <x-input-label class="mt-4" for="show_anime_notes_publicly" :value="__('Show Anime Notes Publicly')" />
+            <x-input-label class="mt-4" for="show_anime_notes_publicly" :value="__('Show Anime Notes Publicly')" />
                 <div class="mt-1 text-gray-800 dark:text-gray-200">
                     <label class="inline-flex items-center">
                         <input id="show_anime_notes_publicly" type="radio" name="show_anime_notes_publicly" value="1" class="form-radio"
