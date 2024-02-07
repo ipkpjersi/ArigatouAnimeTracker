@@ -40,6 +40,7 @@ class ProfileUpdateRequest extends FormRequest
             'enable_score_charts_own_profile_when_logged_in' => ['nullable', 'in:1,0'],
             'enable_score_charts_own_profile_publicly' => ['nullable', 'in:1,0'],
             'enable_score_charts_other_profiles' => ['nullable', 'in:1,0'],
+            'show_anime_list_publicly' => ['nullable', 'in:1,0'],
         ];
     }
 }

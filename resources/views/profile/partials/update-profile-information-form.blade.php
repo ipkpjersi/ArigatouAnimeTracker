@@ -92,6 +92,23 @@
                           required/>
             <x-input-error class="mt-2" :messages="$errors->get('anime_list_pagination_size')"/>
 
+            <x-input-label class="mt-4" for="show_anime_list_publicly" :value="__('Show Anime List Publicly')"/>
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_anime_list_publicly" type="radio" name="show_anime_list_publicly" value="1"
+                           class="form-radio"
+                           @if (old('show_anime_list_publicly', $user->show_anime_list_publicly) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_anime_list_publicly" type="radio" name="show_anime_list_publicly" value="0"
+                           class="form-radio"
+                           @if (old('show_anime_list_publicly', $user->show_anime_list_publicly) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_anime_list_publicly')"/>
+
             <x-input-label class="mt-4" for="show_anime_list_number"
                            :value="__('Show Number of Current Anime in List')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
