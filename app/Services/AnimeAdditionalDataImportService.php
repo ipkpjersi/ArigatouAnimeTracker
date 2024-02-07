@@ -18,8 +18,14 @@ class AnimeAdditionalDataImportService
                     ->get();
         $anime = DB::table('anime')
                     ->where("api_descriptions_empty", "=", $apiDescriptionsEmptyOnly ? "true" : "false")
-                    ->whereNull('description')
-                    ->whereNull('genres')
+                    ->where(function ($query) {
+                        $query->whereNull('description')
+                              ->orWhere(DB::raw("TRIM(description)"), '=', '');
+                    })
+                    ->where(function ($query) {
+                        $query->whereNull('genres')
+                              ->orWhere(DB::raw("TRIM(genres)"), '=', '');
+                    })
                     ->get();
         $total = $all->count();
         $downloading = $anime->count();
