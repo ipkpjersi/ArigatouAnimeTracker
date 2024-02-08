@@ -30,7 +30,6 @@ class ZipAnimeImages extends Command
     public function handle(AnimeImageDownloadService $animeImageDownloadService)
     {
         $this->info("Starting to zip anime images...");
-
         try {
             $animeImageDownloadService->zipImages();
             $this->info("Zipping of anime images completed successfully.");

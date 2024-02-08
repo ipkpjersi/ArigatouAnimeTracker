@@ -8,6 +8,7 @@ use App\Models\AnimeType;
 use App\Services\AnimeImportService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -36,6 +37,7 @@ class ImportAnimeData extends Command
     public function handle(AnimeImportService $animeImportService)
     {
         $this->info("Starting anime data import...");
+        Log::channel('anime_import')->info("Starting anime data import...");
 
         $filePath = $this->argument('filePath') ?? storage_path('app/imports/anime-offline-database.json');
         $forceDownload = $this->option('forceDownload');
@@ -48,6 +50,7 @@ class ImportAnimeData extends Command
 
             if ($forceDownload || !file_exists($filePath)) {
                 $this->info("Anime database file not found or force download is enabled. Downloading from source...");
+                Log::channel('anime_import')->info("Anime database file not found or force download is enabled. Downloading from source...");
                 $fileData = file_get_contents('https://raw.githubusercontent.com/manami-project/anime-offline-database/master/anime-offline-database.json');
                 $directory = dirname($filePath);
                 //$this->info("Downloading anime import JSON file to $directory");
@@ -61,6 +64,7 @@ class ImportAnimeData extends Command
 
             if (!$skipBackup) {
                 $this->info("Backing up data before import...");
+                Log::channel('anime_import')->info("Backing up data before import...");
                 //This would be fine, but we might as well back up all the images etc too so everything matches.
                 //Artisan::call('app:backup-database', [], new ConsoleOutput);
                 Artisan::call('app:backup:run', [], new ConsoleOutput);
@@ -70,6 +74,7 @@ class ImportAnimeData extends Command
             $duration = round($result['duration'], 2);
 
             $this->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
+            Log::channel('anime_import')->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
         } catch (\Exception $e) {
             $this->error('An error occurred during import: ' . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
         }
