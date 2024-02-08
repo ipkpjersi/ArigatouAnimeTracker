@@ -76,8 +76,8 @@ class ImportAnimeData extends Command
             $this->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
             Log::channel('anime_import')->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
         } catch (\Exception $e) {
-            $this->error('An error occurred during anime data import: ' . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
-            Log::channel('anime_import')->info('An error occurred during anime data import: ' . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
+            $this->error('An error occurred during the anime data import: ' . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
+            Log::channel('anime_import')->info('An error occurred during the anime data import: ' . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
         }
     }
 }
