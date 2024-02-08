@@ -60,8 +60,8 @@ class AnimeImportService
                         // Log original and updated details
                         $logger && $logger("Updated details for anime ID {$existingAnime->id} with title $title, updated data only: " . print_r($updateData, true));
                         Log::channel('anime_import')->info("Updated details for anime ID {$existingAnime->id} with title $title, updated data only: " . print_r($updateData, true));
-                        Log::channel('anime_import')->info("[Update] Anime ID {$existingAnime->id} with title: $title Updated, Original anime data: " . json_encode($originalData));
-                        Log::channel('anime_import')->info("[Update] Anime ID {$existingAnime->id} with title: $title Updated, Updated anime data: " . json_encode($updatedData));
+                        Log::channel('anime_import')->info("Updated Anime ID {$existingAnime->id} with title: $title, Original anime data: " . json_encode($originalData));
+                        Log::channel('anime_import')->info("Updated Anime ID {$existingAnime->id} with title: $title, Updated anime data: " . json_encode($updatedData));
                     } else {
                         $logger && $logger("No updates required for anime ID {$existingAnime->id} with title: $title");
                     }
