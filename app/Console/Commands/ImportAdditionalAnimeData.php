@@ -44,7 +44,8 @@ class ImportAdditionalAnimeData extends Command
             $this->info("Imported additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
             Log::channel('anime_import')->info("Imported additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
         } catch (\Exception $e) {
-            $this->error('An error occurred during the data fetch: ' . $e->getMessage());
+            $this->error('An error occurred during the additional anime data fetch: ' . $e->getMessage());
+            Log::channel('anime_import')->info('An error occurred during the additional anime data fetch: ' . $e->getMessage());
         }
     }
 }

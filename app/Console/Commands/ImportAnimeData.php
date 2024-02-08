@@ -63,8 +63,8 @@ class ImportAnimeData extends Command
             }
 
             if (!$skipBackup) {
-                $this->info("Backing up data before import...");
-                Log::channel('anime_import')->info("Backing up data before import...");
+                $this->info("Backing up data before anime data import...");
+                Log::channel('anime_import')->info("Backing up data before anime data import...");
                 //This would be fine, but we might as well back up all the images etc too so everything matches.
                 //Artisan::call('app:backup-database', [], new ConsoleOutput);
                 Artisan::call('app:backup:run', [], new ConsoleOutput);
@@ -76,7 +76,8 @@ class ImportAnimeData extends Command
             $this->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
             Log::channel('anime_import')->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
         } catch (\Exception $e) {
-            $this->error('An error occurred during import: ' . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
+            $this->error('An error occurred during anime data import: ' . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
+            Log::channel('anime_import')->info('An error occurred during anime data import: ' . $e->getMessage() . "\nStack Trace:\n" . $e->getTraceAsString());
         }
     }
 }
