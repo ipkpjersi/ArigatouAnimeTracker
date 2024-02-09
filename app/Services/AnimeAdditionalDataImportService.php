@@ -171,7 +171,7 @@ class AnimeAdditionalDataImportService
                         $count++;
                     } catch (\Exception $e) {
                         $hasError = true;
-                        $logger && $logger("Error importing additional anime data: " . $e->getMessage() . "\n Error on query: " . $query);
+                        $logger && $logger("Error importing additional anime data: " . $e . "\n Error on query: " . $query);
                         $logger && $logger("Imported {$count} SQL queries out of {$total} before running into an error.");
                         break;
                     }

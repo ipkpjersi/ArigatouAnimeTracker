@@ -35,7 +35,7 @@ class UnzipAnimeImages extends Command
             $animeImageDownloadService->unzipImages();
             $this->info("Unzipping of anime images completed successfully.");
         } catch (\Exception $e) {
-            $this->error('An error occurred during the unzipping process: ' . $e->getMessage());
+            $this->error('An error occurred during the unzipping process: ' . $e);
         }
     }
 }

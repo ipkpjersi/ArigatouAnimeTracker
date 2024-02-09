@@ -55,7 +55,7 @@ class AnimeImageDownloadService
                     }
                 }
             } catch (\Exception $e) {
-                $logger && $logger('An error occurred during downloading an image: ' . $e->getMessage());
+                $logger && $logger('An error occurred during downloading an image: ' . $e);
                 continue;
             }
             if ($imageDownloaded) {

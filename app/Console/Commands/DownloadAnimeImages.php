@@ -45,8 +45,8 @@ class DownloadAnimeImages extends Command
             Log::channel('anime_import')->info("Downloaded {$result['successful']} out of {$result['totalImages']} images for {$result['total']} anime records successfully in {$duration} seconds.");
             $this->call('app:zip-anime-images');
         } catch (\Exception $e) {
-            $this->error('An error occurred during the anime image downloads fetch: ' . $e->getMessage());
-            Log::channel('anime_import')->info('An error occurred during the anime image downloads fetch: ' . $e->getMessage());
+            $this->error('An error occurred during the anime image downloads fetch: ' . $e);
+            Log::channel('anime_import')->info('An error occurred during the anime image downloads fetch: ' . $e);
         }
     }
 }

@@ -43,10 +43,11 @@ class DownloadAdditionalAnimeData extends Command
             $result = $animeAdditionalDataImportService->downloadAdditionalAnimeData($logger, $generateSqlFile, $apiDescriptionsEmptyOnly);
             $duration = round($result['duration'], 2);
 
-            $this->info("Fetched and updated additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
-            Log::channel('anime_import')->info("Fetched and updated additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
+            $this->info("Fetched and updated additional anime data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
+            Log::channel('anime_import')->info("Fetched and updated additional anime data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
         } catch (\Exception $e) {
-            $this->error('An error occurred during the data fetch: ' . $e->getMessage());
+            $this->error('An error occurred during the additional anime data fetch: ' . $e);
+            Log::channel('anime_import')->info('An error occurred during the additional anime data fetch: ' . $e);
         }
     }
 }

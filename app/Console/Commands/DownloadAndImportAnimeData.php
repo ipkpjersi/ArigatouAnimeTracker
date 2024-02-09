@@ -51,7 +51,7 @@ class DownloadAndImportAnimeData extends Command
             $this->info("All processes completed successfully.");
 
         } catch (\Exception $e) {
-            $this->error('An error occurred during the process: ' . $e->getMessage());
+            $this->error('An error occurred during the process: ' . $e);
         }
     }
 }

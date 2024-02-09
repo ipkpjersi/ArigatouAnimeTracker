@@ -36,7 +36,7 @@ class ClearAnimeDescriptions extends Command
 
             $this->info("All anime descriptions have been cleared.");
         } catch (\Exception $e) {
-            $this->error('An error occurred: ' . $e->getMessage());
+            $this->error('An error occurred: ' . $e);
         }
     }
 }

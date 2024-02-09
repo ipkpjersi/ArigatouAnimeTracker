@@ -47,7 +47,7 @@ class ClearUserAnimeList extends Command
 
             $this->info("Anime list for user {$username} has been cleared.");
         } catch (\Exception $e) {
-            $this->error('An error occurred: ' . $e->getMessage());
+            $this->error('An error occurred: ' . $e);
         }
     }
 }

@@ -29,7 +29,7 @@ class AnimeListImportService
          try {
             $xml = new SimpleXMLElement($xmlContent);
         } catch (\Exception $e) {
-            \Log::error("An exception has occurred importing a MyAnimeList export: "  . $e->getMessage());
+            \Log::error("An exception has occurred importing a MyAnimeList export: "  . $e);
         }
         $total = count($xml->anime);
         foreach ($xml->anime as $animeData) {

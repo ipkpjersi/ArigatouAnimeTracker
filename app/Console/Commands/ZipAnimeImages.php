@@ -34,7 +34,7 @@ class ZipAnimeImages extends Command
             $animeImageDownloadService->zipImages();
             $this->info("Zipping of anime images completed successfully.");
         } catch (\Exception $e) {
-            $this->error('An error occurred during the zipping process: ' . $e->getMessage());
+            $this->error('An error occurred during the zipping process: ' . $e);
         }
     }
 }

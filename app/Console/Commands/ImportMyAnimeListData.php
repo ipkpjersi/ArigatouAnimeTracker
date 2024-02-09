@@ -53,7 +53,7 @@ class ImportMyAnimeListData extends Command
             $this->info("Imported {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds");
 
         } catch (\Exception $e) {
-            $this->error('An error occurred during import: ' . $e->getMessage());
+            $this->error('An error occurred during import: ' . $e);
         }
     }
 }
