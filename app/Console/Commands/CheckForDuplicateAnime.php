@@ -12,7 +12,7 @@ class CheckForDuplicateAnime extends Command
      *
      * @var string
      */
-    protected $signature = 'anime:check-duplicates';
+    protected $signature = 'app:anime:check-duplicates';
 
     /**
      * The console command description.
