@@ -84,7 +84,7 @@ class AnimeAdditionalDataImportService
                     $logger && $logger("Update data for anime: " . $row->title . " from MAL");
                 } elseif ($response) {
                     $data = $response->json();
-                    $logger && $logger("Failed update response from MAL for anime: " . $row->title . " " . $data);
+                    $logger && $logger("Failed update response from MAL for anime: " . $row->title . " " . print_r($data, true));
                 }
             } else {
                 //Optional logging, we likely don't need this logging unless we know it's not fetching descriptions from MAL when it should be.
