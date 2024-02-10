@@ -180,9 +180,9 @@
 
 
                         <h4 class="font-bold mb-2">Description:</h4>
-                        <p class="mb-4">{!! str_replace("\n", "<br>", $anime->description ?? "This title does not have a description yet.") !!}</p>
+                        <p class="mb-4">{!! str_replace("\n", "<br>", empty(trim($anime->description)) ? "This title does not have a description yet." : $anime->description) !!}</p>
 
-                        <h4 class="font-bold @if (!empty($anime->description)) mt-4 @endif mb-2">More Details:</h4>
+                        <h4 class="font-bold @if (!empty(trim($anime->description))) mt-4 @endif mb-2">More Details:</h4>
                         <ul>
                             @foreach (explode(', ', $anime->sources) as $source)
                                 <li><a href="{{ $source }}" target="_blank" rel="noopener">{{ $source }}</a></li>

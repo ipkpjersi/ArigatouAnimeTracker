@@ -36,9 +36,13 @@ class DownloadAndImportAnimeData extends Command
             $this->info("Downloading and importing anime data...");
             Artisan::call('app:import-anime-data', ['--forceDownload' => true, '--fullUpdate' => true], new ConsoleOutput);
 
-            // Download Additional Anime Data
-            $this->info("Downloading additional anime data...");
+            // Download Additional Anime Data for existing anime data (already has API description empty)
+            $this->info("Downloading additional anime data for existing anime data...");
             Artisan::call('app:download-anime-additional-data', ['generateSqlFile' => true, 'apiDescriptionsEmptyOnly' => true], new ConsoleOutput);
+
+            // Download Additional Anime Data for new anime data (does not have API description empty yet)
+            $this->info("Downloading additional anime data for new anime data...");
+            Artisan::call('app:download-anime-additional-data', ['generateSqlFile' => true, 'apiDescriptionsEmptyOnly' => false], new ConsoleOutput);
 
             // Download Anime Images
             $this->info("Downloading anime images...");
@@ -47,7 +51,7 @@ class DownloadAndImportAnimeData extends Command
             $this->info("All processes completed successfully.");
 
         } catch (\Exception $e) {
-            $this->error('An error occurred during the process: ' . $e->getMessage());
+            $this->error('An error occurred during the process: ' . $e);
         }
     }
 }

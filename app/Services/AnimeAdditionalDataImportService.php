@@ -18,8 +18,14 @@ class AnimeAdditionalDataImportService
                     ->get();
         $anime = DB::table('anime')
                     ->where("api_descriptions_empty", "=", $apiDescriptionsEmptyOnly ? "true" : "false")
-                    ->whereNull('description')
-                    ->whereNull('genres')
+                    ->where(function ($query) {
+                        $query->whereNull('description')
+                              ->orWhere(DB::raw("TRIM(description)"), '=', '');
+                    })
+                    ->where(function ($query) {
+                        $query->whereNull('genres')
+                              ->orWhere(DB::raw("TRIM(genres)"), '=', '');
+                    })
                     ->get();
         $total = $all->count();
         $downloading = $anime->count();
@@ -78,7 +84,7 @@ class AnimeAdditionalDataImportService
                     $logger && $logger("Update data for anime: " . $row->title . " from MAL");
                 } elseif ($response) {
                     $data = $response->json();
-                    $logger && $logger("Failed update response from MAL for anime: " . $row->title . " " . $data);
+                    $logger && $logger("Failed update response from MAL for anime: " . $row->title . " " . print_r($data, true));
                 }
             } else {
                 //Optional logging, we likely don't need this logging unless we know it's not fetching descriptions from MAL when it should be.
@@ -115,9 +121,11 @@ class AnimeAdditionalDataImportService
             if ($description) {
                 $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $sqlFile, $logger);
                 $logger && $logger("Successfully updated description and genres for anime: " . $row->title);
+                Log::channel('anime_import')->info("Successfully updated description and genres for anime: " . $row->title);
                 $count++;
             } else {
-                $logger && $logger("Failed to update description and genres for anime: " . $row->title);
+                $logger && $logger("Failed to fetch/update description and genres for anime: " . $row->title);
+                Log::channel('anime_import')->info("Failed to fetch/update description and genres for anime: " . $row->title);
                 Log::error('Failed to fetch additional data for anime: ' . $row->title);
                 DB::table('anime')
                 ->where('id', $row->id)
@@ -154,6 +162,7 @@ class AnimeAdditionalDataImportService
         if (File::exists($sqlPath)) {
             $sqlContent = File::get($sqlPath);
             $sqlQueries = explode(";\n", $sqlContent);
+            $total = count($sqlQueries);
             foreach ($sqlQueries as $query) {
                 if (trim($query) !== '') {
                     try {
@@ -162,14 +171,15 @@ class AnimeAdditionalDataImportService
                         $count++;
                     } catch (\Exception $e) {
                         $hasError = true;
-                        $logger && $logger("Error importing additional anime data: " . $e->getMessage() . "\n Error on query: " . $query);
+                        $logger && $logger("Error importing additional anime data: " . $e . "\n Error on query: " . $query);
                         $logger && $logger("Imported {$count} SQL queries out of {$total} before running into an error.");
                         break;
                     }
                 }
             }
             if (!$hasError) {
-                $logger && $logger("Imported {$count} SQL queries successfully.");
+                $logger && $logger("Imported {$count} out of {$total} additional anime data SQL queries successfully.");
+                Log::channel('anime_import')->info("Imported {$count} out of {$total} additional anime data SQL queries successfully.");
             }
         } else {
             $logger && $logger('Error importing additional anime data: SQL file does not exist.');

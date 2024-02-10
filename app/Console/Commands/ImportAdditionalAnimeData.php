@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\AnimeAdditionalDataImportService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class ImportAdditionalAnimeData extends Command
 {
@@ -30,6 +31,7 @@ class ImportAdditionalAnimeData extends Command
     public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService)
     {
         $this->info('Starting to import additional anime data from SQL file...');
+        Log::channel('anime_import')->info('Starting to import additional anime data from SQL file...');
 
         try {
             $logger = function($message) {
@@ -40,8 +42,10 @@ class ImportAdditionalAnimeData extends Command
             $duration = round($result['duration'], 2);
 
             $this->info("Imported additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
+            Log::channel('anime_import')->info("Imported additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
         } catch (\Exception $e) {
-            $this->error('An error occurred during the data fetch: ' . $e->getMessage());
+            $this->error('An error occurred during the additional anime data fetch: ' . $e);
+            Log::channel('anime_import')->info('An error occurred during the additional anime data fetch: ' . $e);
         }
     }
 }
