@@ -88,6 +88,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/animelist/{username}/clear',  [AnimeController::class, 'clearAnimeList'])->name('user.anime.clear');
 
+    Route::post('/anime/{username}/clearSortOrders', [AnimeController::class, 'clearAnimeListSortOrders'])->name('user.anime.clearSortOrders');
+
     Route::post('/add-friend/{friendId}', [UserController::class, 'addFriend'])->name('add-friend');
     Route::post('/remove-friend/{friendId}', [UserController::class, 'removeFriend'])->name('remove-friend');
 

@@ -636,6 +636,22 @@ class AnimeController extends Controller
         }
     }
 
+    public function clearAnimeListSortOrders($username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+
+        // Check if the logged-in user matches the username or is an admin
+        if (auth()->user()->id === $user->id || auth()->user()->is_admin) {
+            // Assuming 'anime' is the name of the relationship and 'anime_user' is the pivot table
+            // Here, we update the 'sort_order' field to null for all anime list entries of the user
+            $user->anime()->updateExistingPivot($user->anime->pluck('id'), ['sort_order' => null]);
+
+            return redirect()->back()->with('message', 'Anime list sort orders cleared.');
+        } else {
+            return redirect()->back()->with('error', 'You do not have permission to clear these sort orders.');
+        }
+    }
+
     public function importAnimeList(Request $request, AnimeListImportService $importer)
     {
         $importType = $request->input('import_type');

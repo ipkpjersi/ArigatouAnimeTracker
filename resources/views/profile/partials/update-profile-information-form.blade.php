@@ -17,6 +17,7 @@
         @csrf
         @method('patch')
 
+        <!-- Username -->
         <div>
             <x-input-label for="username" :value="__('Username')"/>
             <x-text-input id="username" name="username" type="text" class="mt-1 block w-full"
@@ -24,6 +25,7 @@
             <x-input-error class="mt-2" :messages="$errors->get('username')"/>
         </div>
 
+        <!-- Email -->
         <div>
             <x-input-label for="email" :value="__('Email')"/>
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full"
@@ -44,6 +46,7 @@
                 </div>
             </div>
 
+            <!-- Current Avatar -->
             <x-input-label class="mt-4" for="avatar" :value="__('Avatar (Resized to 150x150)')"/>
             <img id="current-avatar" src="{{ $user->avatar }}" alt="Current Avatar"
                  @if (!$user->avatar) style="display:none; width:150px; height:150px"
@@ -54,6 +57,7 @@
                     class="mt-3 text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded shadow">{{ __('Delete Avatar') }}</button>
             <x-input-error class="mt-2" :messages="$errors->get('avatar')"/>
 
+            <!-- Dark Mode -->
             <x-input-label class="mt-4" for="dark_mode" :value="__('Dark Mode')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
@@ -69,6 +73,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('dark_mode')"/>
 
+            <!-- Show Adult Content -->
             <x-input-label class="mt-4" for="show_adult_content" :value="__('Show Adult Content')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
@@ -84,6 +89,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_adult_content')"/>
 
+            <!-- Anime List Pagination Size (Default: 15) -->
             <x-input-label class="mt-4" for="anime_list_pagination_size"
                            :value="__('Anime List Pagination Size (Default: 15)')"/>
             <x-text-input id="anime_list_pagination_size" name="anime_list_pagination_size" type="number" min="2"
@@ -92,6 +98,7 @@
                           required/>
             <x-input-error class="mt-2" :messages="$errors->get('anime_list_pagination_size')"/>
 
+            <!-- Show Anime List Publicly -->
             <x-input-label class="mt-4" for="show_anime_list_publicly" :value="__('Show Anime List Publicly')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
@@ -109,6 +116,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_anime_list_publicly')"/>
 
+            <!-- Show Number of Current Anime in List -->
             <x-input-label class="mt-4" for="show_anime_list_number"
                            :value="__('Show Number of Current Anime in List')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
@@ -127,6 +135,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_anime_list_number')"/>
 
+            <!-- Show Delete Anime List Button -->
             <x-input-label class="mt-4" for="show_clear_anime_list_button"
                            :value="__('Show Delete Anime List Button')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
@@ -145,6 +154,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_anime_list_number')"/>
 
+            <!-- Display Anime Cards instead of List on Categories pages -->
             <x-input-label class="mt-4" for="display_anime_cards"
                            :value="__('Display Anime Cards instead of List on Categories pages')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
@@ -161,6 +171,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_anime_list_number')"/>
 
+            <!-- Enable Friends System -->
             <x-input-label class="mt-4" for="enable_friends_system" :value="__('Enable Friends System')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
@@ -178,6 +189,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('enable_friends_system')"/>
 
+            <!-- Show Friends on My Profile Publicly -->
             <x-input-label class="mt-4" for="show_friends_on_profile_publicly"
                            :value="__('Show Friends on My Profile Publicly')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
@@ -196,6 +208,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_friends_on_profile_publicly')"/>
 
+            <!-- Show Friends on My Profile when I am Logged In -->
             <x-input-label class="mt-4" for="show_friends_on_profile_when_logged_in"
                            :value="__('Show Friends on My Profile when I am Logged In')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
@@ -214,6 +227,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_friends_on_profile_when_logged_in')"/>
 
+            <!-- Show Friends Link in Navigation Dropdown -->
             <x-input-label class="mt-4" for="show_friends_in_nav_dropdown"
                            :value="__('Show Friends Link in Navigation Dropdown')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
@@ -232,6 +246,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_friends_in_nav_dropdown')"/>
 
+            <!-- View Friends on Other Users' Profiles -->
             <x-input-label class="mt-4" for="show_friends_on_others_profiles"
                            :value="__('View Friends on Other Users\' Profiles')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
@@ -250,6 +265,7 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_friends_on_others_profiles')"/>
 
+            <!-- Show Anime Notes Publicly -->
             <x-input-label class="mt-4" for="show_anime_notes_publicly" :value="__('Show Anime Notes Publicly')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
@@ -419,6 +435,24 @@
                     <input id="enable_score_charts_other_profiles" type="radio"
                            name="enable_score_charts_other_profiles" value="0" class="form-radio"
                            @if (old('enable_score_charts_other_profiles', $user->enable_score_charts_other_profiles) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+
+            <!-- Show Delete Anime List Sort Orders Button  -->
+            <x-input-label class="mt-4" for="show_clear_sort_orders_button"
+                           :value="__('Show Delete Anime List Sort Orders Button')"/>
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_clear_anime_list_sort_orders_button" type="radio"
+                           name="show_clear_anime_list_sort_orders_button" value="1" class="form-radio"
+                           @if (old('show_clear_anime_list_sort_orders_button', $user->show_clear_anime_list_sort_orders_button) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_clear_anime_list_sort_orders_button" type="radio"
+                           name="show_clear_anime_list_sort_orders_button" value="0" class="form-radio"
+                           @if (old('show_clear_anime_list_sort_orders_button', $user->show_clear_anime_list_sort_orders_button) !== 1) checked @endif>
                     <span class="ml-2">No</span>
                 </label>
             </div>

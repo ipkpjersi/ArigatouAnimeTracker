@@ -12,10 +12,10 @@
         <div class="max-w-[1700px] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
                 <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 hidden overflow-y-auto">
-                    <div class="bg-white dark:bg-gray-700 rounded relative w-96 h-64">
+                    <div class="bg-white dark:bg-gray-700 rounded relative w-128 h-64">
                         <button id="closeModal" class="absolute top-2 right-4 bg-red-500 text-white p-2 pl-4 pr-4 mb-2 rounded">X</button>
                         <div class="p-4 mt-10">
-                            <p>Are you sure you want to delete your anime list?</p>
+                            <p id="clearAnimeText"></p>
                             <div class="flex items-center mt-2">
                               <input type="checkbox" id="confirmCheckbox">
                               <label for="confirmCheckbox" class="ml-2">I understand the consequences</label>
@@ -293,6 +293,14 @@
                                     </button>
                                 </form>
                             @endif
+                            @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
+                                <form id="clearSortOrdersForm" class="inline-block" action="{{ route('user.anime.clearSortOrders', ['username' => $username]) }}" method="post">
+                                    @csrf
+                                    <button type="button" id="clearSortOrdersBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
+                                        Delete Anime List Sort Orders
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -354,10 +362,12 @@
         }
         document.addEventListener("DOMContentLoaded", function() {
             const clearListBtn = document.getElementById("clearListBtn");
+            const clearSortOrdersBtn = document.getElementById("clearSortOrdersBtn");
             const clearModal = document.getElementById("clearModal");
             const confirmClear = document.getElementById("confirmClear");
             const cancelClear = document.getElementById("cancelClear");
             const clearForm = document.getElementById("clearForm");
+            const clearSortOrdersForm = document.getElementById("clearSortOrdersForm");
             const confirmUsername = document.getElementById("confirmUsername");
             const confirmCheckbox = document.getElementById("confirmCheckbox");
             const errorText = document.getElementById("errorText");
@@ -373,8 +383,43 @@
             if (clearListBtn) {
                 clearListBtn.addEventListener("click", function(event) {
                     event.preventDefault();
+                    document.getElementById("clearAnimeText").innerText = "Are you sure you want to delete your anime list?";
                     document.body.style.overflow = 'hidden';
                     clearModal.classList.remove("hidden");
+                    confirmClear.onclick = function() {
+                        if (!confirmCheckbox.checked) {
+                            showError("Please check the confirmation box.");
+                            return;
+                        }
+                        if (confirmUsername.value !== username) {
+                            showError("Username does not match.");
+                            return;
+                        }
+                        // Submit the clearSortOrdersForm instead of clearForm
+                        clearForm.submit();
+                    }
+                    firstFocusableElement.focus(); // Set focus on the first focusable element
+                });
+            }
+
+            if (clearSortOrdersBtn) {
+                clearSortOrdersBtn.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    document.getElementById("clearAnimeText").innerText = "Are you sure you want to delete your anime list sort orders?";
+                    document.body.style.overflow = 'hidden';
+                    clearModal.classList.remove("hidden");
+                    confirmClear.onclick = function() {
+                        if (!confirmCheckbox.checked) {
+                            showError("Please check the confirmation box.");
+                            return;
+                        }
+                        if (confirmUsername.value !== username) {
+                            showError("Username does not match.");
+                            return;
+                        }
+                        // Submit the clearSortOrdersForm instead of clearForm
+                        clearSortOrdersForm.submit();
+                    }
                     firstFocusableElement.focus(); // Set focus on the first focusable element
                 });
             }
