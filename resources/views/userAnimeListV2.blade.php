@@ -314,6 +314,9 @@
                     },
                     scrollX: scrollWidth,
                     bScrollCollapse: true,
+                    colReorder: {
+                        order: colReorder
+                    },
                     createdRow: function(row, data, dataIndex) {
                         // Calculate the overall index based on the current page and data index
                         let pageIndex = $('#userAnimeTable').DataTable().page.info().page;
