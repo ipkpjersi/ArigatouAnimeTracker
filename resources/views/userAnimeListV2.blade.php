@@ -335,12 +335,12 @@
             }
 
             // Initial DataTable initialization
-            let initialScrollWidth = window.innerWidth < 992 ? "100%" : "";
+            let initialScrollWidth = window.innerWidth < 1700 ? "100%" : "";
             let dataTable = initDataTable(initialScrollWidth);
 
             // Resize event listener to reinitialize DataTable
             window.addEventListener("resize", function() {
-                let newScrollWidth = window.innerWidth < 992 ? "100%" : "";
+                let newScrollWidth = window.innerWidth < 1700 ? "100%" : "";
 
                 // Check if scrollWidth needs to be updated
                 if (newScrollWidth !== initialScrollWidth) {
