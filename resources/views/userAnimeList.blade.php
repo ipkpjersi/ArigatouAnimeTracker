@@ -293,7 +293,7 @@
                                     </button>
                                 </form>
                             @endif
-                            @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
+                            @if (auth()->user()->show_clear_anime_list_sort_orders_button)
                                 <form id="clearSortOrdersForm" class="inline-block" action="{{ route('user.anime.clearSortOrders', ['username' => $username]) }}" method="post">
                                     @csrf
                                     <button type="button" id="clearSortOrdersBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
