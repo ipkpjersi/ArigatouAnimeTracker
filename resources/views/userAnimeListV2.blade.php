@@ -305,35 +305,54 @@
             if (showAllAnime === '1') {
                 customUrl.searchParams.set('showallanime', '1');
             }
-            let scrollWidth = "";
-            if (window && window.innerWidth && window.innerWidth < 992) {
-                scrollWidth = "100%";
-            }
-            let dataTable = $('#userAnimeTable').DataTable({
-                processing: true,
-                serverSide: true,
-                order: [[7, 'asc'], [6, 'asc'], [1, 'asc']],
-                ajax: customUrl.toString(),
-                columns: columns,
-                initComplete: function() {
-                    let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
-                    $('#userAnimeTable_filter').prepend(resetBtn);
-                },
-                rowCallback: rowCallback,
-                "sScrollX": scrollWidth,
-                "bScrollCollapse": true,
-                colReorder: {
-                    order: colReorder
-                },
-                createdRow: function(row, data, dataIndex) {
-                    // Calculate the overall index based on the current page and data index
-                    let pageIndex = $('#userAnimeTable').DataTable().page.info().page;
-                    let pageSize = $('#userAnimeTable').DataTable().page.info().length;
-                    let overallIndex = pageIndex * pageSize + dataIndex + 1;
+            function initDataTable(scrollWidth) {
+                return $('#userAnimeTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    order: [[7, 'asc'], [6, 'asc'], [1, 'asc']],
+                    ajax: customUrl.toString(),
+                    columns: columns,
+                    initComplete: function() {
+                        let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
+                        $('#userAnimeTable_filter').prepend(resetBtn);
+                    },
+                    rowCallback: rowCallback,
+                    scrollX: scrollWidth,
+                    bScrollCollapse: true,
+                    colReorder: {
+                        order: colReorder
+                    },
+                    createdRow: function(row, data, dataIndex) {
+                        // Calculate the overall index based on the current page and data index
+                        let pageIndex = $('#userAnimeTable').DataTable().page.info().page;
+                        let pageSize = $('#userAnimeTable').DataTable().page.info().length;
+                        let overallIndex = pageIndex * pageSize + dataIndex + 1;
 
-                    // Assign the ID to the row
-                    $(row).attr('id', 'row-' + overallIndex);
-                },
+                        // Assign the ID to the row
+                        $(row).attr('id', 'row-' + overallIndex);
+                    },
+                });
+            }
+
+            // Initial DataTable initialization
+            let initialScrollWidth = window.innerWidth < 992 ? "100%" : "";
+            let dataTable = initDataTable(initialScrollWidth);
+
+            // Resize event listener to reinitialize DataTable
+            window.addEventListener("resize", function() {
+                let newScrollWidth = window.innerWidth < 992 ? "100%" : "";
+
+                // Check if scrollWidth needs to be updated
+                if (newScrollWidth !== initialScrollWidth) {
+                    // Destroy the current DataTable instance
+                    dataTable.destroy();
+
+                    // Reinitialize the DataTable with the new sScrollX value
+                    dataTable = initDataTable(newScrollWidth);
+
+                    // Update the initialScrollWidth for the next resize event
+                    initialScrollWidth = newScrollWidth;
+                }
             });
         });
         document.addEventListener("DOMContentLoaded", function() {
