@@ -101,6 +101,7 @@ class AnimeListImportService
             $score = $animeData['score'];
             $progress = $animeData['progress'];
             $notes = $animeData['notes'] ?? '';
+            $sortOrder = $animeData['sort_order'];
             $showAnimeNotesPublicly = $animeData['show_anime_notes_publicly'] ?? 1;
             $displayInList = $animeData['display_in_list'] ?? 1;
 
@@ -141,7 +142,8 @@ class AnimeListImportService
                 'progress' => $progress,
                 'notes' => $notes,
                 'show_anime_notes_publicly' => $showAnimeNotesPublicly,
-                'display_in_list' => $displayInList
+                'display_in_list' => $displayInList,
+                'sort_order' => $sortOrder
             ]);
 
             $count++;
