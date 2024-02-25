@@ -276,52 +276,44 @@
                     }
                 });
             }
-            let rowCallback = "";
-            if ("{{ $show_anime_list_number }}" == "1") {
-                rowCallback = function(row, data, index) {
-                    var info = $(this).DataTable().page.info();
-                    var pageNo = info.page;
-                    var length = info.length;
-                    var realIndex = pageNo * length + index + 1;
-                    $('td:eq(0)', row).html(realIndex);
-                };
-            }
-            let colReorder = [];
-            if ($(window).width() <= 640) {
-                if ("{{ $show_anime_list_number }}" == "1") {
-                    colReorder = [0, 1, 2, 7, 11, 10, 3, 4, 5, 6, 8, 9, 12];
-                } else {
-                    colReorder = [0, 1, 6, 10, 9, 2, 3, 4, 5, 7, 8, 11];
-                }
-            }
             //We cannot use datatables responsive for this because it injects additional rows which breaks updating our user anime list.
             let urlParams = new URLSearchParams(window.location.search);
             let showAllAnimeQueryParam = urlParams.get('showallanime') === '1';
             let isUserAuthenticatedAndMatching = '{{ Auth::check() && strtolower(Auth::user()->username) === strtolower($username) }}' === '1';
             let showAllAnime = showAllAnimeQueryParam && isUserAuthenticatedAndMatching ? '1' : '0';
-
             let customUrl = new URL('{{ route('user.anime.list.data.v2', ['username' => $username]) }}', window.location.origin);
             // Construct the URL with the showallanime parameter
             if (showAllAnime === '1') {
                 customUrl.searchParams.set('showallanime', '1');
             }
             function initDataTable(scrollWidth) {
-                return $('#userAnimeTable').DataTable({
+                let rowCallback = "";
+                let colReorder = [];
+                let order = [];
+                if ("{{ $show_anime_list_number }}" == "1") {
+                    order = [[8, 'asc'], [7, 'asc'], [1, 'asc']];
+                 } else {
+                    order = [[7, 'asc'], [6, 'asc'], [0, 'asc']];
+                 }
+                if ($(window).width() <= 640) {
+                    if ("{{ $show_anime_list_number }}" == "1") {
+                        colReorder = [0, 1, 2, 7, 11, 10, 3, 4, 5, 6, 9, 8, 12, 13];
+                    } else {
+                        colReorder = [0, 1, 6, 10, 9, 2, 3, 4, 5, 8, 7, 11, 12];
+                    }
+                }
+                let dataTable = $('#userAnimeTable').DataTable({
                     processing: true,
                     serverSide: true,
-                    order: [[7, 'asc'], [6, 'asc'], [1, 'asc']],
+                    order: order,
                     ajax: customUrl.toString(),
                     columns: columns,
                     initComplete: function() {
                         let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
                         $('#userAnimeTable_filter').prepend(resetBtn);
                     },
-                    rowCallback: rowCallback,
                     scrollX: scrollWidth,
                     bScrollCollapse: true,
-                    colReorder: {
-                        order: colReorder
-                    },
                     createdRow: function(row, data, dataIndex) {
                         // Calculate the overall index based on the current page and data index
                         let pageIndex = $('#userAnimeTable').DataTable().page.info().page;
@@ -332,6 +324,15 @@
                         $(row).attr('id', 'row-' + overallIndex);
                     },
                 });
+                // Update index on draw callback so the number in list
+                dataTable.on('draw', function() {
+                    if ("{{ $show_anime_list_number }}" == "1") {
+                        dataTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
+                            this.nodes().to$().find('td:first').html(this.index() + 1);
+                        });
+                    }
+                });
+                return dataTable;
             }
 
             // Initial DataTable initialization
