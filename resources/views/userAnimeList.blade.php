@@ -9,7 +9,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-[1650px] mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-[1700px] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
                 <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 hidden overflow-y-auto">
                     <div class="bg-white dark:bg-gray-700 rounded relative w-96 h-64">
@@ -136,7 +136,17 @@
                                             </td>
                                             @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                 <td class="py-2 px-4 border-b border-gray-200">
-                                                    <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800 desktop-only">
+                                                    <div class="flex items-center desktop-only">
+                                                        <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">
+                                                        <!-- Up Arrow -->
+                                                        <button onclick="swapAndSubmitSortOrder({{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}, 'up')" class="ml-2 text-gray-600 hover:text-gray-800">
+                                                            ⬆️
+                                                        </button>
+                                                        <!-- Down Arrow -->
+                                                        <button onclick="swapAndSubmitSortOrder({{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}, 'down')" class="ml-2 text-gray-600 hover:text-gray-800">
+                                                            ⬇️
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             @endif
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->episodes }}</td>
@@ -215,7 +225,17 @@
                                             </td>
                                             @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                 <td class="py-2 px-4 border-b border-gray-200">
-                                                    <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800 mobile-only">
+                                                    <div class="flex items-center mobile-only">
+                                                        <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">
+                                                        <!-- Up Arrow -->
+                                                        <button onclick="swapAndSubmitSortOrder({{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}, 'up')" class="ml-2 text-gray-600 hover:text-gray-800">
+                                                            ⬆️
+                                                        </button>
+                                                        <!-- Down Arrow -->
+                                                        <button onclick="swapAndSubmitSortOrder({{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}, 'down')" class="ml-2 text-gray-600 hover:text-gray-800">
+                                                            ⬇️
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             @endif
                                             <td class="py-2 px-4 border-b border-gray-200">
@@ -430,5 +450,30 @@
                 closeModal.addEventListener("click", closeModalAction);
             }
         });
+        function swapAndSubmitSortOrder(animeId, direction) {
+            event.preventDefault(); // Prevent default form submission
+            const currentRow = document.getElementById(`desktop-row-${animeId}`);
+            const adjacentRow = direction === 'up' ? currentRow.previousElementSibling : currentRow.nextElementSibling;
+            const currentSortOrderInput = currentRow.querySelector('[name="sort_order[]"]');
+            // If there's an adjacent row with a sort_order input, swap values
+            if (adjacentRow && adjacentRow.querySelector('[name="sort_order[]"]') && adjacentRow.querySelector('[name="sort_order[]"]').value > 0) {
+                const adjacentSortOrderInput = adjacentRow.querySelector('[name="sort_order[]"]');
+                // Parse the sort_order values as integers for proper comparison
+                const currentSortOrderValue = parseInt(currentSortOrderInput.value, 10);
+                const adjacentSortOrderValue = parseInt(adjacentSortOrderInput.value, 10);
+                    // Perform the swap
+                    currentSortOrderInput.value = adjacentSortOrderValue;
+                    adjacentSortOrderInput.value = currentSortOrderValue;
+            } /*else { //Comment this out since we only want to swap if there is an adjacent row, otherwise we end up with a list of two with a sort_order 4 followed by 5, clicking up on sort_order 4 results in both getting 5.
+                // Adjust the sort_order for the current row if there's no adjacent row
+                if (direction === 'up') {
+                    currentSortOrderInput.value = Math.max(1, (parseInt(currentSortOrderInput.value) || 0) + 1);
+                } else { // Assuming 'down' direction should also not decrease below 1
+                    currentSortOrderInput.value = Math.max(1, (parseInt(currentSortOrderInput.value) || 0) - 1);
+                }
+            }*/
+            // Submit the form to update the server
+            currentRow.closest('form').submit();
+        }
     </script>
 </x-app-layout>
