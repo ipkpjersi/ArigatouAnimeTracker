@@ -369,9 +369,6 @@ class AnimeController extends Controller
         ]);
     }
 
-
-
-
     public function userAnimeList(Request $request, $username) {
         $user = User::where('username', $username)->firstOrFail();
         if ($user->is_banned === 1 && (Auth::user() === null || Auth::user()->is_admin !== 1)) abort(404);
