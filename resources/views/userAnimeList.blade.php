@@ -153,7 +153,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->season }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->year }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                <textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 desktop-only" {{ (auth()->user() === null || strtolower(auth()->user()->username) !== strtolower($username)) ? 'readonly' : '' }}>{{ $anime->pivot->notes ?? '' }}</textarea>
+                                                <textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 desktop-only" {{ (auth()->user() === null || strtolower(auth()->user()->username) !== strtolower($username)) ? 'readonly' : '' }}>{{ $anime->notes ?? '' }}</textarea>
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
