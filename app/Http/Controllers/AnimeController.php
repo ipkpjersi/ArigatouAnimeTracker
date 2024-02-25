@@ -369,15 +369,12 @@ class AnimeController extends Controller
         ]);
     }
 
-
-
-
     public function userAnimeList(Request $request, $username) {
         $user = User::where('username', $username)->firstOrFail();
         if ($user->is_banned === 1 && (Auth::user() === null || Auth::user()->is_admin !== 1)) abort(404);
         $showAllAnime = false;
         if ($request->has('showallanime') && $request->input('showallanime') === '1' && Auth::user() !== null && strtolower(Auth::user()->username) === strtolower($user->username)) $showAllAnime = true;
-        $show_anime_list_number = $user->show_anime_list_number;
+        $show_anime_list_number = Auth::user() != null && Auth::user()->show_anime_list_number == 1;
         $watchStatuses = DB::table('watch_status')->get();
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
         $query = $user->anime()
@@ -412,7 +409,7 @@ class AnimeController extends Controller
     {
         $user = User::where('username', $username)->firstOrFail();
         if ($user->is_banned === 1 && (Auth::user() === null || Auth::user()->is_admin !== 1)) abort(404);
-        $show_anime_list_number = $user->show_anime_list_number;
+        $show_anime_list_number = Auth::user() != null && Auth::user()->show_anime_list_number == 1;
         $watchStatuses = WatchStatus::all();
         $watchStatusMap = $watchStatuses->pluck('status', 'id')->toArray();
         $userAnimeCount = $user->anime()
@@ -454,11 +451,21 @@ class AnimeController extends Controller
         if ($user->show_anime_list_publicly === 0 && (Auth::user() === null || strtolower(Auth::user()->username) !== strtolower($user->username))) {
             $query = $query->where('anime_user.display_in_list', '=', Anime::$HIDE_ALL_ANIME_PUBLICLY_ID);
         }
-        $defaultOrder = [
-            ['column' => 7, 'dir' => 'asc'],
-            ['column' => 6, 'dir' => 'asc'],
-            ['column' => 1, 'dir' => 'asc']
-        ];
+        //We need to match the order we have in DataTables frontend.
+        if (Auth::user() != null && Auth::user()->show_anime_list_number == 1) {
+            $defaultOrder = [
+                ['column' => 8, 'dir' => 'asc'],
+                ['column' => 7, 'dir' => 'asc'],
+                ['column' => 1, 'dir' => 'asc']
+            ];
+        } else {
+            $defaultOrder = [
+                ['column' => 7, 'dir' => 'asc'],
+                ['column' => 6, 'dir' => 'asc'],
+                ['column' => 0, 'dir' => 'asc']
+            ];
+        }
+
 
         $orderData = $request->has('order') ? $request->input('order') : [];
         //Check if order count matches.
@@ -636,6 +643,22 @@ class AnimeController extends Controller
             return redirect()->back()->with('message', 'Anime list cleared.');
         } else {
             return redirect()->back()->with('error', 'You do not have permission to clear this anime list.');
+        }
+    }
+
+    public function clearAnimeListSortOrders($username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+
+        // Check if the logged-in user matches the username or is an admin
+        if (auth()->user()->id === $user->id || auth()->user()->is_admin) {
+            // Assuming 'anime' is the name of the relationship and 'anime_user' is the pivot table
+            // Here, we update the 'sort_order' field to null for all anime list entries of the user
+            $user->anime()->updateExistingPivot($user->anime->pluck('id'), ['sort_order' => null]);
+
+            return redirect()->back()->with('message', 'Anime list sort orders cleared.');
+        } else {
+            return redirect()->back()->with('error', 'You do not have permission to clear these sort orders.');
         }
     }
 

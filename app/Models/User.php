@@ -43,7 +43,8 @@ class User extends Authenticatable
         'enable_score_charts_own_profile_when_logged_in',
         'enable_score_charts_own_profile_publicly',
         'enable_score_charts_other_profiles',
-        'show_anime_list_publicly'
+        'show_anime_list_publicly',
+        'show_clear_anime_list_sort_orders_button'
     ];
 
     /**

@@ -9,13 +9,13 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-[1550px] mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-[1700px] mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 hidden overflow-y-auto">
-                    <div class="bg-white dark:bg-gray-700 rounded relative w-96 h-64">
+                    <div class="bg-white dark:bg-gray-700 rounded relative w-128 h-64">
                         <button id="closeModal" class="absolute top-2 right-4 bg-red-500 text-white p-2 pl-4 pr-4 mb-2 rounded">X</button>
                         <div class="p-4 mt-10">
-                            <p>Are you sure you want to delete your anime list?</p>
+                            <p id="clearAnimeText"></p>
                             <div class="flex items-center mt-2">
                               <input type="checkbox" id="confirmCheckbox">
                               <label for="confirmCheckbox" class="ml-2">I understand the consequences</label>
@@ -93,6 +93,14 @@
                                     </button>
                                 </form>
                             @endif
+                            @if (auth()->user()->show_clear_anime_list_sort_orders_button)
+                                <form id="clearSortOrdersForm" class="inline-block" action="{{ route('user.anime.clearSortOrders', ['username' => $username]) }}" method="post">
+                                    @csrf
+                                    <button type="button" id="clearSortOrdersBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
+                                        Delete Anime List Sort Orders
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -112,6 +120,31 @@
                 alert('Error removing anime. Please try again: ' + error);
                 console.log('Error removing anime. Please try again: ' + error);
             });
+        }
+        function swapAndSubmitSortOrder(animeId, direction) {
+            event.preventDefault(); // Prevent default form submission
+            const currentRow = document.getElementById(`row-${animeId}`);
+            const adjacentRow = direction === 'up' ? currentRow.previousElementSibling : currentRow.nextElementSibling;
+            const currentSortOrderInput = currentRow.querySelector('[name="sort_order[]"]');
+            // If there's an adjacent row with a sort_order input, swap values
+            if (adjacentRow && adjacentRow.querySelector('[name="sort_order[]"]') && adjacentRow.querySelector('[name="sort_order[]"]').value > 0) {
+                const adjacentSortOrderInput = adjacentRow.querySelector('[name="sort_order[]"]');
+                // Parse the sort_order values as integers for proper comparison
+                const currentSortOrderValue = parseInt(currentSortOrderInput.value, 10);
+                const adjacentSortOrderValue = parseInt(adjacentSortOrderInput.value, 10);
+                    // Perform the swap
+                    currentSortOrderInput.value = adjacentSortOrderValue;
+                    adjacentSortOrderInput.value = currentSortOrderValue;
+            } /*else { //Comment this out since we only want to swap if there is an adjacent row, otherwise we end up with a list of two with a sort_order 4 followed by 5, clicking up on sort_order 4 results in both getting 5.
+                // Adjust the sort_order for the current row if there's no adjacent row
+                if (direction === 'up') {
+                    currentSortOrderInput.value = Math.max(1, (parseInt(currentSortOrderInput.value) || 0) + 1);
+                } else { // Assuming 'down' direction should also not decrease below 1
+                    currentSortOrderInput.value = Math.max(1, (parseInt(currentSortOrderInput.value) || 0) - 1);
+                }
+            }*/
+            // Submit the form to update the server
+            currentRow.closest('form').submit();
         }
     </script>
     <script type="module">
@@ -186,8 +219,16 @@
                     data: 'sort_order',
                     name: 'sort_order',
                     searchable: false,
-                    render: function(data, type, row) {
-                         return '<input type="number" min="1" name="sort_order[]" value="' + data + '" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">';
+                    render: function(data, type, row, meta) {
+                        return `
+                            <div style="display: flex; align-items: center;">
+                                <input type="number" min="1" name="sort_order[]" value="${data}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">
+                                <!-- Up Arrow -->
+                                <button onclick="swapAndSubmitSortOrder(${meta.row + 1}, 'up')" class="ml-2 text-gray-600 hover:text-gray-800">⬆️</button>
+                                <!-- Down Arrow -->
+                                <button onclick="swapAndSubmitSortOrder(${meta.row + 1}, 'down')" class="ml-2 text-gray-600 hover:text-gray-800">⬇️</button>
+                            </div>
+                        `;
                     }
                 });
             }
@@ -235,68 +276,96 @@
                     }
                 });
             }
-            let rowCallback = "";
-            if ("{{ $show_anime_list_number }}" == "1") {
-                rowCallback = function(row, data, index) {
-                    var info = $(this).DataTable().page.info();
-                    var pageNo = info.page;
-                    var length = info.length;
-                    var realIndex = pageNo * length + index + 1;
-                    $('td:eq(0)', row).html(realIndex);
-                };
-            }
-            let colReorder = [];
-            if ($(window).width() <= 640) {
-                if ("{{ $show_anime_list_number }}" == "1") {
-                    colReorder = [0, 1, 2, 7, 11, 10, 3, 4, 5, 6, 8, 9, 12];
-                } else {
-                    colReorder = [0, 1, 6, 10, 9, 2, 3, 4, 5, 7, 8, 11];
-                }
-            }
             //We cannot use datatables responsive for this because it injects additional rows which breaks updating our user anime list.
             let urlParams = new URLSearchParams(window.location.search);
             let showAllAnimeQueryParam = urlParams.get('showallanime') === '1';
             let isUserAuthenticatedAndMatching = '{{ Auth::check() && strtolower(Auth::user()->username) === strtolower($username) }}' === '1';
             let showAllAnime = showAllAnimeQueryParam && isUserAuthenticatedAndMatching ? '1' : '0';
-
             let customUrl = new URL('{{ route('user.anime.list.data.v2', ['username' => $username]) }}', window.location.origin);
             // Construct the URL with the showallanime parameter
             if (showAllAnime === '1') {
                 customUrl.searchParams.set('showallanime', '1');
             }
-            $('#userAnimeTable').DataTable({
-                processing: true,
-                serverSide: true,
-                order: [[7, 'asc'], [6, 'asc'], [1, 'asc']],
-                ajax: customUrl.toString(),
-                columns: columns,
-                initComplete: function() {
-                    let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
-                    $('#userAnimeTable_filter').prepend(resetBtn);
-                },
-                rowCallback: rowCallback,
-                "sScrollX": "100%",
-                "bScrollCollapse": true,
-                colReorder: {
-                    order: colReorder
-                },
-                createdRow: function(row, data, dataIndex) {
-                    // Calculate the overall index based on the current page and data index
-                    let pageIndex = $('#userAnimeTable').DataTable().page.info().page;
-                    let pageSize = $('#userAnimeTable').DataTable().page.info().length;
-                    let overallIndex = pageIndex * pageSize + dataIndex + 1;
+            function initDataTable(scrollWidth) {
+                let colReorder = [];
+                let order = [];
+                if ("{{ $show_anime_list_number }}" == "1") {
+                    order = [[8, 'asc'], [7, 'asc'], [1, 'asc']];
+                 } else {
+                    order = [[7, 'asc'], [6, 'asc'], [0, 'asc']];
+                 }
+                if ($(window).width() <= 640) {
+                    if ("{{ $show_anime_list_number }}" == "1") {
+                        colReorder = [0, 1, 2, 7, 11, 10, 3, 4, 5, 6, 9, 8, 12, 13];
+                    } else {
+                        colReorder = [0, 1, 6, 10, 9, 2, 3, 4, 5, 8, 7, 11, 12];
+                    }
+                }
+                let dataTable = $('#userAnimeTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    order: order,
+                    ajax: customUrl.toString(),
+                    columns: columns,
+                    initComplete: function() {
+                        let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
+                        $('#userAnimeTable_filter').prepend(resetBtn);
+                    },
+                    scrollX: scrollWidth,
+                    bScrollCollapse: true,
+                    colReorder: {
+                        order: colReorder
+                    },
+                    createdRow: function(row, data, dataIndex) {
+                        // Calculate the overall index based on the current page and data index
+                        let pageIndex = $('#userAnimeTable').DataTable().page.info().page;
+                        let pageSize = $('#userAnimeTable').DataTable().page.info().length;
+                        let overallIndex = pageIndex * pageSize + dataIndex + 1;
 
-                    // Assign the ID to the row
-                    $(row).attr('id', 'row-' + overallIndex);
-                },
+                        // Assign the ID to the row
+                        $(row).attr('id', 'row-' + overallIndex);
+                    },
+                });
+                // Update index on draw callback so the number in list is always shown when enabled
+                dataTable.on('draw', function() {
+                    if ("{{ $show_anime_list_number }}" == "1") {
+                        dataTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
+                            this.nodes().to$().find('td:first').html(this.index() + 1);
+                        });
+                    }
+                });
+                return dataTable;
+            }
+
+            // Initial DataTable initialization
+            let initialScrollWidth = window.innerWidth < 1700 ? "100%" : "";
+            let dataTable = initDataTable(initialScrollWidth);
+
+            // Resize event listener to reinitialize DataTable
+            window.addEventListener("resize", function() {
+                let newScrollWidth = window.innerWidth < 1700 ? "100%" : "";
+
+                // Check if scrollWidth needs to be updated
+                if (newScrollWidth !== initialScrollWidth) {
+                    // Destroy the current DataTable instance
+                    dataTable.destroy();
+
+                    // Reinitialize the DataTable with the new sScrollX value
+                    dataTable = initDataTable(newScrollWidth);
+
+                    // Update the initialScrollWidth for the next resize event
+                    initialScrollWidth = newScrollWidth;
+                }
             });
         });
         document.addEventListener("DOMContentLoaded", function() {
             const clearListBtn = document.getElementById("clearListBtn");
+            const clearSortOrdersBtn = document.getElementById("clearSortOrdersBtn");
             const clearModal = document.getElementById("clearModal");
             const confirmClear = document.getElementById("confirmClear");
             const cancelClear = document.getElementById("cancelClear");
             const clearForm = document.getElementById("clearForm");
+            const clearSortOrdersForm = document.getElementById("clearSortOrdersForm");
             const confirmUsername = document.getElementById("confirmUsername");
             const confirmCheckbox = document.getElementById("confirmCheckbox");
             const errorText = document.getElementById("errorText");
@@ -312,8 +381,43 @@
             if (clearListBtn) {
                 clearListBtn.addEventListener("click", function(event) {
                     event.preventDefault();
+                    document.getElementById("clearAnimeText").innerText = "Are you sure you want to delete your anime list?";
                     document.body.style.overflow = 'hidden';
                     clearModal.classList.remove("hidden");
+                    confirmClear.onclick = function() {
+                        if (!confirmCheckbox.checked) {
+                            showError("Please check the confirmation box.");
+                            return;
+                        }
+                        if (confirmUsername.value !== username) {
+                            showError("Username does not match.");
+                            return;
+                        }
+                        // Submit the clearSortOrdersForm instead of clearForm
+                        clearForm.submit();
+                    }
+                    firstFocusableElement.focus(); // Set focus on the first focusable element
+                });
+            }
+
+            if (clearSortOrdersBtn) {
+                clearSortOrdersBtn.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    document.getElementById("clearAnimeText").innerText = "Are you sure you want to delete your anime list sort orders?";
+                    document.body.style.overflow = 'hidden';
+                    clearModal.classList.remove("hidden");
+                    confirmClear.onclick = function() {
+                        if (!confirmCheckbox.checked) {
+                            showError("Please check the confirmation box.");
+                            return;
+                        }
+                        if (confirmUsername.value !== username) {
+                            showError("Username does not match.");
+                            return;
+                        }
+                        // Submit the clearSortOrdersForm instead of clearForm
+                        clearSortOrdersForm.submit();
+                    }
                     firstFocusableElement.focus(); // Set focus on the first focusable element
                 });
             }
@@ -384,6 +488,7 @@
                     errorText.classList.add("hidden");
                 }, 3000);
             }
+
             if (closeModal) {
                 closeModal.addEventListener("click", closeModalAction);
             }
