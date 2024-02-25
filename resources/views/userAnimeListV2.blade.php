@@ -324,7 +324,7 @@
                         $(row).attr('id', 'row-' + overallIndex);
                     },
                 });
-                // Update index on draw callback so the number in list
+                // Update index on draw callback so the number in list is always shown when enabled
                 dataTable.on('draw', function() {
                     if ("{{ $show_anime_list_number }}" == "1") {
                         dataTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
