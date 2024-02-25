@@ -152,7 +152,26 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
-            <x-input-error class="mt-2" :messages="$errors->get('show_anime_list_number')"/>
+            <x-input-error class="mt-2" :messages="$errors->get('show_clear_anime_list_button')"/>
+
+            <!-- Show Delete Anime List Sort Orders Button  -->
+            <x-input-label class="mt-4" for="show_clear_sort_orders_button"
+                           :value="__('Show Delete Anime List Sort Orders Button')"/>
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_clear_anime_list_sort_orders_button" type="radio"
+                           name="show_clear_anime_list_sort_orders_button" value="1" class="form-radio"
+                           @if (old('show_clear_anime_list_sort_orders_button', $user->show_clear_anime_list_sort_orders_button) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_clear_anime_list_sort_orders_button" type="radio"
+                           name="show_clear_anime_list_sort_orders_button" value="0" class="form-radio"
+                           @if (old('show_clear_anime_list_sort_orders_button', $user->show_clear_anime_list_sort_orders_button) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_clear_anime_list_sort_orders_button')"/>
 
             <!-- Display Anime Cards instead of List on Categories pages -->
             <x-input-label class="mt-4" for="display_anime_cards"
@@ -169,7 +188,7 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
-            <x-input-error class="mt-2" :messages="$errors->get('show_anime_list_number')"/>
+            <x-input-error class="mt-2" :messages="$errors->get('display_anime_cards')"/>
 
             <!-- Enable Friends System -->
             <x-input-label class="mt-4" for="enable_friends_system" :value="__('Enable Friends System')"/>
@@ -299,6 +318,7 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
+            <x-input-error class="mt-2" :messages="$errors->get('enable_reviews_system')"/>
 
             <!-- Show Own Reviews When Logged In -->
             <x-input-label class="mt-4" for="show_reviews_when_logged_in"
@@ -317,6 +337,7 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_reviews_when_logged_in')"/>
 
             <!-- Show Own Reviews Publicly -->
             <x-input-label class="mt-4" for="show_reviews_publicly" :value="__('Show Own Reviews Publicly')"/>
@@ -334,6 +355,7 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_reviews_publicly')"/>
 
             <!-- Show Others' Reviews -->
             <x-input-label class="mt-4" for="show_others_reviews" :value="__('Show Others\' Reviews')"/>
@@ -349,6 +371,7 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_others_reviews')"/>
 
             <!-- Show Reviews in Navigation Dropdown -->
             <x-input-label class="mt-4" for="show_reviews_in_nav_dropdown"
@@ -367,6 +390,7 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_reviews_in_nav_dropdown')"/>
 
             <!-- Enable Score Charts System -->
             <x-input-label class="mt-4" for="enable_score_charts_system" :value="__('Enable Score Charts System')"/>
@@ -384,6 +408,7 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
+            <x-input-error class="mt-2" :messages="$errors->get('enable_score_charts_system')"/>
 
             <!-- Enable Score Charts on Own Profile When Logged In -->
             <x-input-label class="mt-4" for="enable_score_charts_own_profile_when_logged_in"
@@ -402,6 +427,7 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
+            <x-input-error class="mt-2" :messages="$errors->get('enable_score_charts_own_profile_when_logged_in')"/>
 
             <!-- Enable Score Charts on Own Profile Publicly -->
             <x-input-label class="mt-4" for="enable_score_charts_own_profile_publicly"
@@ -420,6 +446,7 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
+            <x-input-error class="mt-2" :messages="$errors->get('enable_score_charts_own_profile_publicly')"/>
 
             <!-- Enable Score Charts on Other Profiles -->
             <x-input-label class="mt-4" for="enable_score_charts_other_profiles"
@@ -438,24 +465,7 @@
                     <span class="ml-2">No</span>
                 </label>
             </div>
-
-            <!-- Show Delete Anime List Sort Orders Button  -->
-            <x-input-label class="mt-4" for="show_clear_sort_orders_button"
-                           :value="__('Show Delete Anime List Sort Orders Button')"/>
-            <div class="mt-1 text-gray-800 dark:text-gray-200">
-                <label class="inline-flex items-center">
-                    <input id="show_clear_anime_list_sort_orders_button" type="radio"
-                           name="show_clear_anime_list_sort_orders_button" value="1" class="form-radio"
-                           @if (old('show_clear_anime_list_sort_orders_button', $user->show_clear_anime_list_sort_orders_button) === 1) checked @endif>
-                    <span class="ml-2">Yes</span>
-                </label>
-                <label class="inline-flex items-center ml-6">
-                    <input id="show_clear_anime_list_sort_orders_button" type="radio"
-                           name="show_clear_anime_list_sort_orders_button" value="0" class="form-radio"
-                           @if (old('show_clear_anime_list_sort_orders_button', $user->show_clear_anime_list_sort_orders_button) !== 1) checked @endif>
-                    <span class="ml-2">No</span>
-                </label>
-            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('enable_score_charts_other_profiles')"/>
 
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
