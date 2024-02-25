@@ -287,7 +287,6 @@
                 customUrl.searchParams.set('showallanime', '1');
             }
             function initDataTable(scrollWidth) {
-                let rowCallback = "";
                 let colReorder = [];
                 let order = [];
                 if ("{{ $show_anime_list_number }}" == "1") {
