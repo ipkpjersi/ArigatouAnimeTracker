@@ -305,7 +305,11 @@
             if (showAllAnime === '1') {
                 customUrl.searchParams.set('showallanime', '1');
             }
-            $('#userAnimeTable').DataTable({
+            let scrollWidth = "";
+            if (window && window.innerWidth && window.innerWidth < 992) {
+                scrollWidth = "100%";
+            }
+            let dataTable = $('#userAnimeTable').DataTable({
                 processing: true,
                 serverSide: true,
                 order: [[7, 'asc'], [6, 'asc'], [1, 'asc']],
@@ -316,7 +320,7 @@
                     $('#userAnimeTable_filter').prepend(resetBtn);
                 },
                 rowCallback: rowCallback,
-                "sScrollX": "100%",
+                "sScrollX": scrollWidth,
                 "bScrollCollapse": true,
                 colReorder: {
                     order: colReorder
