@@ -13,6 +13,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <p>Two factor authentication (2FA) strengthens access security by requiring two methods (also referred to as factors) to verify your identity. Two factor authentication protects against phishing, social engineering and password brute force attacks and secures your logins from attackers exploiting weak or stolen credentials.</p>
+                    <x-auth-validation-errors class="mb-4" :errors="$errors" />
                     @if (session('error'))
                         <div class="mb-4 text-red-600">
                             {{ session('error') }}
