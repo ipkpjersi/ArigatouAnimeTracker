@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AnimeController;
+use App\Http\Controllers\PasswordSecurityController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -25,31 +26,38 @@ Route::get('/', function () {
     return view('welcome');
 })->name("welcome");
 
-Route::get('/users/', [UserController::class, 'list'])->name("users.list");
+Route::get('/users/', [UserController::class, 'list'])->name("users.list")->middleware('2fa');
 
-Route::get('/users/getUserData', [UserController::class, 'getUserData'])->name('users.data');
+Route::get('/users/getUserData', [UserController::class, 'getUserData'])->name('users.data')->middleware('2fa');
 
-Route::get('/users/{username}', [UserController::class, 'detail'])->name("users.detail");
+Route::get('/users/{username}', [UserController::class, 'detail'])->name("users.detail")->middleware('2fa');
 
-Route::get('/anime/', [AnimeController::class, 'list'])->name("anime.list");
+Route::get('/anime/', [AnimeController::class, 'list'])->name("anime.list")->middleware('2fa');
 
-Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->name("anime.data");
+Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->name("anime.data")->middleware('2fa');
 
-Route::get('/anime/{id}/{title?}', [AnimeController::class, 'detail'])->name('anime.detail');
+Route::get('/anime/{id}/{title?}', [AnimeController::class, 'detail'])->name('anime.detail')->middleware('2fa');
 
-Route::get('/animelist/{username}', [AnimeController::class, 'userAnimeList'])->name('user.anime.list');
+Route::get('/animelist/{username}', [AnimeController::class, 'userAnimeList'])->name('user.anime.list')->middleware('2fa');
 
-Route::get('/animelist-v2/{username}',  [AnimeController::class, 'userAnimeListV2'])->name('user.anime.list.v2');
-Route::get('/animelist-v2/data/{username}', [AnimeController::class, 'getUserAnimeDataV2'])->name('user.anime.list.data.v2');
+Route::get('/animelist-v2/{username}',  [AnimeController::class, 'userAnimeListV2'])->name('user.anime.list.v2')->middleware('2fa');
+Route::get('/animelist-v2/data/{username}', [AnimeController::class, 'getUserAnimeDataV2'])->name('user.anime.list.data.v2')->middleware('2fa');
 
-Route::get('/top-anime', [AnimeController::class, 'topAnime'])->name('anime.top');
+Route::get('/top-anime', [AnimeController::class, 'topAnime'])->name('anime.top')->middleware('2fa');
 
-Route::get('/categories', [AnimeController::class, 'categories'])->name('anime.categories');
+Route::get('/categories', [AnimeController::class, 'categories'])->name('anime.categories')->middleware('2fa');
 
-Route::get('/category/{category}/{view?}', [AnimeController::class, 'category'])->name('anime.category');
+Route::get('/category/{category}/{view?}', [AnimeController::class, 'category'])->name('anime.category')->middleware('2fa');
 
 //Protected routes
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', '2fa')->group(function () {
+    Route::get('/2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');
+    Route::post('/generate2faSecret', [PasswordSecurityController::class, 'generate2faSecret'])->name('generate2faSecret');
+    Route::post('/2fa', [PasswordSecurityController::class, 'enable2fa'])->name('enable2fa');
+    Route::post('/disable2fa', [PasswordSecurityController::class, 'disable2fa'])->name('disable2fa');
+    Route::match(['get', 'post'], '/2faVerify', function () {
+        return redirect(str_contains(URL()->previous(), '2faVerify') ? '/' : URL()->previous());
+    })->name('2faVerify')->middleware('2fa');
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
