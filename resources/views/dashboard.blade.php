@@ -18,15 +18,4 @@
             </div>
         </div>
     </div>
-    <script type="module">
-        $(document).ready(function () {
-        $('#myTable').DataTable({
-            responsive: true,
-            columnDefs: [
-                { responsivePriority: 1, targets: 0 }, //Highest priority to first column
-                { responsivePriority: 2, targets: 1 }, //Next priority to second column
-            ]
-        });
-    });
-    </script>
 </x-app-layout>

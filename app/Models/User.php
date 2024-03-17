@@ -167,4 +167,9 @@ class User extends Authenticatable
         $friend->pivot->show_friend_publicly = !$friend->pivot->show_friend_publicly;
         $friend->pivot->save();
     }
+
+    public function passwordSecurity()
+    {
+        return $this->hasOne(\App\Models\PasswordSecurity::class);
+    }
 }
