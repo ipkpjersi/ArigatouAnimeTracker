@@ -1,6 +1,6 @@
 <?php
 return [
-    "recent_registrations_limit_daily" => env("RECENT_REGISTRATIONS_LIMIT_DAILY", ""),
+    "recent_registrations_limit_daily" => env("RECENT_REGISTRATIONS_LIMIT_DAILY", 2),
     "registrations_enabled" => env("REGISTRATIONS_ENABLED", "true"),
     "mal_client_id" => env("MAL_CLIENT_ID", ""),
     "additional_data_service_sleep_time" => env("ADDITIONAL_DATA_SERVICE_SLEEP_TIME", 5),
