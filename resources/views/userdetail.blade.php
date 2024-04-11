@@ -203,19 +203,19 @@
                                 <ul>
                                     @foreach ($stats['animeStatusCounts'] as $status => $count)
                                         <li>
-                                            <span class="inline-block rounded-full h-4 w-4 mr-2"
-                                                  style="
-                                                    background-color: {{ match($status) {
-                                                        'WATCHING' => '#3A8E40',
-                                                        'COMPLETED' => '#1D77C3',
-                                                        'ON-HOLD' => '#DAA005',
-                                                        'DROPPED' => '#A93226',
-                                                        'PLAN-TO-WATCH' => '#7D1F8F',
-                                                        default => '#000'
-                                                    } }};
-                                                  ">
-                                            </span>
-                                            {{ $status }}: {{ $count }}
+                                            <a href="{{ route('user.anime.list', ['username' => $user->username, 'status' => strtolower($status)]) }}" class="flex items-center">
+                                                <span class="inline-block rounded-full h-4 w-4 mr-2"
+                                                      style="background-color: {{ match($status) {
+                                                          'WATCHING' => '#3A8E40',
+                                                          'COMPLETED' => '#1D77C3',
+                                                          'ON-HOLD' => '#DAA005',
+                                                          'DROPPED' => '#A93226',
+                                                          'PLAN-TO-WATCH' => '#7D1F8F',
+                                                          default => '#000'
+                                                      } }};">
+                                                </span>
+                                                {{ $status }}: {{ $count }}
+                                            </a>
                                         </li>
                                     @endforeach
                                 </ul>
