@@ -26,8 +26,8 @@
                         <!-- Friends Section -->
                         @if ($canViewFriends)
                             <div class="w-full md:w-3/5 mt-4">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-bold">Friends</h4>
+                                <div class="flex justify-start md:justify-between items-center mb-4">
+                                    <h4 class="font-bold mr-4 md:mr-0">Friends</h4>
                                     <a href="/users/{{ $user->username }}?view=friends" class="text-clickable-link-blue">All ({{ count($user->friends) }})</a>
                                 </div>
                                 <div class="flex flex-wrap mb-4">
