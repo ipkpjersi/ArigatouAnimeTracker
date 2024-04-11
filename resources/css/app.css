@@ -91,3 +91,10 @@
   max-height: 90px;
   overflow-y: auto;
 }
+
+.text-clickable-link-blue {
+    color: #abc4ed !important;
+}
+.text-clickable-link-blue:hover, .text-clickable-link:active {
+    color: rgb(59 130 246 / 1) !important;
+}
