@@ -27,7 +27,7 @@
                         @if ($canViewFriends)
                             <div class="w-full md:w-3/5 mt-4">
                                 <div class="flex justify-start md:justify-between items-center mb-4">
-                                    <h4 class="font-bold mr-4 md:mr-0">Friends</h4>
+                                    <h4 class="font-bold mr-9 md:mr-0">Friends</h4>
                                     <a href="/users/{{ $user->username }}?view=friends" class="text-clickable-link-blue">All ({{ count($user->friends) }})</a>
                                 </div>
                                 <div class="flex flex-wrap mb-4">
@@ -220,7 +220,9 @@
                                     @endforeach
                                 </ul>
                                 @if ($enableScoreCharts && $showChart)
-                                    <canvas id="userScoreChart" width="400" height="400" class="mt-4"></canvas>
+                                    <div class="max-w-[220px] max-h-[220px] mb-2 lg:mb-0">
+                                        <canvas id="userScoreChart" width="220" height="220"></canvas>
+                                    </div>
                                 @endif
                             </div>
 
