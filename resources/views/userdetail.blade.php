@@ -26,9 +26,9 @@
                         <!-- Friends Section -->
                         @if ($canViewFriends)
                             <div class="w-full md:w-3/5 mt-4">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-bold">Friends</h4>
-                                    <a href="/users/{{ $user->username }}?view=friends" class="text-blue-500 hover:text-blue-700">All ({{ count($user->friends) }})</a>
+                                <div class="flex justify-start md:justify-between items-center mb-4">
+                                    <h4 class="font-bold mr-9 md:mr-0">Friends</h4>
+                                    <a href="/users/{{ $user->username }}?view=friends" class="text-clickable-link-blue">All ({{ count($user->friends) }})</a>
                                 </div>
                                 <div class="flex flex-wrap mb-4">
                                     @foreach ($friends as $friend)
@@ -72,7 +72,7 @@
                         @endif
                         @if ($enableReviewsSystem)
                             <div class="flex justify-between mb-4">
-                                <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}" class="text-blue-500 hover:text-blue-700">All Reviews ({{ $totalReviewsCount }})</a>
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}" class="text-clickable-link-blue">All Reviews ({{ $totalReviewsCount }})</a>
                             </div>
                         @endif
                     </div>
@@ -203,24 +203,26 @@
                                 <ul>
                                     @foreach ($stats['animeStatusCounts'] as $status => $count)
                                         <li>
-                                            <span class="inline-block rounded-full h-4 w-4 mr-2"
-                                                  style="
-                                                    background-color: {{ match($status) {
-                                                        'WATCHING' => '#3A8E40',
-                                                        'COMPLETED' => '#1D77C3',
-                                                        'ON-HOLD' => '#DAA005',
-                                                        'DROPPED' => '#A93226',
-                                                        'PLAN-TO-WATCH' => '#7D1F8F',
-                                                        default => '#000'
-                                                    } }};
-                                                  ">
-                                            </span>
-                                            {{ $status }}: {{ $count }}
+                                            <a href="{{ route('user.anime.list', ['username' => $user->username, 'status' => strtolower($status)]) }}" class="flex items-center text-clickable-link-blue">
+                                                <span class="inline-block rounded-full h-4 w-4 mr-2"
+                                                      style="background-color: {{ match($status) {
+                                                          'WATCHING' => '#3A8E40',
+                                                          'COMPLETED' => '#1D77C3',
+                                                          'ON-HOLD' => '#DAA005',
+                                                          'DROPPED' => '#A93226',
+                                                          'PLAN-TO-WATCH' => '#7D1F8F',
+                                                          default => '#000'
+                                                      } }};">
+                                                </span>
+                                                {{ $status }}: {{ $count }}
+                                            </a>
                                         </li>
                                     @endforeach
                                 </ul>
                                 @if ($enableScoreCharts && $showChart)
-                                    <canvas id="userScoreChart" width="400" height="400" class="mt-4"></canvas>
+                                    <div class="max-w-[220px] max-h-[220px] mb-2 lg:mb-0">
+                                        <canvas id="userScoreChart" width="220" height="220"></canvas>
+                                    </div>
                                 @endif
                             </div>
 

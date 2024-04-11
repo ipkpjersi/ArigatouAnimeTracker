@@ -400,6 +400,13 @@ class AnimeController extends Controller
         if ($user->show_anime_list_publicly === 0 && (Auth::user() === null || strtolower(Auth::user()->username) !== strtolower($user->username))) {
             $query = $query->where('anime_user.display_in_list', '=', Anime::$HIDE_ALL_ANIME_PUBLICLY_ID);
         }
+        if ($request->has('status')) {
+            $status = $request->input('status');
+            $watchStatusId = array_search(strtoupper($status), $watchStatusMap);
+            if ($watchStatusId !== false) {
+                $query = $query->where('anime_user.watch_status_id', $watchStatusId);
+            }
+        }
         $userAnime= $query->paginate($user->anime_list_pagination_size ?? 15)->withQueryString();
 
         return view('userAnimeList', ['userAnime' => $userAnime, 'username' => $username, 'show_anime_list_number' => $show_anime_list_number, 'watchStatuses' => $watchStatuses, 'watchStatusMap' => $watchStatusMap]);
@@ -484,7 +491,13 @@ class AnimeController extends Controller
         if ($sortingMatchesDefault) {
             $query->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC');
         }
-
+        if ($request->has('status')) {
+            $status = $request->input('status');
+            $watchStatusId = array_search(strtoupper($status), WatchStatus::all()->pluck('status', 'id')->toArray());
+            if ($watchStatusId !== false) {
+                $query = $query->where('anime_user.watch_status_id', $watchStatusId);
+            }
+        }
         return DataTables::of($query)
             ->addColumn('anime_id', function ($row) {
                 return $row->id;

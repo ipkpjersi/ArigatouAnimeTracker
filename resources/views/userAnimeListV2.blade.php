@@ -70,6 +70,9 @@
                     </form>
                     @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                         <form action="{{ route('user.anime.list.v2', ['username' => $username] + request()->query()) }}" method="GET" class="mb-3 mt-4">
+                            @foreach(request()->except('showallanime') as $key => $value)
+                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @endforeach
                             <input type="checkbox" name="showallanime" value="1" onchange="this.form.submit()" {{ request('showallanime') ? 'checked' : '' }}> Show All Anime
                         </form>
                     @endif
@@ -285,6 +288,11 @@
             // Construct the URL with the showallanime parameter
             if (showAllAnime === '1') {
                 customUrl.searchParams.set('showallanime', '1');
+            }
+            // Check if the status parameter is set and add it to the URL
+            let statusParam = urlParams.get('status');
+            if (statusParam !== null && statusParam !== "") {
+                customUrl.searchParams.set('status', statusParam);
             }
             function initDataTable(scrollWidth) {
                 let colReorder = [];
