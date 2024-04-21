@@ -39,11 +39,12 @@
 1. Clone the repository to your local machine.
 2. Install the PHP dependencies using Composer: `composer install`.
 3. Install the JavaScript dependencies using npm: `npm install`.
-4. Copy the `.env.example` file to a new file named `.env` and configure your database credentials.
-5. Generate an application key: `php artisan key:generate`.
-6. Run the database migrations: `php artisan migrate`.
-7. Start the development server: `php artisan serve`.
-8. Optionally, there are several commands for managing the project that you can find by typing `php artisan app`
+4. Run the JavaScript build process using npm: `npm run build` or run the JavaScript build server with npm: `npm run dev`.
+5. Copy the `.env.example` file to a new file named `.env` and configure your database credentials.
+6. Generate an application key: `php artisan key:generate`.
+7. Run the database migrations: `php artisan migrate`.
+8. Start the development server: `php artisan serve`.
+9. Optionally, there are several commands for managing the project that you can find by typing `php artisan app`
 
 ## 💡 Features
 - Keep track of your favourite anime and manage your watchlist.
