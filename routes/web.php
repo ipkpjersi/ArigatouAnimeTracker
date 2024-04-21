@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 //Unprotected routes
 Route::get('/', function () {
-    if (Auth::user() != null) {
+    if (Auth::user() !== null) {
         return redirect('home');
     }
     return view('welcome');
