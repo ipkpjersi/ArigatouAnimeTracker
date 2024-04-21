@@ -4,7 +4,7 @@
     </x-slot>
 
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Invite Codes') }}
         </h2>
     </x-slot>
@@ -22,7 +22,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="mb-4">
-                        <button id="generateCodes" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Generate New Codes</button>
+                        <button id="generateCodes" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 mb-2">Generate New Codes</button>
                         <button id="revokeCodes" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Revoke Unused Codes</button>
                     </div>
                     <table id="inviteCodesTable" class="display">
