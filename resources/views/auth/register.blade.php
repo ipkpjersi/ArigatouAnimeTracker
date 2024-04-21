@@ -48,7 +48,7 @@
 
         @if ($inviteOnlyRegistration)
             <!-- Invite Code -->
-            <div>
+            <div class="mt-4">
                 <x-input-label for="invite_code" :value="__('Invite Code')" />
                 <x-text-input id="invite_code" class="block mt-1 w-full" type="text" name="invite_code" :value="old('invite_code')" required autofocus autocomplete="invite_code" />
                 <x-input-error :messages="$errors->get('invite_code')" class="mt-2" />
