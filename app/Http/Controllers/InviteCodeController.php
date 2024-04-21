@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InviteCode;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 
 class InviteCodeController extends Controller
@@ -51,6 +52,9 @@ class InviteCodeController extends Controller
         $query = InviteCode::query();
 
         return DataTables::of($query)
+            ->editColumn('created_at', function($user) {
+                return Carbon::parse($user->created_at)->format('M d, Y');
+            })
             ->make(true);
     }
 }
