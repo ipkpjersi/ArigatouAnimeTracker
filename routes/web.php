@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AnimeController;
+use App\Http\Controllers\InviteCodeController;
 use App\Http\Controllers\PasswordSecurityController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -106,6 +107,11 @@ Route::middleware('auth', '2fa')->group(function () {
     Route::delete('/anime/{id}/delete-review', [AnimeController::class, 'deleteReview'])->name('anime.deleteReview');
 
     Route::post('/toggle-friend-publicly/{id}', [UserController::class, 'toggleFriendPublicly'])->name('toggle-friend-publicly');
+
+    Route::post('/invite-codes/generate-invite-codes', [InviteCodeController::class, 'generateInviteCodes'])->name('generate-invite-codes');
+    Route::post('/invite-codes/revoke-unused-invite-codes', [InviteCodeController::class, 'revokeUnusedInviteCodes'])->name('revoke-unused-invite-codes');
+    Route::get('/invite-codes/list', [InviteCodeController::class, 'index'])->name('invite-codes-index');
+    Route::get('/invite-codes/data', [InviteCodeController::class, 'data'])->name('invite-codes-data');
 
 });
 

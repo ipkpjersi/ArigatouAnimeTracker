@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\InviteCode;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
@@ -21,7 +22,8 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        $inviteOnlyRegistration = config("global.invite_only_registration_enabled");
+        return view('auth.register', compact('inviteOnlyRegistration'));
     }
 
     /**
@@ -34,7 +36,7 @@ class RegisteredUserController extends Controller
         if (!config("global.registrations_enabled")) {
             return redirect()->route('register')->with('error', 'Registrations are currently closed. Please try again later.');
         }
-        
+
         $ipAddress = get_client_ip_address();
 
         $recentRegistrations = User::where('registration_ip', $ipAddress)
@@ -46,11 +48,18 @@ class RegisteredUserController extends Controller
             return redirect()->route('register')->with('error', 'Too many registration attempts. Please try again later.');
         }
 
-        $request->validate([
-            'username' => ['required', 'string', 'max:255', 'unique:'.User::class],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+        $rules = [
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        ];
+
+        $inviteOnlyRegistration = config("global.invite_only_registration_enabled");
+        if ($inviteOnlyRegistration) {
+            $rules['invite_code'] = 'required|exists:invite_codes,code,used,false';
+        }
+
+        $request->validate($rules);
 
         $user = User::create([
             'username' => $request->username,
@@ -58,6 +67,15 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'registration_ip' => $ipAddress,
         ]);
+
+        if ($inviteOnlyRegistration && $user) {
+            $inviteCode = InviteCode::where('code', $request->input('invite_code'))->first();
+            if ($inviteCode) {
+                $inviteCode->used = true;
+                $inviteCode->username = $request->username;
+                $inviteCode->save();
+            }
+        }
 
         event(new Registered($user));
 

@@ -91,6 +91,11 @@
                             <x-dropdown-link :href="route('profile.edit')">
                                 {{ __('Profile Settings') }}
                             </x-dropdown-link>
+                            @if(Auth::user()->isAdmin())
+                                <x-dropdown-link :href="route('invite-codes-index')">
+                                    {{ __('Invite Codes') }}
+                                </x-dropdown-link>
+                            @endif
 
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">
@@ -192,6 +197,11 @@
                     <x-responsive-nav-link :href="route('profile.edit')">
                         {{ __('Profile Settings') }}
                     </x-responsive-nav-link>
+                    @if(Auth::user()->isAdmin())
+                        <x-responsive-nav-link :href="route('invite-codes-index')">
+                            {{ __('Invite Codes') }}
+                        </x-responsive-nav-link>
+                    @endif
 
                     <!-- Authentication -->
                     <form method="POST" action="{{ route('logout') }}">
