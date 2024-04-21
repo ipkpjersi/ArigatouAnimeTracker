@@ -17,9 +17,9 @@ class InviteCodeController extends Controller
         }
 
         // Run artisan command to generate invite codes
-        Artisan::call('app:generate-invite-codes');
+        $count = Artisan::call('app:generate-invite-codes');
 
-        return response()->json(['message' => 'Invite codes generated successfully']);
+        return response()->json(['message' => "$count invite codes generated successfully"]);
     }
 
     public function revokeUnusedInviteCodes(Request $request)
@@ -30,13 +30,16 @@ class InviteCodeController extends Controller
         }
 
         // Run artisan command to revoke unused invite codes
-        Artisan::call('app:revoke-unused-invite-codes');
+        $count = Artisan::call('app:revoke-unused-invite-codes');
 
-        return response()->json(['message' => 'Unused invite codes revoked successfully']);
+        return response()->json(['message' => "$count unused invite codes revoked successfully"]);
     }
 
     public function index()
     {
+        if (!auth()->user() || !auth()->user()->isAdmin()) {
+            abort(404);
+        }
         return view('invitecodeslist');
     }
 

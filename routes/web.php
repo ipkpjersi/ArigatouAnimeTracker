@@ -110,7 +110,7 @@ Route::middleware('auth', '2fa')->group(function () {
 
     Route::post('/invite-codes/generate-invite-codes', [InviteCodeController::class, 'generateInviteCodes'])->name('generate-invite-codes');
     Route::post('/invite-codes/revoke-unused-invite-codes', [InviteCodeController::class, 'revokeUnusedInviteCodes'])->name('revoke-unused-invite-codes');
-    Route::get('/invite-codes/list', [InviteCodeController::class, 'index'])->name('invite-codes-index');
+    Route::get('/invite-codes', [InviteCodeController::class, 'index'])->name('invite-codes-index');
     Route::get('/invite-codes/data', [InviteCodeController::class, 'data'])->name('invite-codes-data');
 
 });

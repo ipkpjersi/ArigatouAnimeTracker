@@ -31,6 +31,6 @@ class RevokeUnusedInviteCodes extends Command
         $deletedCount = InviteCode::where('used', false)->delete();
 
         $this->info("Successfully deleted {$deletedCount} unused invite codes.");
-        return 0;
+        return $deletedCount;
     }
 }

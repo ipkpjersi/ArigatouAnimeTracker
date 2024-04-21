@@ -69,7 +69,7 @@
                 axios.post('{{ route("generate-invite-codes") }}', {
                     _token: '{{ csrf_token() }}'
                 }).then(function(response) {
-                    showModal('Invite codes generated successfully');
+                    showModal(response.data.message);
                     table.ajax.reload();
                 }).catch(function(error) {
                     showModal('Error: ' + error.response.data.message);
@@ -80,7 +80,7 @@
                 axios.post('{{ route("revoke-unused-invite-codes") }}', {
                     _token: '{{ csrf_token() }}'
                 }).then(function(response) {
-                    showModal('Unused invite codes revoked successfully');
+                    showModal(response.data.message);
                     table.ajax.reload();
                 }).catch(function(error) {
                     showModal('Error: ' + error.response.data.message);
