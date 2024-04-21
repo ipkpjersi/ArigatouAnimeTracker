@@ -6,7 +6,7 @@
     <x-auth-session-status class="mb-4" :status="session('status')" />
     <div class="flex justify-center flex-col items-center mb-6">
         <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-        <h2 class="text-xl text-gray-700 dark:text-gray-300">Arigatou Anime Tracker</h2>
+        <h2 class="text-xl text-gray-700 dark:text-gray-300">{{ config('app.name', 'Laravel') }}</h2>
     </div>
 
     <!-- Custom Error Message -->
