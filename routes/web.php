@@ -27,6 +27,14 @@ Route::get('/', function () {
     return view('welcome');
 })->name("welcome");
 
+Route::get('/home', function () {
+    return redirect('dashboard');
+})->name('home');
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', '2fa'])->name('dashboard');
+
 Route::get('/users/', [UserController::class, 'list'])->name("users.list")->middleware('2fa');
 
 Route::get('/users/getUserData', [UserController::class, 'getUserData'])->name('users.data')->middleware('2fa');
@@ -59,13 +67,6 @@ Route::middleware('auth', '2fa')->group(function () {
     Route::match(['get', 'post'], '/2faVerify', function () {
         return redirect(str_contains(URL()->previous(), '2faVerify') ? '/' : URL()->previous());
     })->name('2faVerify')->middleware('2fa');
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
-    Route::get('/home', function () {
-        return view('dashboard');
-    })->name('home');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
