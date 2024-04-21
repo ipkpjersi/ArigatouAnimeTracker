@@ -4,7 +4,7 @@
     </x-slot>
     <div class="flex justify-center flex-col items-center mb-6">
         <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-        <h2 class="text-xl text-gray-700 dark:text-gray-300">Arigatou Anime Tracker</h2>
+        <h2 class="text-xl text-gray-700 dark:text-gray-300">{{ config('app.name', 'Laravel') }}</h2>
     </div>
     <form method="POST" action="{{ route('register') }}">
         @csrf
@@ -45,6 +45,15 @@
 
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
+
+        @if ($inviteOnlyRegistration)
+            <!-- Invite Code -->
+            <div class="mt-4">
+                <x-input-label for="invite_code" :value="__('Invite Code')" />
+                <x-text-input id="invite_code" class="block mt-1 w-full" type="text" name="invite_code" :value="old('invite_code')" required autofocus autocomplete="invite_code" />
+                <x-input-error :messages="$errors->get('invite_code')" class="mt-2" />
+            </div>
+        @endif
 
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">

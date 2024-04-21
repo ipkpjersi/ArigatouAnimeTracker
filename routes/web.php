@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AnimeController;
+use App\Http\Controllers\InviteCodeController;
 use App\Http\Controllers\PasswordSecurityController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -20,11 +21,19 @@ use Illuminate\Support\Facades\Route;
 
 //Unprotected routes
 Route::get('/', function () {
-    if (Auth::user() != null) {
+    if (Auth::user() !== null) {
         return redirect('home');
     }
     return view('welcome');
 })->name("welcome");
+
+Route::get('/home', function () {
+    return redirect('dashboard');
+})->name('home');
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', '2fa'])->name('dashboard');
 
 Route::get('/users/', [UserController::class, 'list'])->name("users.list")->middleware('2fa');
 
@@ -58,13 +67,6 @@ Route::middleware('auth', '2fa')->group(function () {
     Route::match(['get', 'post'], '/2faVerify', function () {
         return redirect(str_contains(URL()->previous(), '2faVerify') ? '/' : URL()->previous());
     })->name('2faVerify')->middleware('2fa');
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
-    Route::get('/home', function () {
-        return view('dashboard');
-    })->name('home');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -106,6 +108,11 @@ Route::middleware('auth', '2fa')->group(function () {
     Route::delete('/anime/{id}/delete-review', [AnimeController::class, 'deleteReview'])->name('anime.deleteReview');
 
     Route::post('/toggle-friend-publicly/{id}', [UserController::class, 'toggleFriendPublicly'])->name('toggle-friend-publicly');
+
+    Route::post('/invite-codes/generate-invite-codes', [InviteCodeController::class, 'generateInviteCodes'])->name('generate-invite-codes');
+    Route::post('/invite-codes/revoke-unused-invite-codes', [InviteCodeController::class, 'revokeUnusedInviteCodes'])->name('revoke-unused-invite-codes');
+    Route::get('/invite-codes', [InviteCodeController::class, 'index'])->name('invite-codes-index');
+    Route::get('/invite-codes/data', [InviteCodeController::class, 'data'])->name('invite-codes-data');
 
 });
 
