@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('code', 36);
             $table->boolean('used')->default(false);
             $table->string('username')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
         });
     }

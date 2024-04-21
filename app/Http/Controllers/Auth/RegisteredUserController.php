@@ -73,6 +73,7 @@ class RegisteredUserController extends Controller
             if ($inviteCode) {
                 $inviteCode->used = true;
                 $inviteCode->username = $request->username;
+                $inviteCode->email = $request->email;
                 $inviteCode->save();
             }
         }
