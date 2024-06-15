@@ -15,6 +15,8 @@ class AnimeListExportService
             return $this->exportToMyAnimeList($userId, $logger);
         } elseif ($fileType === 'arigatou') {
             return $this->exportToArigatou($userId, $logger);
+        } elseif ($fileType === 'myanimelistcss') {
+            return $this->exportToMyAnimeListCss($userId, $logger);
         } else {
             // Unknown file type
             return "";
@@ -114,5 +116,51 @@ class AnimeListExportService
         $formattedJson = json_encode(['animeList' => $animeArray], JSON_PRETTY_PRINT);
         $duration = microtime(true) - $startTime;
         return ["total" => $total, "duration" => $duration, "output" => $formattedJson];
+    }
+
+    private function exportToMyAnimeListCss($userId, $logger = null)
+    {
+        $startTime = microtime(true);
+        $animeList = AnimeUser::with('anime')
+            ->where('user_id', $userId)
+            ->whereHas('watch_status', function ($query) {
+                $query->where('status', 'COMPLETED');
+            })
+            ->where('sort_order', '>=', 1)
+            ->orderBy('sort_order', 'ASC')
+            ->get();
+        $total = count($animeList);
+        $cssOutput = "";
+        //These seem to be the min and max orders MAL allows, starting from -1000 and going up to 3000.
+        $minOrder = -1000;
+        $maxOrder = 3000;
+        $currentOrder = $minOrder;
+        foreach ($animeList as $animeUser) {
+            $source = collect(explode(', ', $animeUser->anime->sources))->first(function ($source) {
+                return str_contains($source, 'myanimelist.net/anime/');
+            });
+            if ($source) {
+                preg_match('/myanimelist\.net\/anime\/(\d+)/', $source, $matches);
+                $animeId = $matches[1] ?? null;
+                if ($animeId) {
+                    //If we wanted to use just the provided sort order, from 1 to 3000, we could just use sort_order.
+                    //$order = $animeUser->sort_order;
+                    //Technically, by default the order is limited from 1 to 3000, maybe we want more anime total, so let's scale it from min to max for a total of 4000 anime.
+                    $order = $currentOrder;
+                    $cssOutput .= ".list-container .list-block .completed table.list-table > tbody.list-item:has(a[href*=\"anime/{$animeId}/\"]) {\n";
+                    $cssOutput .= "  visibility: unset;\n";
+                    $cssOutput .= "  height: unset;\n";
+                    $cssOutput .= "  order: {$order};\n";
+                    $cssOutput .= "}\n";
+                    $currentOrder++;
+                }
+            }
+            if ($currentOrder > $maxOrder) {
+                exit("You have exceeded the maximum total anime for MAL custom sorting, congratulations! This isn't very easily achievable.");
+            }
+        }
+
+        $duration = microtime(true) - $startTime;
+        return ["total" => $total, "duration" => $duration, "output" => $cssOutput];
     }
 }
