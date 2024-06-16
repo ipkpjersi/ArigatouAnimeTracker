@@ -81,7 +81,7 @@ class AnimeAdditionalDataImportService
                     $malUsers = $data['num_scoring_users'] ?? null; //The users who have scored/ranked the anime
                     $malMembers = $data['num_list_users'] ?? null; //The members with this anime on their list.
 
-                    $logger && $logger("Update data for anime: " . $row->title . " from MAL");
+                    $logger && $logger("Updated data for anime: " . $row->title . " from MAL");
                 } elseif ($response) {
                     $data = $response->json();
                     $logger && $logger("Failed update response from MAL for anime: " . $row->title . " " . print_r($data, true));
