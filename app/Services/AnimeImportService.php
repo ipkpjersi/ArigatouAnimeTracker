@@ -117,10 +117,10 @@ class AnimeImportService
                 'year' => $animeData['animeSeason']['year'],
                 'picture' => $animeData['picture'],
                 'thumbnail' => $animeData['thumbnail'],
-                'synonyms' => implode(', ', $animeData['synonyms']),
-                'relations' => implode(', ', $animeData['relations']),
-                'sources' => implode(', ', $animeData['sources']),
-                'tags' => implode(', ', $animeData['tags']),
+                'synonyms' => isset($animeData['synonyms']) ? implode(', ', $animeData['synonyms']) : '',
+                'relations' => isset($animeData['relations']) ? implode(', ', $animeData['relations']) : '',
+                'sources' => isset($animeData['sources']) ? implode(', ', $animeData['sources']) : '',
+                'tags' => isset($animeData['tags']) ? implode(', ', $animeData['tags']) : '',
             ]);
             $episodes = $animeData['episodes'];
             $type = $type->type;
