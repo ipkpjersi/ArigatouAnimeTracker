@@ -38,14 +38,14 @@ class AnimeImportService
                     if ($existingAnime->anime_type_id !== $type->id) $updateData['anime_type_id'] = $type->id;
                     if ($existingAnime->anime_status_id !== $status->id) $updateData['anime_status_id'] = $status->id;
                     if ($existingAnime->episodes !== $animeData['episodes']) $updateData['episodes'] = $animeData['episodes'];
-                    if ($existingAnime->season !== $animeData['animeSeason']['season']) $updateData['season'] = $animeData['animeSeason']['season'];
-                    if ($existingAnime->year !== $animeData['animeSeason']['year']) $updateData['year'] = $animeData['animeSeason']['year'];
+                    if (isset($animeData['animeSeason']['season']) && $existingAnime->season !== $animeData['animeSeason']['season']) $updateData['season'] = $animeData['animeSeason']['season'];
+                    if (isset($animeData['animeSeason']['year']) && $existingAnime->year !== $animeData['animeSeason']['year']) $updateData['year'] = $animeData['animeSeason']['year'];
                     if ($existingAnime->picture !== $animeData['picture']) $updateData['picture'] = $animeData['picture'];
-                    if ($existingAnime->thumbnail !== $animeData['thumbnail']) $updateData['thumbnail'] = $animeData['thumbnail'];
-                    if ($existingAnime->synonyms !== implode(', ', $animeData['synonyms'])) $updateData['synonyms'] = implode(', ', $animeData['synonyms']);
-                    if ($existingAnime->relations !== implode(', ', $animeData['relations'])) $updateData['relations'] = implode(', ', $animeData['relations']);
-                    if ($existingAnime->sources !== implode(', ', $animeData['sources'])) $updateData['sources'] = implode(', ', $animeData['sources']);
-                    if ($existingAnime->tags !== implode(', ', $animeData['tags'])) $updateData['tags'] = implode(', ', $animeData['tags']);
+                    if (isset($animeData['thumbnail']) && $existingAnime->thumbnail !== $animeData['thumbnail']) $updateData['thumbnail'] = $animeData['thumbnail'];
+                    if (isset($animeData['synonyms']) && $existingAnime->synonyms !== implode(', ', $animeData['synonyms'])) $updateData['synonyms'] = implode(', ', $animeData['synonyms']);
+                    if (isset($animeData['relations']) && $existingAnime->relations !== implode(', ', $animeData['relations'])) $updateData['relations'] = implode(', ', $animeData['relations']);
+                    if (isset($animeData['sources']) && $existingAnime->sources !== implode(', ', $animeData['sources'])) $updateData['sources'] = implode(', ', $animeData['sources']);
+                    if (isset($animeData['tags']) && $existingAnime->tags !== implode(', ', $animeData['tags'])) $updateData['tags'] = implode(', ', $animeData['tags']);
 
                     // Perform update if there are changes
                     if (!empty($updateData)) {
