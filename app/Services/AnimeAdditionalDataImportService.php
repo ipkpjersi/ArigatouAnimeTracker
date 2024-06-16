@@ -98,7 +98,7 @@ class AnimeAdditionalDataImportService
                     $data = $response->json();
                     $description = $data['summary'] ?? null;
                     $genres = $data['genres'] ? implode(',', $data['genres']) : null;
-                    $logger && $logger("Update description and genres for anime: " . $row->title . " from notify.moe");
+                    $logger && $logger("Updated description and/or genres for anime: " . $row->title . " from notify.moe");
                 }
             }
 
@@ -114,7 +114,7 @@ class AnimeAdditionalDataImportService
                         return $genre['attributes']['name'];
                     }, $genresData['data'] ?? []);
                     $genres = $genres ? implode(',', $genres) : null;
-                    $logger && $logger("Update description and genres for anime: " . $row->title . " from kitsu.io");
+                    $logger && $logger("Updated description and/or genres for anime: " . $row->title . " from kitsu.io");
                 }
             }
 
