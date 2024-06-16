@@ -711,7 +711,7 @@ class AnimeController extends Controller
 
         // Validation
         $request->validate([
-            'export_type' => 'required|in:myanimelist,arigatou',
+            'export_type' => 'required|in:myanimelist,arigatou,myanimelistcss',
         ]);
 
         $userId = Auth::id();
@@ -726,6 +726,9 @@ class AnimeController extends Controller
             Storage::put('exports/'.$fileName, $result['output']);
         } elseif ($exportType === 'arigatou') {
             $fileName = "{$fileNameBase}.json";
+            Storage::put('exports/'.$fileName, $result['output']);
+        } elseif ($exportType === 'myanimelistcss') {
+            $fileName = "{$fileNameBase}.css";
             Storage::put('exports/'.$fileName, $result['output']);
         } else {
             return redirect()->back()->with('message', 'Export failed due to unknown file type.');
