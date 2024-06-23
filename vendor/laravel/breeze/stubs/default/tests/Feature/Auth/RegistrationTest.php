@@ -2,8 +2,6 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Providers\AppServiceProvider;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -28,6 +26,6 @@ class RegistrationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(AppServiceProvider::HOME);
+        $response->assertRedirect(route('dashboard', absolute: false));
     }
 }

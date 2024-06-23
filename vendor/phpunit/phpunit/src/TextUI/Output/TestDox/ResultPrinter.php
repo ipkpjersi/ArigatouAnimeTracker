@@ -20,7 +20,6 @@ use function rtrim;
 use function str_starts_with;
 use function trim;
 use PHPUnit\Event\Code\Throwable;
-use PHPUnit\Event\TestData\NoDataSetFromDataProviderException;
 use PHPUnit\Framework\TestStatus\TestStatus;
 use PHPUnit\Logging\TestDox\TestResult as TestDoxTestResult;
 use PHPUnit\Logging\TestDox\TestResultCollection;
@@ -30,15 +29,17 @@ use PHPUnit\Util\Color;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class ResultPrinter
+final readonly class ResultPrinter
 {
-    private readonly Printer $printer;
-    private readonly bool $colors;
+    private Printer $printer;
+    private bool $colors;
+    private int $columns;
 
-    public function __construct(Printer $printer, bool $colors)
+    public function __construct(Printer $printer, bool $colors, int $columns)
     {
         $this->printer = $printer;
         $this->colors  = $colors;
+        $this->columns = $columns;
     }
 
     /**
@@ -76,18 +77,12 @@ final class ResultPrinter
         $this->printer->print($buffer . PHP_EOL);
     }
 
-    /**
-     * @throws NoDataSetFromDataProviderException
-     */
     private function printTestResult(TestDoxTestResult $test): void
     {
         $this->printTestResultHeader($test);
         $this->printTestResultBody($test);
     }
 
-    /**
-     * @throws NoDataSetFromDataProviderException
-     */
     private function printTestResultHeader(TestDoxTestResult $test): void
     {
         $buffer = ' ' . $this->symbolFor($test->status()) . ' ';
@@ -233,7 +228,8 @@ final class ResultPrinter
         $diff    = implode(PHP_EOL, $diff);
 
         if (!empty($message)) {
-            $message = Color::colorizeTextBox($style, $message);
+            // Testdox output has a left-margin of 5; keep right-margin to prevent terminal scrolling
+            $message = Color::colorizeTextBox($style, $message, $this->columns - 7);
         }
 
         return [
@@ -317,7 +313,7 @@ final class ResultPrinter
             return 'fg-cyan';
         }
 
-        if ($status->isRisky() || $status->isIncomplete() || $status->isWarning()) {
+        if ($status->isIncomplete() || $status->isDeprecation() || $status->isNotice() || $status->isRisky() || $status->isWarning()) {
             return 'fg-yellow';
         }
 
@@ -342,7 +338,7 @@ final class ResultPrinter
             return 'fg-cyan';
         }
 
-        if ($status->isRisky() || $status->isIncomplete() || $status->isWarning()) {
+        if ($status->isIncomplete() || $status->isDeprecation() || $status->isNotice() || $status->isRisky() || $status->isWarning()) {
             return 'fg-yellow';
         }
 
@@ -363,16 +359,12 @@ final class ResultPrinter
             return '↩';
         }
 
-        if ($status->isRisky()) {
-            return '☢';
+        if ($status->isDeprecation() || $status->isNotice() || $status->isRisky() || $status->isWarning()) {
+            return '⚠';
         }
 
         if ($status->isIncomplete()) {
             return '∅';
-        }
-
-        if ($status->isWarning()) {
-            return '⚠';
         }
 
         return '?';

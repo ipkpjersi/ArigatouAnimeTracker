@@ -20,6 +20,7 @@ use function time;
 use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\Runner\TestSuiteSorter;
 use PHPUnit\TextUI\CliArguments\Configuration as CliConfiguration;
+use PHPUnit\TextUI\CliArguments\Exception;
 use PHPUnit\TextUI\XmlConfiguration\Configuration as XmlConfiguration;
 use PHPUnit\TextUI\XmlConfiguration\LoadedFromFileConfiguration;
 use PHPUnit\TextUI\XmlConfiguration\SchemaDetector;
@@ -32,21 +33,15 @@ use SebastianBergmann\Invoker\Invoker;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class Merger
+final readonly class Merger
 {
     /**
-     * @throws \PHPUnit\TextUI\CliArguments\Exception
      * @throws \PHPUnit\TextUI\XmlConfiguration\Exception
+     * @throws Exception
      * @throws NoCustomCssFileException
      */
     public function merge(CliConfiguration $cliConfiguration, XmlConfiguration $xmlConfiguration): Configuration
     {
-        $cliArgument = null;
-
-        if ($cliConfiguration->hasArgument()) {
-            $cliArgument = $cliConfiguration->argument();
-        }
-
         $configurationFile = null;
 
         if ($xmlConfiguration->wasLoadedFromFile()) {
@@ -83,20 +78,8 @@ final class Merger
             $testResultCacheFile    = $cacheDirectory . DIRECTORY_SEPARATOR . 'test-results';
         }
 
-        if ($coverageCacheDirectory === null) {
-            if ($cliConfiguration->hasCoverageCacheDirectory() && Filesystem::createDirectory($cliConfiguration->coverageCacheDirectory())) {
-                $coverageCacheDirectory = realpath($cliConfiguration->coverageCacheDirectory());
-            } elseif ($xmlConfiguration->codeCoverage()->hasCacheDirectory()) {
-                $coverageCacheDirectory = $xmlConfiguration->codeCoverage()->cacheDirectory()->path();
-            }
-        }
-
         if (!isset($testResultCacheFile)) {
-            if ($cliConfiguration->hasCacheResultFile()) {
-                $testResultCacheFile = $cliConfiguration->cacheResultFile();
-            } elseif ($xmlConfiguration->phpunit()->hasCacheResultFile()) {
-                $testResultCacheFile = $xmlConfiguration->phpunit()->cacheResultFile();
-            } elseif ($xmlConfiguration->wasLoadedFromFile()) {
+            if ($xmlConfiguration->wasLoadedFromFile()) {
                 $testResultCacheFile = dirname(realpath($xmlConfiguration->filename())) . DIRECTORY_SEPARATOR . '.phpunit.result.cache';
             } else {
                 $candidate = realpath($_SERVER['PHP_SELF']);
@@ -217,8 +200,6 @@ final class Merger
             $outputToStandardErrorStream = $xmlConfiguration->phpunit()->stderr();
         }
 
-        $maxNumberOfColumns = (new Console)->getNumberOfColumns();
-
         if ($cliConfiguration->hasColumns()) {
             $columns = $cliConfiguration->columns();
         } else {
@@ -226,7 +207,7 @@ final class Merger
         }
 
         if ($columns === 'max') {
-            $columns = $maxNumberOfColumns;
+            $columns = (new Console)->getNumberOfColumns();
         }
 
         if ($columns < 16) {
@@ -235,10 +216,6 @@ final class Merger
             EventFacade::emitter()->testRunnerTriggeredWarning(
                 'Less than 16 columns requested, number of columns set to 16',
             );
-        }
-
-        if ($columns > $maxNumberOfColumns) {
-            $columns = $maxNumberOfColumns;
         }
 
         assert(is_int($columns));
@@ -354,6 +331,14 @@ final class Merger
         if ($xmlConfiguration->codeCoverage()->hasText()) {
             $coverageTextShowUncoveredFiles = $xmlConfiguration->codeCoverage()->text()->showUncoveredFiles();
             $coverageTextShowOnlySummary    = $xmlConfiguration->codeCoverage()->text()->showOnlySummary();
+        }
+
+        if ($cliConfiguration->hasCoverageTextShowUncoveredFiles()) {
+            $coverageTextShowUncoveredFiles = $cliConfiguration->coverageTextShowUncoveredFiles();
+        }
+
+        if ($cliConfiguration->hasCoverageTextShowOnlySummary()) {
+            $coverageTextShowOnlySummary = $cliConfiguration->coverageTextShowOnlySummary();
         }
 
         if ($cliConfiguration->hasCoverageText()) {
@@ -474,8 +459,7 @@ final class Merger
             $reverseDefectList = $xmlConfiguration->phpunit()->reverseDefectList();
         }
 
-        $requireCoverageMetadata                         = $xmlConfiguration->phpunit()->requireCoverageMetadata();
-        $registerMockObjectsFromTestArgumentsRecursively = $xmlConfiguration->phpunit()->registerMockObjectsFromTestArgumentsRecursively();
+        $requireCoverageMetadata = $xmlConfiguration->phpunit()->requireCoverageMetadata();
 
         if ($cliConfiguration->hasExecutionOrder()) {
             $executionOrder = $cliConfiguration->executionOrder();
@@ -606,6 +590,12 @@ final class Merger
             $filter = $cliConfiguration->filter();
         }
 
+        $excludeFilter = null;
+
+        if ($cliConfiguration->hasExcludeFilter()) {
+            $excludeFilter = $cliConfiguration->excludeFilter();
+        }
+
         if ($cliConfiguration->hasGroups()) {
             $groups = $cliConfiguration->groups();
         } else {
@@ -693,32 +683,40 @@ final class Merger
             }
         }
 
-        if ($xmlConfiguration->codeCoverage()->hasNonEmptyListOfFilesToBeIncludedInCodeCoverageReport()) {
-            foreach ($xmlConfiguration->codeCoverage()->directories() as $directory) {
-                $sourceIncludeDirectories[] = $directory;
-            }
-
-            $sourceIncludeFiles       = $xmlConfiguration->codeCoverage()->files();
-            $sourceExcludeDirectories = $xmlConfiguration->codeCoverage()->excludeDirectories();
-            $sourceExcludeFiles       = $xmlConfiguration->codeCoverage()->excludeFiles();
-        } else {
-            foreach ($xmlConfiguration->source()->includeDirectories() as $directory) {
-                $sourceIncludeDirectories[] = $directory;
-            }
-
-            $sourceIncludeFiles       = $xmlConfiguration->source()->includeFiles();
-            $sourceExcludeDirectories = $xmlConfiguration->source()->excludeDirectories();
-            $sourceExcludeFiles       = $xmlConfiguration->source()->excludeFiles();
+        foreach ($xmlConfiguration->source()->includeDirectories() as $directory) {
+            $sourceIncludeDirectories[] = $directory;
         }
 
+        $sourceIncludeFiles       = $xmlConfiguration->source()->includeFiles();
+        $sourceExcludeDirectories = $xmlConfiguration->source()->excludeDirectories();
+        $sourceExcludeFiles       = $xmlConfiguration->source()->excludeFiles();
+
+        $useBaseline      = null;
+        $generateBaseline = null;
+
+        if (!$cliConfiguration->hasGenerateBaseline()) {
+            if ($cliConfiguration->hasUseBaseline()) {
+                $useBaseline = $cliConfiguration->useBaseline();
+            } elseif ($xmlConfiguration->source()->hasBaseline()) {
+                $useBaseline = $xmlConfiguration->source()->baseline();
+            }
+        } else {
+            $generateBaseline = $cliConfiguration->generateBaseline();
+        }
+
+        assert($useBaseline !== '');
+        assert($generateBaseline !== '');
+
         return new Configuration(
-            $cliArgument,
+            $cliConfiguration->arguments(),
             $configurationFile,
             $bootstrap,
             $cacheResult,
             $cacheDirectory,
             $coverageCacheDirectory,
             new Source(
+                $useBaseline,
+                $cliConfiguration->ignoreBaseline(),
                 FilterDirectoryCollection::fromArray($sourceIncludeDirectories),
                 $sourceIncludeFiles,
                 $sourceExcludeDirectories,
@@ -733,6 +731,10 @@ final class Merger
                 $xmlConfiguration->source()->ignoreSuppressionOfPhpNotices(),
                 $xmlConfiguration->source()->ignoreSuppressionOfWarnings(),
                 $xmlConfiguration->source()->ignoreSuppressionOfPhpWarnings(),
+                $xmlConfiguration->source()->deprecationTriggers(),
+                $xmlConfiguration->source()->ignoreSelfDeprecations(),
+                $xmlConfiguration->source()->ignoreDirectDeprecations(),
+                $xmlConfiguration->source()->ignoreIndirectDeprecations(),
             ),
             $testResultCacheFile,
             $coverageClover,
@@ -798,7 +800,6 @@ final class Merger
             $displayDetailsOnTestsThatTriggerWarnings,
             $reverseDefectList,
             $requireCoverageMetadata,
-            $registerMockObjectsFromTestArgumentsRecursively,
             $noProgress,
             $noResults,
             $noOutput,
@@ -816,6 +817,7 @@ final class Merger
             $testsCovering,
             $testsUsing,
             $filter,
+            $excludeFilter,
             $groups,
             $excludeGroups,
             $randomOrderSeed,
@@ -840,6 +842,8 @@ final class Merger
             ),
             $xmlConfiguration->phpunit()->controlGarbageCollector(),
             $xmlConfiguration->phpunit()->numberOfTestsBeforeGarbageCollection(),
+            $generateBaseline,
+            $cliConfiguration->debug(),
         );
     }
 }

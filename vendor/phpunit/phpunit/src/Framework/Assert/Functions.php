@@ -69,6 +69,82 @@ use PHPUnit\Framework\MockObject\Stub\ReturnValueMap as ReturnValueMapStub;
 use PHPUnit\Util\Xml\XmlException;
 use Throwable;
 
+if (!function_exists('PHPUnit\Framework\assertArrayIsEqualToArrayOnlyConsideringListOfKeys')) {
+    /**
+     * Asserts that two arrays are equal while only considering a list of keys.
+     *
+     * @psalm-param non-empty-list<array-key> $keysToBeConsidered
+     *
+     * @throws Exception
+     * @throws ExpectationFailedException
+     *
+     * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+     *
+     * @see Assert::assertArrayIsEqualToArrayOnlyConsideringListOfKeys
+     */
+    function assertArrayIsEqualToArrayOnlyConsideringListOfKeys(array $expected, array $actual, array $keysToBeConsidered, string $message = ''): void
+    {
+        Assert::assertArrayIsEqualToArrayOnlyConsideringListOfKeys(...func_get_args());
+    }
+}
+
+if (!function_exists('PHPUnit\Framework\assertArrayIsEqualToArrayIgnoringListOfKeys')) {
+    /**
+     * Asserts that two arrays are equal while ignoring a list of keys.
+     *
+     * @psalm-param non-empty-list<array-key> $keysToBeIgnored
+     *
+     * @throws Exception
+     * @throws ExpectationFailedException
+     *
+     * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+     *
+     * @see Assert::assertArrayIsEqualToArrayIgnoringListOfKeys
+     */
+    function assertArrayIsEqualToArrayIgnoringListOfKeys(array $expected, array $actual, array $keysToBeIgnored, string $message = ''): void
+    {
+        Assert::assertArrayIsEqualToArrayIgnoringListOfKeys(...func_get_args());
+    }
+}
+
+if (!function_exists('PHPUnit\Framework\assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys')) {
+    /**
+     * Asserts that two arrays are identical while only considering a list of keys.
+     *
+     * @psalm-param non-empty-list<array-key> $keysToBeConsidered
+     *
+     * @throws Exception
+     * @throws ExpectationFailedException
+     *
+     * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+     *
+     * @see Assert::assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys
+     */
+    function assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys(array $expected, array $actual, array $keysToBeConsidered, string $message = ''): void
+    {
+        Assert::assertArrayIsIdenticalToArrayOnlyConsideringListOfKeys(...func_get_args());
+    }
+}
+
+if (!function_exists('PHPUnit\Framework\assertArrayIsIdenticalToArrayIgnoringListOfKeys')) {
+    /**
+     * Asserts that two arrays are equal while ignoring a list of keys.
+     *
+     * @psalm-param non-empty-list<array-key> $keysToBeIgnored
+     *
+     * @throws Exception
+     * @throws ExpectationFailedException
+     *
+     * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+     *
+     * @see Assert::assertArrayIsIdenticalToArrayIgnoringListOfKeys
+     */
+    function assertArrayIsIdenticalToArrayIgnoringListOfKeys(array $expected, array $actual, array $keysToBeIgnored, string $message = ''): void
+    {
+        Assert::assertArrayIsIdenticalToArrayIgnoringListOfKeys(...func_get_args());
+    }
+}
+
 if (!function_exists('PHPUnit\Framework\assertArrayHasKey')) {
     /**
      * Asserts that an array has a specified key.
@@ -405,6 +481,20 @@ if (!function_exists('PHPUnit\Framework\assertObjectEquals')) {
     function assertObjectEquals(object $expected, object $actual, string $method = 'equals', string $message = ''): void
     {
         Assert::assertObjectEquals(...func_get_args());
+    }
+}
+
+if (!function_exists('PHPUnit\Framework\assertObjectNotEquals')) {
+    /**
+     * @throws ExpectationFailedException
+     *
+     * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+     *
+     * @see Assert::assertObjectNotEquals
+     */
+    function assertObjectNotEquals(object $expected, object $actual, string $method = 'equals', string $message = ''): void
+    {
+        Assert::assertObjectNotEquals(...func_get_args());
     }
 }
 
@@ -1134,9 +1224,9 @@ if (!function_exists('PHPUnit\Framework\assertObjectHasProperty')) {
      *
      * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
      *
-     * @see Assert::assertObjectHasProperty()
+     * @see Assert::assertObjectHasProperty
      */
-    function assertObjectHasProperty(string $attributeName, object $object, string $message = ''): void
+    function assertObjectHasProperty(string $propertyName, object $object, string $message = ''): void
     {
         Assert::assertObjectHasProperty(...func_get_args());
     }
@@ -1150,9 +1240,9 @@ if (!function_exists('PHPUnit\Framework\assertObjectNotHasProperty')) {
      *
      * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
      *
-     * @see Assert::assertObjectNotHasProperty()
+     * @see Assert::assertObjectNotHasProperty
      */
-    function assertObjectNotHasProperty(string $attributeName, object $object, string $message = ''): void
+    function assertObjectNotHasProperty(string $propertyName, object $object, string $message = ''): void
     {
         Assert::assertObjectNotHasProperty(...func_get_args());
     }
@@ -1206,6 +1296,7 @@ if (!function_exists('PHPUnit\Framework\assertInstanceOf')) {
      *
      * @throws Exception
      * @throws ExpectationFailedException
+     * @throws UnknownClassOrInterfaceException
      *
      * @psalm-template ExpectedType of object
      *
@@ -1802,6 +1893,38 @@ if (!function_exists('PHPUnit\Framework\assertStringEqualsStringIgnoringLineEndi
     }
 }
 
+if (!function_exists('PHPUnit\Framework\assertFileMatchesFormat')) {
+    /**
+     * Asserts that a string matches a given format string.
+     *
+     * @throws ExpectationFailedException
+     *
+     * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+     *
+     * @see Assert::assertFileMatchesFormat
+     */
+    function assertFileMatchesFormat(string $format, string $actualFile, string $message = ''): void
+    {
+        Assert::assertFileMatchesFormat(...func_get_args());
+    }
+}
+
+if (!function_exists('PHPUnit\Framework\assertFileMatchesFormatFile')) {
+    /**
+     * Asserts that a string matches a given format string.
+     *
+     * @throws ExpectationFailedException
+     *
+     * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+     *
+     * @see Assert::assertFileMatchesFormatFile
+     */
+    function assertFileMatchesFormatFile(string $formatFile, string $actualFile, string $message = ''): void
+    {
+        Assert::assertFileMatchesFormatFile(...func_get_args());
+    }
+}
+
 if (!function_exists('PHPUnit\Framework\assertStringMatchesFormat')) {
     /**
      * Asserts that a string matches a given format string.
@@ -1823,6 +1946,8 @@ if (!function_exists('PHPUnit\Framework\assertStringNotMatchesFormat')) {
      * Asserts that a string does not match a given format string.
      *
      * @throws ExpectationFailedException
+     *
+     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/5472
      *
      * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
      *
@@ -1855,6 +1980,8 @@ if (!function_exists('PHPUnit\Framework\assertStringNotMatchesFormatFile')) {
      * Asserts that a string does not match a given format string.
      *
      * @throws ExpectationFailedException
+     *
+     * @deprecated https://github.com/sebastianbergmann/phpunit/issues/5472
      *
      * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
      *
@@ -2230,9 +2357,6 @@ if (!function_exists('PHPUnit\Framework\assertJsonFileNotEqualsJsonFile')) {
 }
 
 if (!function_exists('PHPUnit\Framework\logicalAnd')) {
-    /**
-     * @throws Exception
-     */
     function logicalAnd(mixed ...$constraints): LogicalAnd
     {
         return Assert::logicalAnd(...func_get_args());
@@ -2271,13 +2395,6 @@ if (!function_exists('PHPUnit\Framework\isTrue')) {
     function isTrue(): IsTrue
     {
         return Assert::isTrue(...func_get_args());
-    }
-}
-
-if (!function_exists('PHPUnit\Framework\callback')) {
-    function callback(callable $callback): Callback
-    {
-        return Assert::callback(...func_get_args());
     }
 }
 
@@ -2338,9 +2455,6 @@ if (!function_exists('PHPUnit\Framework\containsIdentical')) {
 }
 
 if (!function_exists('PHPUnit\Framework\containsOnly')) {
-    /**
-     * @throws Exception
-     */
     function containsOnly(string $type): TraversableContainsOnly
     {
         return Assert::containsOnly(...func_get_args());
@@ -2348,9 +2462,6 @@ if (!function_exists('PHPUnit\Framework\containsOnly')) {
 }
 
 if (!function_exists('PHPUnit\Framework\containsOnlyInstancesOf')) {
-    /**
-     * @throws Exception
-     */
     function containsOnlyInstancesOf(string $className): TraversableContainsOnly
     {
         return Assert::containsOnlyInstancesOf(...func_get_args());
@@ -2456,9 +2567,6 @@ if (!function_exists('PHPUnit\Framework\identicalTo')) {
 }
 
 if (!function_exists('PHPUnit\Framework\isInstanceOf')) {
-    /**
-     * @throws UnknownClassOrInterfaceException
-     */
     function isInstanceOf(string $className): IsInstanceOf
     {
         return Assert::isInstanceOf(...func_get_args());
@@ -2466,9 +2574,6 @@ if (!function_exists('PHPUnit\Framework\isInstanceOf')) {
 }
 
 if (!function_exists('PHPUnit\Framework\isType')) {
-    /**
-     * @throws Exception
-     */
     function isType(string $type): IsType
     {
         return Assert::isType(...func_get_args());
@@ -2504,9 +2609,6 @@ if (!function_exists('PHPUnit\Framework\matches')) {
 }
 
 if (!function_exists('PHPUnit\Framework\stringStartsWith')) {
-    /**
-     * @throws InvalidArgumentException
-     */
     function stringStartsWith(string $prefix): StringStartsWith
     {
         return Assert::stringStartsWith(...func_get_args());
@@ -2514,9 +2616,6 @@ if (!function_exists('PHPUnit\Framework\stringStartsWith')) {
 }
 
 if (!function_exists('PHPUnit\Framework\stringContains')) {
-    /**
-     * @throws InvalidArgumentException
-     */
     function stringContains(string $string, bool $case = true): StringContains
     {
         return Assert::stringContains(...func_get_args());
@@ -2524,9 +2623,6 @@ if (!function_exists('PHPUnit\Framework\stringContains')) {
 }
 
 if (!function_exists('PHPUnit\Framework\stringEndsWith')) {
-    /**
-     * @throws InvalidArgumentException
-     */
     function stringEndsWith(string $suffix): StringEndsWith
     {
         return Assert::stringEndsWith(...func_get_args());
@@ -2551,6 +2647,20 @@ if (!function_exists('PHPUnit\Framework\objectEquals')) {
     function objectEquals(object $object, string $method = 'equals'): ObjectEquals
     {
         return Assert::objectEquals(...func_get_args());
+    }
+}
+
+if (!function_exists('PHPUnit\Framework\callback')) {
+    /**
+     * @psalm-template CallbackInput of mixed
+     *
+     * @psalm-param callable(CallbackInput $callback): bool $callback
+     *
+     * @psalm-return Callback<CallbackInput>
+     */
+    function callback(callable $callback): Callback
+    {
+        return Assert::callback($callback);
     }
 }
 

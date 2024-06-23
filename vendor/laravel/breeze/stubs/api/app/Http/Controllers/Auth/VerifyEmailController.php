@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Providers\AppServiceProvider;
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
@@ -18,7 +16,7 @@ class VerifyEmailController extends Controller
     {
         if ($request->user()->hasVerifiedEmail()) {
             return redirect()->intended(
-                config('app.frontend_url').AppServiceProvider::HOME.'?verified=1'
+                config('app.frontend_url').'/dashboard?verified=1'
             );
         }
 
@@ -27,7 +25,7 @@ class VerifyEmailController extends Controller
         }
 
         return redirect()->intended(
-            config('app.frontend_url').AppServiceProvider::HOME.'?verified=1'
+            config('app.frontend_url').'/dashboard?verified=1'
         );
     }
 }

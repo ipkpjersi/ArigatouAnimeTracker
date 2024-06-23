@@ -16,11 +16,18 @@ use PHPUnit\Metadata\Version\Requirement;
  *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class RequiresPhpExtension extends Metadata
+final readonly class RequiresPhpExtension extends Metadata
 {
-    private readonly string $extension;
-    private readonly ?Requirement $versionRequirement;
+    /**
+     * @psalm-var non-empty-string
+     */
+    private string $extension;
+    private ?Requirement $versionRequirement;
 
+    /**
+     * @psalm-param 0|1 $level
+     * @psalm-param non-empty-string $extension
+     */
     protected function __construct(int $level, string $extension, ?Requirement $versionRequirement)
     {
         parent::__construct($level);
@@ -29,11 +36,17 @@ final class RequiresPhpExtension extends Metadata
         $this->versionRequirement = $versionRequirement;
     }
 
+    /**
+     * @psalm-assert-if-true RequiresPhpExtension $this
+     */
     public function isRequiresPhpExtension(): bool
     {
         return true;
     }
 
+    /**
+     * @psalm-return non-empty-string
+     */
     public function extension(): string
     {
         return $this->extension;

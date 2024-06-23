@@ -10,13 +10,13 @@
 namespace PHPUnit\Framework\TestStatus;
 
 /**
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
- *
  * @psalm-immutable
+ *
+ * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-abstract class TestStatus
+abstract readonly class TestStatus
 {
-    private readonly string $message;
+    private string $message;
 
     public static function from(int $status): self
     {

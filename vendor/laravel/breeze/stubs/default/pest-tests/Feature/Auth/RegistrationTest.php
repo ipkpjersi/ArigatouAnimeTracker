@@ -1,8 +1,5 @@
 <?php
 
-use App\Providers\AppServiceProvider;
-use App\Providers\RouteServiceProvider;
-
 test('registration screen can be rendered', function () {
     $response = $this->get('/register');
 
@@ -18,5 +15,5 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(AppServiceProvider::HOME);
+    $response->assertRedirect(route('dashboard', absolute: false));
 });

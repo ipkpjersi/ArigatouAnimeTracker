@@ -17,7 +17,7 @@ use PHPUnit\Util\ThrowableToStringMapper;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class ThrowableBuilder
+final readonly class ThrowableBuilder
 {
     /**
      * @throws Exception
@@ -35,7 +35,7 @@ final class ThrowableBuilder
             $t::class,
             $t->getMessage(),
             ThrowableToStringMapper::map($t),
-            Filter::getFilteredStacktrace($t),
+            Filter::getFilteredStacktrace($t, false),
             $previous,
         );
     }
