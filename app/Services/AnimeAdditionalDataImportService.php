@@ -81,7 +81,7 @@ class AnimeAdditionalDataImportService
                     $malUsers = $data['num_scoring_users'] ?? null; //The users who have scored/ranked the anime
                     $malMembers = $data['num_list_users'] ?? null; //The members with this anime on their list.
 
-                    $logger && $logger("Update data for anime: " . $row->title . " from MAL");
+                    $logger && $logger("Updated data for anime: " . $row->title . " from MAL");
                 } elseif ($response) {
                     $data = $response->json();
                     $logger && $logger("Failed update response from MAL for anime: " . $row->title . " " . print_r($data, true));
@@ -98,7 +98,7 @@ class AnimeAdditionalDataImportService
                     $data = $response->json();
                     $description = $data['summary'] ?? null;
                     $genres = $data['genres'] ? implode(',', $data['genres']) : null;
-                    $logger && $logger("Update description and genres for anime: " . $row->title . " from notify.moe");
+                    $logger && $logger("Updated description and/or genres for anime: " . $row->title . " from notify.moe");
                 }
             }
 
@@ -114,7 +114,7 @@ class AnimeAdditionalDataImportService
                         return $genre['attributes']['name'];
                     }, $genresData['data'] ?? []);
                     $genres = $genres ? implode(',', $genres) : null;
-                    $logger && $logger("Update description and genres for anime: " . $row->title . " from kitsu.io");
+                    $logger && $logger("Updated description and/or genres for anime: " . $row->title . " from kitsu.io");
                 }
             }
 

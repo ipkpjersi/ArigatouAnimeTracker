@@ -20,7 +20,7 @@ class DownloadAndImportAnimeData extends Command
      *
      * @var string
      */
-    protected $description = 'Download and import anime data, then download additional data and images.';
+    protected $description = 'Download and import anime data, then download additional data and images. This is the recommended import command.';
 
     /**
      * Execute the console command.
