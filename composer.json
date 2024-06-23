@@ -30,7 +30,6 @@
         "barryvdh/laravel-debugbar": "^3.10",
         "fakerphp/faker": "^1.23",
         "kitloong/laravel-migrations-generator": "^7.0",
-        "krlove/eloquent-model-generator": "dev-l10-compatibility",
         "laravel/breeze": "^2.0",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
@@ -87,10 +86,5 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/laravel-shift/eloquent-model-generator.git"
-        }
-    ]
+    "repositories": []
 }
