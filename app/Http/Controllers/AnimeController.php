@@ -532,6 +532,20 @@ class AnimeController extends Controller
         $user = User::where('username', $username)->firstOrFail();
 
         if ($request->has('anime_ids') && is_array($request->anime_ids)) {
+            //Is the user updating from the anime detail page (or possibly from the list page if their list has only one entry)?
+            $updatingFromAnimeDetailPage = count($request->anime_ids) === 1;
+            if ($updatingFromAnimeDetailPage) {
+                $sortOrder = $request->sort_order[0] ?? null;
+                //Check if the user has the setting enabled and a sort_order is provided
+                if ($user->modifying_sort_order_on_detail_page_sorts_entire_list && $sortOrder !== null) {
+                    //Find the existing entry with the provided sort_order, if it even exists
+                    $existingEntry = $user->anime()->where('sort_order', $sortOrder)->first();
+                    if ($existingEntry) {
+                        //Increment the sort_order of the existing entry and all entries below it to move the other entries down
+                        $user->anime()->where('sort_order', '>=', $sortOrder)->increment('sort_order');
+                    }
+                }
+            }
             foreach ($request->anime_ids as $index => $anime_id) {
                 $anime = Anime::find($anime_id);
                 $currentPivotData = $user->anime()->where('anime_id', $anime_id)->first()->pivot;
