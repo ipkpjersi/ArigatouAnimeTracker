@@ -10,6 +10,7 @@
 namespace PHPUnit\Event\Test;
 
 use const PHP_EOL;
+use function implode;
 use function sprintf;
 use PHPUnit\Event\Code\Test;
 use PHPUnit\Event\Event;
@@ -20,40 +21,42 @@ use PHPUnit\Event\Telemetry;
  *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class PhpNoticeTriggered implements Event
+final readonly class PhpNoticeTriggered implements Event
 {
-    private readonly Telemetry\Info $telemetryInfo;
-    private readonly Test $test;
+    private Telemetry\Info $telemetryInfo;
+    private Test $test;
 
     /**
      * @psalm-var non-empty-string
      */
-    private readonly string $message;
+    private string $message;
 
     /**
      * @psalm-var non-empty-string
      */
-    private readonly string $file;
+    private string $file;
 
     /**
      * @psalm-var positive-int
      */
-    private readonly int $line;
-    private readonly bool $suppressed;
+    private int $line;
+    private bool $suppressed;
+    private bool $ignoredByBaseline;
 
     /**
      * @psalm-param non-empty-string $message
      * @psalm-param non-empty-string $file
      * @psalm-param positive-int $line
      */
-    public function __construct(Telemetry\Info $telemetryInfo, Test $test, string $message, string $file, int $line, bool $suppressed)
+    public function __construct(Telemetry\Info $telemetryInfo, Test $test, string $message, string $file, int $line, bool $suppressed, bool $ignoredByBaseline)
     {
-        $this->telemetryInfo = $telemetryInfo;
-        $this->test          = $test;
-        $this->message       = $message;
-        $this->file          = $file;
-        $this->line          = $line;
-        $this->suppressed    = $suppressed;
+        $this->telemetryInfo     = $telemetryInfo;
+        $this->test              = $test;
+        $this->message           = $message;
+        $this->file              = $file;
+        $this->line              = $line;
+        $this->suppressed        = $suppressed;
+        $this->ignoredByBaseline = $ignoredByBaseline;
     }
 
     public function telemetryInfo(): Telemetry\Info
@@ -95,6 +98,11 @@ final class PhpNoticeTriggered implements Event
         return $this->suppressed;
     }
 
+    public function ignoredByBaseline(): bool
+    {
+        return $this->ignoredByBaseline;
+    }
+
     public function asString(): string
     {
         $message = $this->message;
@@ -103,10 +111,19 @@ final class PhpNoticeTriggered implements Event
             $message = PHP_EOL . $message;
         }
 
+        $details = [$this->test->id()];
+
+        if ($this->suppressed) {
+            $details[] = 'suppressed using operator';
+        }
+
+        if ($this->ignoredByBaseline) {
+            $details[] = 'ignored by baseline';
+        }
+
         return sprintf(
-            'Test Triggered %sPHP Notice (%s)%s',
-            $this->wasSuppressed() ? 'Suppressed ' : '',
-            $this->test->id(),
+            'Test Triggered PHP Notice (%s)%s',
+            implode(', ', $details),
             $message,
         );
     }

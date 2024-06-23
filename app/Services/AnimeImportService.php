@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Anime;
@@ -35,20 +36,42 @@ class AnimeImportService
 
                     // Prepare data for comparison and update
                     $updateData = [];
-                    if ($existingAnime->anime_type_id !== $type->id) $updateData['anime_type_id'] = $type->id;
-                    if ($existingAnime->anime_status_id !== $status->id) $updateData['anime_status_id'] = $status->id;
-                    if ($existingAnime->episodes !== $animeData['episodes']) $updateData['episodes'] = $animeData['episodes'];
-                    if (isset($animeData['animeSeason']['season']) && $existingAnime->season !== $animeData['animeSeason']['season']) $updateData['season'] = $animeData['animeSeason']['season'];
-                    if (isset($animeData['animeSeason']['year']) && $existingAnime->year !== $animeData['animeSeason']['year']) $updateData['year'] = $animeData['animeSeason']['year'];
-                    if ($existingAnime->picture !== $animeData['picture']) $updateData['picture'] = $animeData['picture'];
-                    if (isset($animeData['thumbnail']) && $existingAnime->thumbnail !== $animeData['thumbnail']) $updateData['thumbnail'] = $animeData['thumbnail'];
-                    if (isset($animeData['synonyms']) && $existingAnime->synonyms !== implode(', ', $animeData['synonyms'])) $updateData['synonyms'] = implode(', ', $animeData['synonyms']);
-                    if (isset($animeData['relations']) && $existingAnime->relations !== implode(', ', $animeData['relations'])) $updateData['relations'] = implode(', ', $animeData['relations']);
-                    if (isset($animeData['sources']) && $existingAnime->sources !== implode(', ', $animeData['sources'])) $updateData['sources'] = implode(', ', $animeData['sources']);
-                    if (isset($animeData['tags']) && $existingAnime->tags !== implode(', ', $animeData['tags'])) $updateData['tags'] = implode(', ', $animeData['tags']);
+                    if ($existingAnime->anime_type_id !== $type->id) {
+                        $updateData['anime_type_id'] = $type->id;
+                    }
+                    if ($existingAnime->anime_status_id !== $status->id) {
+                        $updateData['anime_status_id'] = $status->id;
+                    }
+                    if ($existingAnime->episodes !== $animeData['episodes']) {
+                        $updateData['episodes'] = $animeData['episodes'];
+                    }
+                    if (isset($animeData['animeSeason']['season']) && $existingAnime->season !== $animeData['animeSeason']['season']) {
+                        $updateData['season'] = $animeData['animeSeason']['season'];
+                    }
+                    if (isset($animeData['animeSeason']['year']) && $existingAnime->year !== $animeData['animeSeason']['year']) {
+                        $updateData['year'] = $animeData['animeSeason']['year'];
+                    }
+                    if ($existingAnime->picture !== $animeData['picture']) {
+                        $updateData['picture'] = $animeData['picture'];
+                    }
+                    if (isset($animeData['thumbnail']) && $existingAnime->thumbnail !== $animeData['thumbnail']) {
+                        $updateData['thumbnail'] = $animeData['thumbnail'];
+                    }
+                    if (isset($animeData['synonyms']) && $existingAnime->synonyms !== implode(', ', $animeData['synonyms'])) {
+                        $updateData['synonyms'] = implode(', ', $animeData['synonyms']);
+                    }
+                    if (isset($animeData['relations']) && $existingAnime->relations !== implode(', ', $animeData['relations'])) {
+                        $updateData['relations'] = implode(', ', $animeData['relations']);
+                    }
+                    if (isset($animeData['sources']) && $existingAnime->sources !== implode(', ', $animeData['sources'])) {
+                        $updateData['sources'] = implode(', ', $animeData['sources']);
+                    }
+                    if (isset($animeData['tags']) && $existingAnime->tags !== implode(', ', $animeData['tags'])) {
+                        $updateData['tags'] = implode(', ', $animeData['tags']);
+                    }
 
                     // Perform update if there are changes
-                    if (!empty($updateData)) {
+                    if (! empty($updateData)) {
                         // It was updated, so let's force a re-download of the descriptions etc just in case by setting api_descriptions_empty to false.
                         // We're not even emptying out descriptions so if it already has a description when downloading descriptions, it will keep this false because it's not true (the description technically isn't empty), otherwise it will set it to true again (if it fails to download the description again).
                         // Either way, both scenarios are fine and shouldn't cause problems.
@@ -58,13 +81,14 @@ class AnimeImportService
                         $updatedData = $existingAnime->refresh()->toArray(); // Refresh and get updated data
 
                         // Log original and updated details
-                        $logger && $logger("Updated details for anime ID {$existingAnime->id} with title $title, updated data only: " . print_r($updateData, true));
-                        Log::channel('anime_import')->info("Updated details for anime ID {$existingAnime->id} with title $title, updated data only: " . print_r($updateData, true));
-                        Log::channel('anime_import')->info("Updated Anime ID {$existingAnime->id} with title: $title, Original anime data: " . json_encode($originalData));
-                        Log::channel('anime_import')->info("Updated Anime ID {$existingAnime->id} with title: $title, Updated anime data: " . json_encode($updatedData));
+                        $logger && $logger("Updated details for anime ID {$existingAnime->id} with title $title, updated data only: ".print_r($updateData, true));
+                        Log::channel('anime_import')->info("Updated details for anime ID {$existingAnime->id} with title $title, updated data only: ".print_r($updateData, true));
+                        Log::channel('anime_import')->info("Updated Anime ID {$existingAnime->id} with title: $title, Original anime data: ".json_encode($originalData));
+                        Log::channel('anime_import')->info("Updated Anime ID {$existingAnime->id} with title: $title, Updated anime data: ".json_encode($updatedData));
                     } else {
                         $logger && $logger("No updates required for anime ID {$existingAnime->id} with title: $title");
                     }
+
                     continue;
                 }
                 if ($animeWithSameTitle->count() > 1) {
@@ -75,6 +99,7 @@ class AnimeImportService
                         $logger && $logger("Duplicate ID: {$duplicate->id}, Title: {$duplicate->title}, Season: {$duplicate->season}, Year: {$duplicate->year}, Type: {$duplicate->anime_type->type}, Status: {$duplicate->anime_status->status}");
                         Log::channel('anime_import')->info("Duplicate ID: {$duplicate->id}, Title: {$duplicate->title}, Season: {$duplicate->season}, Year: {$duplicate->year}, Type: {$duplicate->anime_type->type}, Status: {$duplicate->anime_status->status}");
                     }
+
                     continue;
                 }
                 $logger && $logger("No existing anime found for title $title, continuing to add...");
@@ -95,17 +120,18 @@ class AnimeImportService
                 ->first();
 
             if ($existingAnime) {
-                $logger && $logger("Skipping existing anime: " . $title);
+                $logger && $logger('Skipping existing anime: '.$title);
+
                 continue;
             }
 
             $type = AnimeType::where('type', $animeData['type'] ?? 'UNKNOWN')->firstOrCreate(['type' => $animeData['type'] ?? 'UNKNOWN']);
             if ($type->wasRecentlyCreated) {
-                $logger && $logger("New anime type created: " . $type->type);
+                $logger && $logger('New anime type created: '.$type->type);
             }
             $status = AnimeStatus::where('status', $animeData['status'] ?? 'UNKNOWN')->firstOrCreate(['status' => $animeData['status'] ?? 'UNKNOWN']);
             if ($status->wasRecentlyCreated) {
-                $logger && $logger("New anime status created: " . $status->status);
+                $logger && $logger('New anime status created: '.$status->status);
             }
 
             Anime::create([
@@ -135,6 +161,7 @@ class AnimeImportService
         }
 
         $duration = microtime(true) - $startTime;
+
         return [
             'count' => $count,
             'total' => $total,

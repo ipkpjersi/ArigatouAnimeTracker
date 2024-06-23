@@ -16,6 +16,7 @@ use function trim;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\Factory as ComparatorFactory;
+use SebastianBergmann\Exporter\Exporter;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
@@ -97,7 +98,7 @@ final class IsEqualIgnoringCase extends Constraint
 
         return sprintf(
             'is equal to %s',
-            $this->exporter()->export($this->value),
+            (new Exporter)->export($this->value),
         );
     }
 }

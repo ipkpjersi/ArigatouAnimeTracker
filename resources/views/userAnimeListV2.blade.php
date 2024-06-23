@@ -172,7 +172,7 @@
                 { data: 'anime_status.status', name: 'anime_status.status', searchable: 'false' }, // Adjust based on actual returned data structure
                 { data: 'watch_status_id', name: 'watch_status_id', searchable: 'false', render: function(data, type, row) {
                     //console.log("watch_status_id data" + data);
-                    if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
+                    if('{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}') {
                         var options = '';
                         options += options += '<option value="">Pick an option...</option>';
                         options += '@foreach ($watchStatuses as $status) <option value="{{ $status->id }}" ' + (data === {{ $status->id }} ? 'selected' : '') + '>{{ $status->status }}</option> @endforeach';
@@ -186,7 +186,7 @@
                     name: 'progress',
                     searchable: false,
                     render: function(data, type, row) {
-                        if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
+                        if('{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}') {
                             var options = '';
                             options += '<option value="">Pick an option...</option>';
                             for(var i = 1; i <= row.episodes; i++) {
@@ -203,7 +203,7 @@
                     name: 'score',
                     searchable: false,
                     render: function(data, type, row) {
-                        if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
+                        if('{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}') {
                             var options = '';
                             options += '<option value="">Pick an option...</option>';
                             for(var i = 1; i <= 10; i++) {
@@ -217,7 +217,7 @@
                 }
             );
 
-            if ('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
+            if ('{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}') {
                 columns.push({
                     data: 'sort_order',
                     name: 'sort_order',
@@ -258,7 +258,7 @@
                 name: 'notes',
                 searchable: false,
                 render: function(data, type, row) {
-                    if('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
+                    if('{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}') {
                         // If the user matches, make textarea editable
                         return '<textarea name="notes[]" class="border rounded py-2 px-3 dark:bg-gray-800">' + (data ? data : '') + '</textarea>';
                     } else {
@@ -268,7 +268,7 @@
                 }
             });
 
-            if ('{{ strtolower(optional(auth()->user())->username ?? '') }}' === '{{ strtolower($username) }}') {
+            if ('{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}') {
                 columns.push({
                     data: 'anime_id',
                     name: 'delete',

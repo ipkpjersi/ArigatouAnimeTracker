@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\InviteCode;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
+use App\Providers\AppServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+
 use function App\Helpers\get_client_ip_address;
 
 class RegisteredUserController extends Controller
@@ -22,7 +23,8 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        $inviteOnlyRegistration = config("global.invite_only_registration_enabled");
+        $inviteOnlyRegistration = config('global.invite_only_registration_enabled');
+
         return view('auth.register', compact('inviteOnlyRegistration'));
     }
 
@@ -33,18 +35,18 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        if (!config("global.registrations_enabled")) {
+        if (! config('global.registrations_enabled')) {
             return redirect()->route('register')->with('error', 'Registrations are currently closed. Please try again later.');
         }
 
         $ipAddress = get_client_ip_address();
 
         $recentRegistrations = User::where('registration_ip', $ipAddress)
-        ->where('created_at', '>=', now()->subDay())
-        ->where('registration_ip', '<>', '127.0.0.1')
-        ->count();
+            ->where('created_at', '>=', now()->subDay())
+            ->where('registration_ip', '<>', '127.0.0.1')
+            ->count();
 
-        if ($recentRegistrations >= config("global.recent_registrations_limit_daily")) {
+        if ($recentRegistrations >= config('global.recent_registrations_limit_daily')) {
             return redirect()->route('register')->with('error', 'Too many registration attempts. Please try again later.');
         }
 
@@ -54,7 +56,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
 
-        $inviteOnlyRegistration = config("global.invite_only_registration_enabled");
+        $inviteOnlyRegistration = config('global.invite_only_registration_enabled');
         if ($inviteOnlyRegistration) {
             $rules['invite_code'] = 'required|exists:invite_codes,code,used,false';
         }
@@ -82,6 +84,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+        return redirect(AppServiceProvider::HOME);
     }
 }

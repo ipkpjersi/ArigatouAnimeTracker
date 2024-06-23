@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class ClearApiDescriptionsEmpty extends Command
 {
@@ -23,20 +23,18 @@ class ClearApiDescriptionsEmpty extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
-        $this->info("Starting to clear all anime API descriptions empty flags...");
+        $this->info('Starting to clear all anime API descriptions empty flags...');
 
         try {
             // Clear all anime genres and api empty flag so all can be downloaded again
             DB::table('anime')->update(['api_descriptions_empty' => false]);
 
-            $this->info("All anime API descriptions empty flags have been cleared.");
+            $this->info('All anime API descriptions empty flags have been cleared.');
         } catch (\Exception $e) {
-            $this->error('An error occurred: ' . $e);
+            $this->error('An error occurred: '.$e);
         }
     }
 }

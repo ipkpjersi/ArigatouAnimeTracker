@@ -84,6 +84,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         'namespace',
         'new',
         'or',
+        'parent',
         'print',
         'private',
         'protected',
@@ -182,9 +183,11 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         $info = $this->type;
 
         if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
-            if ($this->handleTestCreation($path)) {
-                $info .= ' and test';
-            }
+            $this->handleTestCreation($path);
+        }
+
+        if (windows_os()) {
+            $path = str_replace('/', '\\', $path);
         }
 
         $this->components->info(sprintf('%s [%s] created successfully.', $info, $path));
@@ -245,8 +248,9 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
 
-        return collect((new Finder)->files()->depth(0)->in($modelPath))
+        return collect(Finder::create()->files()->depth(0)->in($modelPath))
             ->map(fn ($file) => $file->getBasename('.php'))
+            ->sort()
             ->values()
             ->all();
     }
@@ -264,8 +268,9 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             return [];
         }
 
-        return collect((new Finder)->files()->depth(0)->in($eventPath))
+        return collect(Finder::create()->files()->depth(0)->in($eventPath))
             ->map(fn ($file) => $file->getBasename('.php'))
+            ->sort()
             ->values()
             ->all();
     }
@@ -412,7 +417,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function getNameInput()
     {
-        return trim($this->argument('name'));
+        return (string) Str::of($this->argument('name'))->trim()->beforeLast('.php');
     }
 
     /**
@@ -447,9 +452,12 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function isReservedName($name)
     {
-        $name = strtolower($name);
-
-        return in_array($name, $this->reservedNames);
+        return in_array(
+            strtolower($name),
+            collect($this->reservedNames)
+                ->transform(fn ($name) => strtolower($name))
+                ->all()
+        );
     }
 
     /**
@@ -498,7 +506,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
                     'Factory' => 'E.g. PostFactory',
                     'Job' => 'E.g. ProcessPodcast',
                     'Listener' => 'E.g. SendPodcastNotification',
-                    'Mail' => 'E.g. OrderShipped',
+                    'Mailable' => 'E.g. OrderShipped',
                     'Middleware' => 'E.g. EnsureTokenIsValid',
                     'Model' => 'E.g. Flight',
                     'Notification' => 'E.g. InvoicePaid',

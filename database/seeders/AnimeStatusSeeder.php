@@ -4,16 +4,13 @@ namespace Database\Seeders;
 
 use App\Models\AnimeStatus;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class AnimeStatusSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         AnimeStatus::firstOrCreate(['status' => 'FINISHED']);
         AnimeStatus::firstOrCreate(['status' => 'ONGOING']);

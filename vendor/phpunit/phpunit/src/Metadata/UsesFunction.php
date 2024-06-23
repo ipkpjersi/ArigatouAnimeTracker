@@ -14,10 +14,17 @@ namespace PHPUnit\Metadata;
  *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class UsesFunction extends Metadata
+final readonly class UsesFunction extends Metadata
 {
-    private readonly string $functionName;
+    /**
+     * @psalm-var non-empty-string
+     */
+    private string $functionName;
 
+    /**
+     * @psalm-param 0|1 $level
+     * @psalm-param non-empty-string $functionName
+     */
     public function __construct(int $level, string $functionName)
     {
         parent::__construct($level);
@@ -25,11 +32,17 @@ final class UsesFunction extends Metadata
         $this->functionName = $functionName;
     }
 
+    /**
+     * @psalm-assert-if-true UsesFunction $this
+     */
     public function isUsesFunction(): bool
     {
         return true;
     }
 
+    /**
+     * @psalm-return non-empty-string
+     */
     public function functionName(): string
     {
         return $this->functionName;

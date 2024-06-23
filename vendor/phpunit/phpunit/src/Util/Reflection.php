@@ -21,7 +21,7 @@ use ReflectionMethod;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class Reflection
+final readonly class Reflection
 {
     /**
      * @psalm-param class-string $className
@@ -48,25 +48,31 @@ final class Reflection
     }
 
     /**
+     * @psalm-param ReflectionClass<TestCase> $class
+     *
      * @psalm-return list<ReflectionMethod>
      */
     public static function publicMethodsInTestClass(ReflectionClass $class): array
     {
-        return self::filterMethods($class, ReflectionMethod::IS_PUBLIC);
+        return self::filterAndSortMethods($class, ReflectionMethod::IS_PUBLIC, true);
     }
 
     /**
+     * @psalm-param ReflectionClass<TestCase> $class
+     *
      * @psalm-return list<ReflectionMethod>
      */
     public static function methodsInTestClass(ReflectionClass $class): array
     {
-        return self::filterMethods($class, null);
+        return self::filterAndSortMethods($class, null, false);
     }
 
     /**
+     * @psalm-param ReflectionClass<TestCase> $class
+     *
      * @psalm-return list<ReflectionMethod>
      */
-    private static function filterMethods(ReflectionClass $class, ?int $filter): array
+    private static function filterAndSortMethods(ReflectionClass $class, ?int $filter, bool $sortHighestToLowest): array
     {
         $methodsByClass = [];
 
@@ -88,9 +94,15 @@ final class Reflection
             $methodsByClass[$declaringClassName][] = $method;
         }
 
+        $classNames = array_keys($methodsByClass);
+
+        if ($sortHighestToLowest) {
+            $classNames = array_reverse($classNames);
+        }
+
         $methods = [];
 
-        foreach (array_reverse(array_keys($methodsByClass)) as $className) {
+        foreach ($classNames as $className) {
             $methods = array_merge($methods, $methodsByClass[$className]);
         }
 

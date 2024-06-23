@@ -9,7 +9,9 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use function gettype;
 use function sprintf;
+use function strtolower;
 use Countable;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\SelfDescribing;
@@ -21,8 +23,6 @@ use SebastianBergmann\Exporter\Exporter;
  */
 abstract class Constraint implements Countable, SelfDescribing
 {
-    private ?Exporter $exporter = null;
-
     /**
      * Evaluates the constraint for parameter $other.
      *
@@ -62,15 +62,6 @@ abstract class Constraint implements Countable, SelfDescribing
         return 1;
     }
 
-    protected function exporter(): Exporter
-    {
-        if ($this->exporter === null) {
-            $this->exporter = new Exporter;
-        }
-
-        return $this->exporter;
-    }
-
     /**
      * Evaluates the constraint for parameter $other. Returns true if the
      * constraint is met, false otherwise.
@@ -87,7 +78,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *
      * @throws ExpectationFailedException
      */
-    protected function fail(mixed $other, string $description, ComparisonFailure $comparisonFailure = null): never
+    protected function fail(mixed $other, string $description, ?ComparisonFailure $comparisonFailure = null): never
     {
         $failureDescription = sprintf(
             'Failed asserting that %s.',
@@ -132,7 +123,7 @@ abstract class Constraint implements Countable, SelfDescribing
      */
     protected function failureDescription(mixed $other): string
     {
-        return $this->exporter()->export($other) . ' ' . $this->toString();
+        return (new Exporter)->export($other) . ' ' . $this->toString();
     }
 
     /**
@@ -172,7 +163,7 @@ abstract class Constraint implements Countable, SelfDescribing
             return '';
         }
 
-        return $this->exporter()->export($other) . ' ' . $string;
+        return (new Exporter)->export($other) . ' ' . $string;
     }
 
     /**
@@ -238,5 +229,28 @@ abstract class Constraint implements Countable, SelfDescribing
     protected function reduce(): self
     {
         return $this;
+    }
+
+    /**
+     * @psalm-return non-empty-string
+     */
+    protected function valueToTypeStringFragment(mixed $value): string
+    {
+        $type = strtolower(gettype($value));
+
+        if ($type === 'double') {
+            $type = 'float';
+        }
+
+        if ($type === 'resource (closed)') {
+            $type = 'closed resource';
+        }
+
+        return match ($type) {
+            'array', 'integer', 'object' => 'an ' . $type . ' ',
+            'boolean', 'closed resource', 'float', 'resource', 'string' => 'a ' . $type . ' ',
+            'null'  => 'null ',
+            default => 'a value of ' . $type . ' ',
+        };
     }
 }

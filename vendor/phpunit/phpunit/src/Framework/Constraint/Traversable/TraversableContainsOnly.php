@@ -9,6 +9,7 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**
@@ -16,11 +17,11 @@ use PHPUnit\Framework\ExpectationFailedException;
  */
 final class TraversableContainsOnly extends Constraint
 {
-    private Constraint $constraint;
+    private readonly Constraint $constraint;
     private readonly string $type;
 
     /**
-     * @throws \PHPUnit\Framework\Exception
+     * @throws Exception
      */
     public function __construct(string $type, bool $isNativeType = true)
     {

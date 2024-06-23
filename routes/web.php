@@ -24,8 +24,9 @@ Route::get('/', function () {
     if (Auth::user() !== null) {
         return redirect('home');
     }
+
     return view('welcome');
-})->name("welcome");
+})->name('welcome');
 
 Route::get('/home', function () {
     return redirect('dashboard');
@@ -35,21 +36,21 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', '2fa'])->name('dashboard');
 
-Route::get('/users/', [UserController::class, 'list'])->name("users.list")->middleware('2fa');
+Route::get('/users/', [UserController::class, 'list'])->name('users.list')->middleware('2fa');
 
 Route::get('/users/getUserData', [UserController::class, 'getUserData'])->name('users.data')->middleware('2fa');
 
-Route::get('/users/{username}', [UserController::class, 'detail'])->name("users.detail")->middleware('2fa');
+Route::get('/users/{username}', [UserController::class, 'detail'])->name('users.detail')->middleware('2fa');
 
-Route::get('/anime/', [AnimeController::class, 'list'])->name("anime.list")->middleware('2fa');
+Route::get('/anime/', [AnimeController::class, 'list'])->name('anime.list')->middleware('2fa');
 
-Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->name("anime.data")->middleware('2fa');
+Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->name('anime.data')->middleware('2fa');
 
 Route::get('/anime/{id}/{title?}', [AnimeController::class, 'detail'])->name('anime.detail')->middleware('2fa');
 
 Route::get('/animelist/{username}', [AnimeController::class, 'userAnimeList'])->name('user.anime.list')->middleware('2fa');
 
-Route::get('/animelist-v2/{username}',  [AnimeController::class, 'userAnimeListV2'])->name('user.anime.list.v2')->middleware('2fa');
+Route::get('/animelist-v2/{username}', [AnimeController::class, 'userAnimeListV2'])->name('user.anime.list.v2')->middleware('2fa');
 Route::get('/animelist-v2/data/{username}', [AnimeController::class, 'getUserAnimeDataV2'])->name('user.anime.list.data.v2')->middleware('2fa');
 
 Route::get('/top-anime', [AnimeController::class, 'topAnime'])->name('anime.top')->middleware('2fa');
@@ -96,7 +97,7 @@ Route::middleware('auth', '2fa')->group(function () {
 
     Route::post('/export/animelist', [AnimeController::class, 'exportAnimeList'])->name('export.animelistdata');
 
-    Route::post('/animelist/{username}/clear',  [AnimeController::class, 'clearAnimeList'])->name('user.anime.clear');
+    Route::post('/animelist/{username}/clear', [AnimeController::class, 'clearAnimeList'])->name('user.anime.clear');
 
     Route::post('/anime/{username}/clearSortOrders', [AnimeController::class, 'clearAnimeListSortOrders'])->name('user.anime.clearSortOrders');
 

@@ -14,10 +14,10 @@ use Throwable;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class Cloner
+final readonly class Cloner
 {
     /**
-     * @psalm-template OriginalType
+     * @psalm-template OriginalType of object
      *
      * @psalm-param OriginalType $original
      *

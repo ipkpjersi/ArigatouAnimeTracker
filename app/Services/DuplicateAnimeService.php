@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use League\Csv\Writer;
-use Carbon\Carbon;
 
 class DuplicateAnimeService
 {
@@ -24,7 +24,7 @@ class DuplicateAnimeService
         return [
             'duration' => $duration,
             'timestamp' => $date,
-            'exports' => $exportResults
+            'exports' => $exportResults,
         ];
     }
 
@@ -44,9 +44,9 @@ class DuplicateAnimeService
         $count = DB::table('anime')
             ->whereIn('title', function ($query) {
                 $query->select('title')
-                      ->from('anime')
-                      ->groupBy('title')
-                      ->havingRaw('COUNT(*) > 1');
+                    ->from('anime')
+                    ->groupBy('title')
+                    ->havingRaw('COUNT(*) > 1');
             })
             ->count();
 
@@ -61,9 +61,9 @@ class DuplicateAnimeService
         $duplicates = DB::table('anime')
             ->whereIn('title', function ($query) {
                 $query->select('title')
-                      ->from('anime')
-                      ->groupBy('title')
-                      ->havingRaw('COUNT(*) > 1');
+                    ->from('anime')
+                    ->groupBy('title')
+                    ->havingRaw('COUNT(*) > 1');
             })
             ->orderBy('title')
             ->get();
@@ -79,20 +79,20 @@ class DuplicateAnimeService
         $firstRecord = is_array($data) ? reset($data) : $data->first();
 
         // Convert the first record to an array and insert the keys as the first row in the CSV
-        $csv->insertOne(array_keys((array)$firstRecord));
+        $csv->insertOne(array_keys((array) $firstRecord));
 
         // Iterate over each record and insert into CSV
         foreach ($data as $record) {
-            $csv->insertOne((array)$record);
+            $csv->insertOne((array) $record);
         }
 
         $filePath = "csv/$filename";
         Storage::disk('local')->put($filePath, $csv->getContent());
-        $logger && $logger("CSV file generated: " . storage_path($filePath));
+        $logger && $logger('CSV file generated: '.storage_path($filePath));
 
         return [
             'count' => is_array($data) ? count($data) : $data->count(),
-            'filePath' => $filePath
+            'filePath' => $filePath,
         ];
     }
 }

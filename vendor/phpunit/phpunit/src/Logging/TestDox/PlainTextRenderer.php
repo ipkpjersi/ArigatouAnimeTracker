@@ -14,7 +14,7 @@ use function sprintf;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class PlainTextRenderer
+final readonly class PlainTextRenderer
 {
     /**
      * @psalm-param array<string, TestResultCollection> $tests
@@ -50,13 +50,22 @@ final class PlainTextRenderer
         foreach ($tests as $test) {
             $prettifiedMethodName = $test->test()->testDox()->prettifiedMethodName();
 
+            $success = true;
+
+            if ($test->status()->isError() ||
+                $test->status()->isFailure() ||
+                $test->status()->isIncomplete() ||
+                $test->status()->isSkipped()) {
+                $success = false;
+            }
+
             if (!isset($result[$prettifiedMethodName])) {
-                $result[$prettifiedMethodName] = $test->status()->isSuccess() ? 'x' : ' ';
+                $result[$prettifiedMethodName] = $success ? 'x' : ' ';
 
                 continue;
             }
 
-            if ($test->status()->isSuccess()) {
+            if ($success) {
                 continue;
             }
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AnimeReview extends Model
 {
@@ -17,13 +18,13 @@ class AnimeReview extends Model
         'body',
         'show_review_publicly',
         'recommendation',
-        'contains_spoilers'
+        'contains_spoilers',
     ];
 
     /**
      * Get the user that authored the review.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -31,7 +32,7 @@ class AnimeReview extends Model
     /**
      * Get the anime that this review belongs to.
      */
-    public function anime()
+    public function anime(): BelongsTo
     {
         return $this->belongsTo(Anime::class);
     }
