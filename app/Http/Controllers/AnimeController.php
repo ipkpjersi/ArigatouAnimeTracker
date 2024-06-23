@@ -530,7 +530,6 @@ class AnimeController extends Controller
                 $currentPivotData = $user->anime()->where('anime_id', $anime_id)->first()->pivot;
                 $currentDisplayInList = $currentPivotData->display_in_list ?? true;
                 $currentShowAnimeNotesPublicly = $currentPivotData->show_anime_notes_publicly ?? true;
-                $currentNotes = $currentPivotData->notes ?? null;
                 $score = isset($request->score[$index]) ? $request->score[$index] : null;
                 $sortOrder = isset($request->sort_order[$index]) ? $request->sort_order[$index] : null;
                 $watchStatusId = $request->watch_status_id[$index] ? $request->watch_status_id[$index] : null;
