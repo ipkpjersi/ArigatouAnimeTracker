@@ -48,6 +48,7 @@ class User extends Authenticatable
         'enable_score_charts_other_profiles',
         'show_anime_list_publicly',
         'show_clear_anime_list_sort_orders_button',
+        'modifying_sort_order_on_detail_page_sorts_entire_list',
     ];
 
     /**

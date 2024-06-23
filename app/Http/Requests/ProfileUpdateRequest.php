@@ -42,6 +42,7 @@ class ProfileUpdateRequest extends FormRequest
             'enable_score_charts_other_profiles' => ['nullable', 'in:1,0'],
             'show_anime_list_publicly' => ['nullable', 'in:1,0'],
             'show_clear_anime_list_sort_orders_button' => ['nullable', 'in:1,0'],
+            'modifying_sort_order_on_detail_page_sorts_entire_list' => ['nullable', 'in:1,0'],
         ];
     }
 }

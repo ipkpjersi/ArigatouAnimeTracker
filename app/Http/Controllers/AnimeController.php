@@ -520,6 +520,13 @@ class AnimeController extends Controller
             ->make(true);
     }
 
+    /**
+     * Used for updating both the v1 of the Anime User List page and also the individual Anime Detail page.
+     * @param Request $request
+     * @param $username
+     * @param $redirectBack
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function updateUserAnimeList(Request $request, $username, $redirectBack = false)
     {
         $user = User::where('username', $username)->firstOrFail();
@@ -569,6 +576,12 @@ class AnimeController extends Controller
         return redirect()->route('user.anime.list', ['username' => $username])->with('message', 'Your anime list has been updated!');
     }
 
+    /**
+     * Used only for updating the Anime User List v2 page.
+     * @param Request $request
+     * @param $username
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function updateUserAnimeListV2(Request $request, $username)
     {
         $anime_ids = $request->input('anime_id');
