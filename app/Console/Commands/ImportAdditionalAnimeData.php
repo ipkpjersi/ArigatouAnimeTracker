@@ -27,7 +27,7 @@ class ImportAdditionalAnimeData extends Command
      *
      * @return void
      */
-    public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService)
+    public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService): void
     {
         $this->info('Starting to import additional anime data from SQL file...');
         Log::channel('anime_import')->info('Starting to import additional anime data from SQL file...');

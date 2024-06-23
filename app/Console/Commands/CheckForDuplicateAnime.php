@@ -26,7 +26,7 @@ class CheckForDuplicateAnime extends Command
      *
      * @return void
      */
-    public function handle(DuplicateAnimeService $duplicateAnimeService)
+    public function handle(DuplicateAnimeService $duplicateAnimeService): void
     {
         $this->info('Starting the process of checking for duplicate anime entries.');
 

@@ -27,7 +27,7 @@ class ClearUserAnimeList extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $username = $this->argument('username');
 

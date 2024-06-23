@@ -27,7 +27,7 @@ class DownloadAnimeImages extends Command
      *
      * @return void
      */
-    public function handle(AnimeImageDownloadService $animeImageDownloadService)
+    public function handle(AnimeImageDownloadService $animeImageDownloadService): void
     {
         $this->info('Starting to download anime images...');
         Log::channel('anime_import')->info('Starting to download anime images...');

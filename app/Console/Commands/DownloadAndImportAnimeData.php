@@ -27,7 +27,7 @@ class DownloadAndImportAnimeData extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $this->info('Starting the process of downloading and importing anime data...');
 

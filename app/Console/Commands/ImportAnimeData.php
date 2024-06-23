@@ -30,7 +30,7 @@ class ImportAnimeData extends Command
      *
      * @return void
      */
-    public function handle(AnimeImportService $animeImportService)
+    public function handle(AnimeImportService $animeImportService): void
     {
         $this->info('Starting anime data import...');
         Log::channel('anime_import')->info('Starting anime data import...');

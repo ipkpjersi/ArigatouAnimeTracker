@@ -12,7 +12,7 @@ class WatchStatusSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         WatchStatus::firstOrCreate(['status' => 'WATCHING']);
         WatchStatus::firstOrCreate(['status' => 'COMPLETED']);

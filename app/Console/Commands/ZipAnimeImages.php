@@ -26,7 +26,7 @@ class ZipAnimeImages extends Command
      *
      * @return void
      */
-    public function handle(AnimeImageDownloadService $animeImageDownloadService)
+    public function handle(AnimeImageDownloadService $animeImageDownloadService): void
     {
         $this->info('Starting to zip anime images...');
         try {

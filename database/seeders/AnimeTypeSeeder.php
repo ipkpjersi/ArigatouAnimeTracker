@@ -12,7 +12,7 @@ class AnimeTypeSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         AnimeType::firstOrCreate(['type' => 'TV']);
         AnimeType::firstOrCreate(['type' => 'MOVIE']);

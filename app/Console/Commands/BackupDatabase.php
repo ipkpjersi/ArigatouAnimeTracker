@@ -26,7 +26,7 @@ class BackupDatabase extends Command
      *
      * @return void
      */
-    public function handle(DatabaseBackupService $backupService)
+    public function handle(DatabaseBackupService $backupService): void
     {
         $this->info('Starting database backup...');
 

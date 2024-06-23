@@ -12,7 +12,7 @@ class AnimeStatusSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         AnimeStatus::firstOrCreate(['status' => 'FINISHED']);
         AnimeStatus::firstOrCreate(['status' => 'ONGOING']);

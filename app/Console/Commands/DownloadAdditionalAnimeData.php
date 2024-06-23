@@ -27,7 +27,7 @@ class DownloadAdditionalAnimeData extends Command
      *
      * @return void
      */
-    public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService)
+    public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService): void
     {
         $generateSqlFile = $this->argument('generateSqlFile') ?? false;
         $apiDescriptionsEmptyOnly = $this->argument('apiDescriptionsEmptyOnly') ?? false;

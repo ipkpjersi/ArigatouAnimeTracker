@@ -12,7 +12,7 @@ class AppBackupRunCommand extends Command
 
     protected $description = 'Alias for backup:run command. This is the recommended backup command.';
 
-    public function handle()
+    public function handle(): void
     {
         $this->info('Running backup:run command via app:backup:run...');
         Artisan::call('backup:run', [], new ConsoleOutput);

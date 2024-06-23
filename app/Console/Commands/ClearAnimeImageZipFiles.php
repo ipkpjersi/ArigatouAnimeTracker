@@ -27,7 +27,7 @@ class ClearAnimeImageZipFiles extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $this->info('Starting to clear image zip files...');
 

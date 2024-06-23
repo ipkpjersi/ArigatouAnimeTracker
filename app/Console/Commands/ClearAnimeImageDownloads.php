@@ -11,7 +11,7 @@ class ClearAnimeImageDownloads extends Command
 
     protected $description = 'Clears the anime image download flags, optionally deleting the files.';
 
-    public function handle()
+    public function handle(): void
     {
         $this->info('Starting to clear all anime image download flags...');
 

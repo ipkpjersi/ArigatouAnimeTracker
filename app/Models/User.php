@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -79,14 +82,14 @@ class User extends Authenticatable
         return $this->isAdmin() || $this->is_moderator;
     }
 
-    public function anime()
+    public function anime(): BelongsToMany
     {
         return $this->belongsToMany(Anime::class)
             ->withPivot('score', 'sort_order', 'progress', 'watch_status_id', 'notes', 'display_in_list', 'show_anime_notes_publicly')
             ->withTimestamps();
     }
 
-    public function reviews()
+    public function reviews(): HasMany
     {
         return $this->hasMany(AnimeReview::class, 'user_id');
     }
@@ -117,7 +120,7 @@ class User extends Authenticatable
         return compact('totalCompleted', 'totalEpisodes', 'averageScore', 'animeStatusCounts', 'totalDaysWatched');
     }
 
-    public function friends()
+    public function friends(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_friends', 'user_id', 'friend_user_id')
             ->withPivot('show_friend_publicly')
@@ -174,7 +177,7 @@ class User extends Authenticatable
         $friend->pivot->save();
     }
 
-    public function passwordSecurity()
+    public function passwordSecurity(): HasOne
     {
         return $this->hasOne(\App\Models\PasswordSecurity::class);
     }

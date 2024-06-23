@@ -26,7 +26,7 @@ class ClearApiDescriptionsEmpty extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $this->info('Starting to clear all anime API descriptions empty flags...');
 

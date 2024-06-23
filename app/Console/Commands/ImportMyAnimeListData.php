@@ -27,7 +27,7 @@ class ImportMyAnimeListData extends Command
      *
      * @return void
      */
-    public function handle(AnimeListImportService $importer)
+    public function handle(AnimeListImportService $importer): void
     {
         $username = $this->argument('username');
         $filePath = $this->argument('filePath');
