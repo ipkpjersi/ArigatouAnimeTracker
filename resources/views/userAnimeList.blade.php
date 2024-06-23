@@ -92,8 +92,8 @@
                                                 <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }} thumbnail" width="50" height="50" onerror="this.onerror=null; this.src='{{ asset('img/notfound.gif') }}'">
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200"><a href="/anime/{{$anime->id}}">{{ $anime->title }}</a></td>
-                                            <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_type)->type }}</td>
-                                            <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_status)->status }}</td>
+                                            <td class="py-2 px-4 border-b border-gray-200">{{ $anime->anime_type?->type }}</td>
+                                            <td class="py-2 px-4 border-b border-gray-200">{{ $anime->anime_status?->status }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800  min-w-[100px] desktop-only" style="padding-right: 36px">
@@ -193,8 +193,8 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->episodes }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->season }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->year }}</td>
-                                            <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_type)->type }}</td>
-                                            <td class="py-2 px-4 border-b border-gray-200">{{ optional($anime->anime_status)->status }}</td>
+                                            <td class="py-2 px-4 border-b border-gray-200">{{ $anime->anime_type?->type }}</td>
+                                            <td class="py-2 px-4 border-b border-gray-200">{{ $anime->anime_status?->status }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200 min-w-[150px]">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[150px] mobile-only" style="padding-right: 36px">

@@ -95,7 +95,7 @@
                                         @if (Auth::user())
                                             @php
                                                 $userAnime = $anime->user->firstWhere('id', Auth::id());
-                                                $watchStatusId = optional($userAnime)->pivot->watch_status_id ?? null;
+                                                $watchStatusId = $userAnime?->pivot->watch_status_id ?? null;
                                                 $selectedStatus = $watchStatusId ? $watchStatuses[$watchStatusId] : null;
                                             @endphp
                                         <div class="no_dropdown_arrow_blank_select-wrapper bg-blue-500">
