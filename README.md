@@ -30,7 +30,7 @@
 ## 🚀 Getting Started
 
 ### Prerequisites:
-- PHP >= 8.1
+- PHP >= 8.2
 - Composer
 - Node.js & npm
 - A MySQL database
