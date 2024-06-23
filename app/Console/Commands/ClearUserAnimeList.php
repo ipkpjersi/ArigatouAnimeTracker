@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\User;
 use App\Models\AnimeUser;
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class ClearUserAnimeList extends Command
@@ -34,8 +34,9 @@ class ClearUserAnimeList extends Command
         // Find the user by username
         $user = User::where('username', $username)->first();
 
-        if (!$user) {
+        if (! $user) {
             $this->error("User with username {$username} not found.");
+
             return;
         }
 
@@ -47,7 +48,7 @@ class ClearUserAnimeList extends Command
 
             $this->info("Anime list for user {$username} has been cleared.");
         } catch (\Exception $e) {
-            $this->error('An error occurred: ' . $e);
+            $this->error('An error occurred: '.$e);
         }
     }
 }

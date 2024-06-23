@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Console\Commands;
 
 use Spatie\Backup\Commands\BackupCommand;
@@ -12,7 +13,7 @@ class CustomBackupCommand extends BackupCommand
 
     public function handle(): int
     {
-        $this->info("Running custom backup command...");
+        $this->info('Running custom backup command...');
         //Interpret the value of the --disable-notifications option as a string.
         //This is necessary because we set a default for a boolean option.
         //In Laravel, boolean options typically check for presence, not value.
@@ -21,6 +22,7 @@ class CustomBackupCommand extends BackupCommand
         } else {
             $this->input->setOption('disable-notifications', false);
         }
+
         //Call the parent handle method since we don't want to modify any underlying logic.
         return parent::handle();
     }

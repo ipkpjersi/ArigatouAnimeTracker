@@ -7,8 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AnimeUser extends Model
 {
-
-    protected $table = "anime_user";
+    protected $table = 'anime_user';
 
     use HasFactory;
 
@@ -38,5 +37,4 @@ class AnimeUser extends Model
     {
         return $this->belongsTo(WatchStatus::class);
     }
-
 }

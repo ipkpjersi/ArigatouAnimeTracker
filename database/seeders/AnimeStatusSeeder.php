@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\AnimeStatus;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class AnimeStatusSeeder extends Seeder
 {

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\WatchStatus;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class WatchStatusSeeder extends Seeder
 {

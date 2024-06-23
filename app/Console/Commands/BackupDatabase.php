@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Console\Commands;
 
 use App\Services\DatabaseBackupService;
@@ -23,7 +24,6 @@ class BackupDatabase extends Command
     /**
      * Execute the console command.
      *
-     * @param DatabaseBackupService $backupService
      * @return void
      */
     public function handle(DatabaseBackupService $backupService)
@@ -37,7 +37,7 @@ class BackupDatabase extends Command
         $backupPath = $backupService->backupDatabase($logger);
 
         if ($backupPath) {
-            $this->info("Database backed up successfully.");
+            $this->info('Database backed up successfully.');
         } else {
             $this->error('Failed to back up the database.');
         }

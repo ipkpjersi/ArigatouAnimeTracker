@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -30,24 +29,24 @@ class ClearAnimeImageFiles extends Command
      */
     public function handle()
     {
-        $this->info("Starting to clear image files...");
+        $this->info('Starting to clear image files...');
 
         $folders = [
             public_path('picture'),
-            public_path('thumbnail')
+            public_path('thumbnail'),
         ];
 
         foreach ($folders as $folder) {
             $this->deleteImageFiles($folder);
         }
 
-        $this->info("Image files cleared.");
+        $this->info('Image files cleared.');
     }
 
     /**
      * Deletes image files within the specified folder while retaining the folder structure.
      *
-     * @param string $folder
+     * @param  string  $folder
      * @return void
      */
     private function deleteImageFiles($folder)
@@ -56,7 +55,7 @@ class ClearAnimeImageFiles extends Command
             $it = new RecursiveDirectoryIterator($folder, RecursiveDirectoryIterator::SKIP_DOTS);
             $files = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
             foreach ($files as $file) {
-                if (!$file->isDir() && $this->isImageFile($file)) {
+                if (! $file->isDir() && $this->isImageFile($file)) {
                     unlink($file->getRealPath());
                 }
             }
@@ -66,12 +65,13 @@ class ClearAnimeImageFiles extends Command
     /**
      * Checks if a file is an image file based on its extension.
      *
-     * @param \SplFileInfo $file
+     * @param  \SplFileInfo  $file
      * @return bool
      */
     private function isImageFile($file)
     {
         $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'tiff'];
+
         return in_array(strtolower($file->getExtension()), $imageExtensions);
     }
 }

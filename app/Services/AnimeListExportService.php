@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Models\AnimeUser;
-use App\Models\WatchStatus;
-use Illuminate\Support\Facades\Auth;
 use SimpleXMLElement;
 
 class AnimeListExportService
@@ -19,7 +17,7 @@ class AnimeListExportService
             return $this->exportToMyAnimeListCss($userId, $logger);
         } else {
             // Unknown file type
-            return "";
+            return '';
         }
     }
 
@@ -32,12 +30,12 @@ class AnimeListExportService
         $total = count($animeList);
         $xml = new SimpleXMLElement('<myanimelist></myanimelist>');
         $myinfo = $xml->addChild('myinfo');
-        $myinfo->addChild('user_id', ""); //TODO: maybe fill these in from some user profile settings?
-        $myinfo->addChild('user_name', ""); //TODO: maybe fill these in from some user profile settings?
+        $myinfo->addChild('user_id', ''); //TODO: maybe fill these in from some user profile settings?
+        $myinfo->addChild('user_name', ''); //TODO: maybe fill these in from some user profile settings?
         $myinfo->addChild('user_export_type', '1');
         $myinfo->addChild('user_total_anime', $animeList->count());
 
-        $dom = new \DOMDocument("1.0");
+        $dom = new \DOMDocument('1.0');
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
 
@@ -70,7 +68,7 @@ class AnimeListExportService
             $anime->addChild('my_score', $animeUser->score);
             $anime->addChild('my_storage', '');
             $anime->addChild('my_storage_value', '0.00');
-            $anime->addChild('my_status', str_replace("-", " ", strtolower($animeUser->watch_status?->status ?? 'PLAN-TO-WATCH')));
+            $anime->addChild('my_status', str_replace('-', ' ', strtolower($animeUser->watch_status?->status ?? 'PLAN-TO-WATCH')));
             $animeNode->appendChild($animeNode->ownerDocument->importNode($myComments, true));
             $anime->addChild('my_times_watched', 0);
             $anime->addChild('my_rewatch_value', '');
@@ -86,7 +84,8 @@ class AnimeListExportService
         $dom->loadXML($xml->asXML()); // Reload the XML with the newly added nodes
         $formattedXml = $dom->saveXML();
         $duration = microtime(true) - $startTime;
-        return ["total" => $total, "duration" => $duration, "output" => $formattedXml];
+
+        return ['total' => $total, 'duration' => $duration, 'output' => $formattedXml];
     }
 
     private function exportToArigatou($userId, $logger = null)
@@ -109,13 +108,14 @@ class AnimeListExportService
                 'notes' => $animeUser->notes,
                 'sort_order' => $animeUser->sort_order,
                 'display_in_list' => $animeUser->display_in_list,
-                'show_anime_notes_publicly' => $animeUser->show_anime_notes_publicly
+                'show_anime_notes_publicly' => $animeUser->show_anime_notes_publicly,
             ];
         }
 
         $formattedJson = json_encode(['animeList' => $animeArray], JSON_PRETTY_PRINT);
         $duration = microtime(true) - $startTime;
-        return ["total" => $total, "duration" => $duration, "output" => $formattedJson];
+
+        return ['total' => $total, 'duration' => $duration, 'output' => $formattedJson];
     }
 
     private function exportToMyAnimeListCss($userId, $logger = null)
@@ -130,7 +130,7 @@ class AnimeListExportService
             ->orderBy('sort_order', 'ASC')
             ->get();
         $total = count($animeList);
-        $cssOutput = "";
+        $cssOutput = '';
         //These seem to be the min and max orders MAL allows, starting from -1000 and going up to 3000.
         $minOrder = -1000;
         $maxOrder = 3000;
@@ -161,6 +161,7 @@ class AnimeListExportService
         }
 
         $duration = microtime(true) - $startTime;
-        return ["total" => $total, "duration" => $duration, "output" => $cssOutput];
+
+        return ['total' => $total, 'duration' => $duration, 'output' => $cssOutput];
     }
 }

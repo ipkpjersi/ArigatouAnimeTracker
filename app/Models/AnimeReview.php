@@ -17,7 +17,7 @@ class AnimeReview extends Model
         'body',
         'show_review_publicly',
         'recommendation',
-        'contains_spoilers'
+        'contains_spoilers',
     ];
 
     /**

@@ -2,18 +2,18 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class ClearAnimeImageDownloads extends Command
 {
     protected $signature = 'app:clear-anime-image-downloads {deleteFiles=false : Whether to delete the actual files (true/false)}';
+
     protected $description = 'Clears the anime image download flags, optionally deleting the files.';
 
     public function handle()
     {
-        $this->info("Starting to clear all anime image download flags...");
+        $this->info('Starting to clear all anime image download flags...');
 
         $deleteFiles = $this->argument('deleteFiles') === 'true';
 
@@ -28,16 +28,16 @@ class ClearAnimeImageDownloads extends Command
                     'picture/file',
                     'thumbnail/images/anime',
                     'thumbnail/anime',
-                    'thumbnail/file'
+                    'thumbnail/file',
                 ];
                 foreach ($folders as $folder) {
                     $dir = public_path($folder);
                     if (is_dir($dir)) {
                         $it = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
                         $files = new \RecursiveIteratorIterator($it,
-                                    \RecursiveIteratorIterator::CHILD_FIRST);
-                        foreach($files as $file) {
-                            if ($file->isDir()){
+                            \RecursiveIteratorIterator::CHILD_FIRST);
+                        foreach ($files as $file) {
+                            if ($file->isDir()) {
                                 rmdir($file->getRealPath());
                             } else {
                                 unlink($file->getRealPath());
@@ -46,12 +46,12 @@ class ClearAnimeImageDownloads extends Command
                         rmdir($dir);
                     }
                 }
-                $this->info("The actual image files have been deleted.");
+                $this->info('The actual image files have been deleted.');
             }
 
-            $this->info("All anime image download flags have been cleared.");
+            $this->info('All anime image download flags have been cleared.');
         } catch (\Exception $e) {
-            $this->error('An error occurred: ' . $e);
+            $this->error('An error occurred: '.$e);
         }
     }
 }

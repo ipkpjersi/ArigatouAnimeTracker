@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Services\AnimeAdditionalDataImportService;
 use App\Services\AnimeImageDownloadService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -26,16 +25,15 @@ class DownloadAnimeImages extends Command
     /**
      * Execute the console command.
      *
-     * @param AnimeImageDownloadService $animeImageDownloadService
      * @return void
      */
     public function handle(AnimeImageDownloadService $animeImageDownloadService)
     {
-        $this->info("Starting to download anime images...");
-        Log::channel('anime_import')->info("Starting to download anime images...");
+        $this->info('Starting to download anime images...');
+        Log::channel('anime_import')->info('Starting to download anime images...');
 
         try {
-            $logger = function($message) {
+            $logger = function ($message) {
                 $this->info($message);
             };
 
@@ -45,8 +43,8 @@ class DownloadAnimeImages extends Command
             Log::channel('anime_import')->info("Downloaded {$result['successful']} out of {$result['totalImages']} images for {$result['total']} anime records successfully in {$duration} seconds.");
             $this->call('app:zip-anime-images');
         } catch (\Exception $e) {
-            $this->error('An error occurred during the anime image downloads fetch: ' . $e);
-            Log::channel('anime_import')->info('An error occurred during the anime image downloads fetch: ' . $e);
+            $this->error('An error occurred during the anime image downloads fetch: '.$e);
+            Log::channel('anime_import')->info('An error occurred during the anime image downloads fetch: '.$e);
         }
     }
 }

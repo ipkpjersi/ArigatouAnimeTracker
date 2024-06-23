@@ -25,7 +25,6 @@ class ImportAdditionalAnimeData extends Command
     /**
      * Execute the console command.
      *
-     * @param AnimeAdditionalDataImportService $animeAdditionalDataImportService
      * @return void
      */
     public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService)
@@ -34,7 +33,7 @@ class ImportAdditionalAnimeData extends Command
         Log::channel('anime_import')->info('Starting to import additional anime data from SQL file...');
 
         try {
-            $logger = function($message) {
+            $logger = function ($message) {
                 $this->info($message);
             };
 
@@ -44,8 +43,8 @@ class ImportAdditionalAnimeData extends Command
             $this->info("Imported additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
             Log::channel('anime_import')->info("Imported additional data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
         } catch (\Exception $e) {
-            $this->error('An error occurred during the additional anime data fetch: ' . $e);
-            Log::channel('anime_import')->info('An error occurred during the additional anime data fetch: ' . $e);
+            $this->error('An error occurred during the additional anime data fetch: '.$e);
+            Log::channel('anime_import')->info('An error occurred during the additional anime data fetch: '.$e);
         }
     }
 }

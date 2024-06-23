@@ -44,7 +44,7 @@ class User extends Authenticatable
         'enable_score_charts_own_profile_publicly',
         'enable_score_charts_other_profiles',
         'show_anime_list_publicly',
-        'show_clear_anime_list_sort_orders_button'
+        'show_clear_anime_list_sort_orders_button',
     ];
 
     /**
@@ -71,14 +71,16 @@ class User extends Authenticatable
         return $this->is_admin;
     }
 
-    public function isModerator() {
+    public function isModerator()
+    {
         return $this->isAdmin() || $this->is_moderator;
     }
 
-    public function anime() {
+    public function anime()
+    {
         return $this->belongsToMany(Anime::class)
-                    ->withPivot('score', 'sort_order', 'progress', 'watch_status_id', 'notes', 'display_in_list', 'show_anime_notes_publicly')
-                    ->withTimestamps();
+            ->withPivot('score', 'sort_order', 'progress', 'watch_status_id', 'notes', 'display_in_list', 'show_anime_notes_publicly')
+            ->withTimestamps();
     }
 
     public function reviews()
@@ -86,7 +88,8 @@ class User extends Authenticatable
         return $this->hasMany(AnimeReview::class, 'user_id');
     }
 
-    public function animeStatistics() {
+    public function animeStatistics()
+    {
         $anime = $this->anime()->withPivot('score', 'watch_status_id', 'progress')->get();
 
         $totalCompleted = $anime->where('pivot.watch_status_id', WatchStatus::where('status', 'COMPLETED')->first()->id)->count();
@@ -106,7 +109,7 @@ class User extends Authenticatable
             }
         }
 
-         $totalDaysWatched = ($totalEpisodes * 24) / (60 * 24);
+        $totalDaysWatched = ($totalEpisodes * 24) / (60 * 24);
 
         return compact('totalCompleted', 'totalEpisodes', 'averageScore', 'animeStatusCounts', 'totalDaysWatched');
     }
@@ -114,8 +117,8 @@ class User extends Authenticatable
     public function friends()
     {
         return $this->belongsToMany(User::class, 'user_friends', 'user_id', 'friend_user_id')
-                    ->withPivot('show_friend_publicly')
-                    ->withTimestamps();
+            ->withPivot('show_friend_publicly')
+            ->withTimestamps();
     }
 
     public function addFriend($friendId)
@@ -137,7 +140,7 @@ class User extends Authenticatable
             throw new \Exception('You cannot remove yourself as a friend.');
         }
 
-        if (!$this->friends()->where('friend_user_id', $friendId)->exists()) {
+        if (! $this->friends()->where('friend_user_id', $friendId)->exists()) {
             throw new \Exception('This user is already not your friend.');
         }
 
@@ -159,12 +162,12 @@ class User extends Authenticatable
         // Find the friend relationship
         $friend = $this->friends()->where('friend_user_id', $friendId)->first();
 
-        if (!$friend) {
+        if (! $friend) {
             throw new \Exception('This user is not your friend.');
         }
 
         // Toggle the 'show_friend_publicly' status
-        $friend->pivot->show_friend_publicly = !$friend->pivot->show_friend_publicly;
+        $friend->pivot->show_friend_publicly = ! $friend->pivot->show_friend_publicly;
         $friend->pivot->save();
     }
 

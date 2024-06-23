@@ -7,8 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Anime extends Model
 {
-
-    protected $table = "anime";
+    protected $table = 'anime';
 
     use HasFactory;
 
@@ -31,7 +30,7 @@ class Anime extends Model
     ];
 
     //Set an ID used to hide all anime from public view.
-    static $HIDE_ALL_ANIME_PUBLICLY_ID = 5555;
+    public static $HIDE_ALL_ANIME_PUBLICLY_ID = 5555;
 
     public function anime_type()
     {
@@ -50,9 +49,9 @@ class Anime extends Model
 
     public function user()
     {
-       return $this->belongsToMany(User::class)
-                    ->withPivot('score', 'sort_order', 'progress', 'watch_status_id', 'notes', 'display_in_list', 'show_anime_notes_publicly')
-                    ->withTimestamps();
+        return $this->belongsToMany(User::class)
+            ->withPivot('score', 'sort_order', 'progress', 'watch_status_id', 'notes', 'display_in_list', 'show_anime_notes_publicly')
+            ->withTimestamps();
     }
 
     public function reviews()

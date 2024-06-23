@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class ClearAnimeDescriptions extends Command
 {
@@ -28,15 +28,15 @@ class ClearAnimeDescriptions extends Command
      */
     public function handle()
     {
-        $this->info("Starting to clear all anime descriptions...");
+        $this->info('Starting to clear all anime descriptions...');
 
         try {
             // Clear all anime descriptions and api empty flag so all can be downloaded again
             DB::table('anime')->update(['description' => null, 'api_descriptions_empty' => false]);
 
-            $this->info("All anime descriptions have been cleared.");
+            $this->info('All anime descriptions have been cleared.');
         } catch (\Exception $e) {
-            $this->error('An error occurred: ' . $e);
+            $this->error('An error occurred: '.$e);
         }
     }
 }

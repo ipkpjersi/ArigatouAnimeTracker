@@ -15,18 +15,18 @@ class AnimeAdditionalDataImportService
         $startTime = microtime(true);
         $count = 0;
         $all = DB::table('anime')
-                    ->get();
+            ->get();
         $anime = DB::table('anime')
-                    ->where("api_descriptions_empty", "=", $apiDescriptionsEmptyOnly ? "true" : "false")
-                    ->where(function ($query) {
-                        $query->whereNull('description')
-                              ->orWhere(DB::raw("TRIM(description)"), '=', '');
-                    })
-                    ->where(function ($query) {
-                        $query->whereNull('genres')
-                              ->orWhere(DB::raw("TRIM(genres)"), '=', '');
-                    })
-                    ->get();
+            ->where('api_descriptions_empty', '=', $apiDescriptionsEmptyOnly ? 'true' : 'false')
+            ->where(function ($query) {
+                $query->whereNull('description')
+                    ->orWhere(DB::raw('TRIM(description)'), '=', '');
+            })
+            ->where(function ($query) {
+                $query->whereNull('genres')
+                    ->orWhere(DB::raw('TRIM(genres)'), '=', '');
+            })
+            ->get();
         $total = $all->count();
         $downloading = $anime->count();
         $logger && $logger("Downloading additional anime data for $downloading out of $total anime.");
@@ -51,7 +51,7 @@ class AnimeAdditionalDataImportService
                 }
             } else {
                 //This probably shouldn't ever happen, sources should probably always be set, or maybe not.
-                $logger && $logger("Sources not set for anime: " . $row->title . " row: " . print_r($row, true));
+                $logger && $logger('Sources not set for anime: '.$row->title.' row: '.print_r($row, true));
             }
 
             $description = null;
@@ -65,14 +65,14 @@ class AnimeAdditionalDataImportService
             // Try MAL first
             if ($malId) {
                 $response = Http::withHeaders([
-                    'X-MAL-CLIENT-ID' => config('global.mal_client_id')
-                ])->get('https://api.myanimelist.net/v2/anime/' . $malId . '?fields=id,title,synopsis,genres,mean,rank,popularity,num_scoring_users,num_list_users');
+                    'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
+                ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,genres,mean,rank,popularity,num_scoring_users,num_list_users');
 
                 if ($response && $response->successful()) {
                     $data = $response->json();
                     $description = $data['synopsis'] ?? null;
                     $genres = array_map(function ($genre) {
-                        return str_replace('"', "", $genre['name']);
+                        return str_replace('"', '', $genre['name']);
                     }, $data['genres'] ?? []);
                     $genres = $genres ? implode(',', $genres) : null;
                     $malRank = $data['rank'] ?? null;
@@ -81,10 +81,10 @@ class AnimeAdditionalDataImportService
                     $malUsers = $data['num_scoring_users'] ?? null; //The users who have scored/ranked the anime
                     $malMembers = $data['num_list_users'] ?? null; //The members with this anime on their list.
 
-                    $logger && $logger("Updated data for anime: " . $row->title . " from MAL");
+                    $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
                 } elseif ($response) {
                     $data = $response->json();
-                    $logger && $logger("Failed update response from MAL for anime: " . $row->title . " " . print_r($data, true));
+                    $logger && $logger('Failed update response from MAL for anime: '.$row->title.' '.print_r($data, true));
                 }
             } else {
                 //Optional logging, we likely don't need this logging unless we know it's not fetching descriptions from MAL when it should be.
@@ -92,46 +92,46 @@ class AnimeAdditionalDataImportService
             }
 
             // Then try notify.moe if MAL fails
-            if ((!$description || !$genres) && $notifyMoeId) {
-                $response = Http::get('https://notify.moe/api/anime/' . $notifyMoeId);
+            if ((! $description || ! $genres) && $notifyMoeId) {
+                $response = Http::get('https://notify.moe/api/anime/'.$notifyMoeId);
                 if ($response && $response->successful()) {
                     $data = $response->json();
                     $description = $data['summary'] ?? null;
                     $genres = $data['genres'] ? implode(',', $data['genres']) : null;
-                    $logger && $logger("Updated description and/or genres for anime: " . $row->title . " from notify.moe");
+                    $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from notify.moe');
                 }
             }
 
             // Finally, try kitsu.io if both MAL and notify.moe fail
-            if ((!$description || !$genres) && $kitsuId) {
-                $response = Http::get('https://kitsu.io/api/edge/anime/' . $kitsuId);
+            if ((! $description || ! $genres) && $kitsuId) {
+                $response = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId);
                 if ($response && $response->successful()) {
                     $data = $response->json();
                     $description = $data['data']['attributes']['synopsis'] ?? null;
-                    $genresResponse = Http::get('https://kitsu.io/api/edge/anime/' . $kitsuId . '/genres');
+                    $genresResponse = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId.'/genres');
                     $genresData = $genresResponse->json();
                     $genres = array_map(function ($genre) {
                         return $genre['attributes']['name'];
                     }, $genresData['data'] ?? []);
                     $genres = $genres ? implode(',', $genres) : null;
-                    $logger && $logger("Updated description and/or genres for anime: " . $row->title . " from kitsu.io");
+                    $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from kitsu.io');
                 }
             }
 
             if ($description) {
                 $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $sqlFile, $logger);
-                $logger && $logger("Successfully updated description and genres for anime: " . $row->title);
-                Log::channel('anime_import')->info("Successfully updated description and genres for anime: " . $row->title);
+                $logger && $logger('Successfully updated description and genres for anime: '.$row->title);
+                Log::channel('anime_import')->info('Successfully updated description and genres for anime: '.$row->title);
                 $count++;
             } else {
-                $logger && $logger("Failed to fetch/update description and genres for anime: " . $row->title);
-                Log::channel('anime_import')->info("Failed to fetch/update description and genres for anime: " . $row->title);
-                Log::error('Failed to fetch additional data for anime: ' . $row->title);
+                $logger && $logger('Failed to fetch/update description and genres for anime: '.$row->title);
+                Log::channel('anime_import')->info('Failed to fetch/update description and genres for anime: '.$row->title);
+                Log::error('Failed to fetch additional data for anime: '.$row->title);
                 DB::table('anime')
-                ->where('id', $row->id)
-                ->update(['api_descriptions_empty' => true]);
+                    ->where('id', $row->id)
+                    ->update(['api_descriptions_empty' => true]);
             }
-            $sleepTime = config("global.additional_data_service_sleep_time", 15);
+            $sleepTime = config('global.additional_data_service_sleep_time', 15);
             $logger && $logger("Sleeping for $sleepTime seconds");
             sleep($sleepTime);
         }
@@ -142,6 +142,7 @@ class AnimeAdditionalDataImportService
         }
 
         $duration = microtime(true) - $startTime;
+
         return [
             'count' => $count,
             'total' => $total,
@@ -149,12 +150,13 @@ class AnimeAdditionalDataImportService
         ];
     }
 
-    public function importAdditionalAnimeData($logger = null) {
+    public function importAdditionalAnimeData($logger = null)
+    {
         $startTime = microtime(true);
         $count = 0;
         $hasError = false;
         $sqlPath = database_path('seeders/anime_additional_data.sql');
-        if (!File::exists($sqlPath)) {
+        if (! File::exists($sqlPath)) {
             $this->unzipSqlFile();
         }
         $anime = DB::table('anime')->get();
@@ -166,18 +168,18 @@ class AnimeAdditionalDataImportService
             foreach ($sqlQueries as $query) {
                 if (trim($query) !== '') {
                     try {
-                        DB::unprepared($query . ';');
-                        $logger && $logger("Importing additional anime data for anime " . ($count + 1));
+                        DB::unprepared($query.';');
+                        $logger && $logger('Importing additional anime data for anime '.($count + 1));
                         $count++;
                     } catch (\Exception $e) {
                         $hasError = true;
-                        $logger && $logger("Error importing additional anime data: " . $e . "\n Error on query: " . $query);
+                        $logger && $logger('Error importing additional anime data: '.$e."\n Error on query: ".$query);
                         $logger && $logger("Imported {$count} SQL queries out of {$total} before running into an error.");
                         break;
                     }
                 }
             }
-            if (!$hasError) {
+            if (! $hasError) {
                 $logger && $logger("Imported {$count} out of {$total} additional anime data SQL queries successfully.");
                 Log::channel('anime_import')->info("Imported {$count} out of {$total} additional anime data SQL queries successfully.");
             }
@@ -185,6 +187,7 @@ class AnimeAdditionalDataImportService
             $logger && $logger('Error importing additional anime data: SQL file does not exist.');
         }
         $duration = microtime(true) - $startTime;
+
         return [
             'count' => $count,
             'total' => $total,
@@ -196,15 +199,29 @@ class AnimeAdditionalDataImportService
     {
         $updateData = [];
 
-        if ($description !== null) $updateData['description'] = $description;
-        if ($genres !== null) $updateData['genres'] = $genres;
-        if ($malRank !== null) $updateData['mal_rank'] = $malRank;
-        if ($malMean !== null) $updateData['mal_mean'] = $malMean;
-        if ($malPopularity !== null) $updateData['mal_popularity'] = $malPopularity;
-        if ($malScoringUsers !== null) $updateData['mal_scoring_users'] = $malScoringUsers;
-        if ($malListMembers !== null) $updateData['mal_list_members'] = $malListMembers;
+        if ($description !== null) {
+            $updateData['description'] = $description;
+        }
+        if ($genres !== null) {
+            $updateData['genres'] = $genres;
+        }
+        if ($malRank !== null) {
+            $updateData['mal_rank'] = $malRank;
+        }
+        if ($malMean !== null) {
+            $updateData['mal_mean'] = $malMean;
+        }
+        if ($malPopularity !== null) {
+            $updateData['mal_popularity'] = $malPopularity;
+        }
+        if ($malScoringUsers !== null) {
+            $updateData['mal_scoring_users'] = $malScoringUsers;
+        }
+        if ($malListMembers !== null) {
+            $updateData['mal_list_members'] = $malListMembers;
+        }
 
-        if (!empty($updateData)) {
+        if (! empty($updateData)) {
             DB::table('anime')
                 ->where('id', $anime->id)
                 ->update($updateData);
@@ -214,25 +231,25 @@ class AnimeAdditionalDataImportService
             $year = empty($anime->year) ? 'NULL' : $anime->year;
             $season = empty($anime->season) ? 'NULL' : "'$anime->season'";
             $title = addslashes(str_replace('"', '', $anime->title));
-            $malMean = !empty($malMean) ? $malMean : $anime->mal_mean ?? 'NULL';
-            $malRank = !empty($malRank) ? $malRank : $anime->mal_rank ?? 'NULL';
-            $malPopularity = !empty($malPopularity) ? $malPopularity : $anime->mal_popularity ?? 'NULL';
-            $malScoringUsers = !empty($malScoringUsers) ? $malScoringUsers : $anime->mal_scoring_users ?? 'NULL';
-            $malListMembers = !empty($malListMembers) ? $malListMembers : $anime->mal_list_members ?? 'NULL';
-            $description = !empty($description) ? addslashes($description) : $anime->description ?? 'NULL';
-            $genres = !empty($genres) ? addslashes($genres) : $anime->genres ?? 'NULL';
+            $malMean = ! empty($malMean) ? $malMean : $anime->mal_mean ?? 'NULL';
+            $malRank = ! empty($malRank) ? $malRank : $anime->mal_rank ?? 'NULL';
+            $malPopularity = ! empty($malPopularity) ? $malPopularity : $anime->mal_popularity ?? 'NULL';
+            $malScoringUsers = ! empty($malScoringUsers) ? $malScoringUsers : $anime->mal_scoring_users ?? 'NULL';
+            $malListMembers = ! empty($malListMembers) ? $malListMembers : $anime->mal_list_members ?? 'NULL';
+            $description = ! empty($description) ? addslashes($description) : $anime->description ?? 'NULL';
+            $genres = ! empty($genres) ? addslashes($genres) : $anime->genres ?? 'NULL';
             $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
     }
 
-     private function zipSqlFile()
+    private function zipSqlFile()
     {
         $sqlPath = database_path('seeders/anime_additional_data.sql');
         $zipPath = database_path('seeders/anime_additional_data.zip');
 
         $zip = new ZipArchive();
-        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
             $zip->addFile($sqlPath, 'anime_additional_data.sql');
             $zip->close();
         } else {
@@ -246,7 +263,7 @@ class AnimeAdditionalDataImportService
         $sqlPath = database_path('seeders/anime_additional_data.sql');
 
         $zip = new ZipArchive();
-        if ($zip->open($zipPath) === TRUE) {
+        if ($zip->open($zipPath) === true) {
             $zip->extractTo(database_path('seeders/'));
             $zip->close();
         } else {

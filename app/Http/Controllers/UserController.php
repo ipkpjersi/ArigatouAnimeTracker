@@ -15,34 +15,40 @@ class UserController extends Controller
 {
     public function getUserData()
     {
-        if (!request()->has(['start', 'length']) || request()->input('length') > 1000) {
+        if (! request()->has(['start', 'length']) || request()->input('length') > 1000) {
             return response()->json(['error' => 'Invalid request'], 400);
         }
         $query = User::select('id', 'avatar', 'username', 'is_admin', 'is_banned', 'created_at');
         if (Auth::user() === null || Auth::user()->is_admin !== 1) {
             $query->where('is_banned', '0');
         }
+
         return DataTables::of($query)
-            ->editColumn('created_at', function($user) {
+            ->editColumn('created_at', function ($user) {
                 return Carbon::parse($user->created_at)->format('M d, Y');
             })
             ->make(true);
     }
 
-    public function list() {
-        return view("userlist");
+    public function list()
+    {
+        return view('userlist');
     }
 
     public function detail(Request $request, $username)
     {
         $user = User::where(['username' => $username])->firstOrFail();
-        if ($user->is_banned === 1 && (Auth::user() === null || Auth::user()->is_admin !== 1)) abort(404);
+        if ($user->is_banned === 1 && (Auth::user() === null || Auth::user()->is_admin !== 1)) {
+            abort(404);
+        }
         $stats = $user->animeStatistics();
         $showPubliclyOnly = true;
-        if ($request->has('showallfriends') && $request->input('showallfriends') === '1' && Auth::user() !== null && strtolower(Auth::user()->username) === strtolower($user->username)) $showPubliclyOnly = false;
+        if ($request->has('showallfriends') && $request->input('showallfriends') === '1' && Auth::user() !== null && strtolower(Auth::user()->username) === strtolower($user->username)) {
+            $showPubliclyOnly = false;
+        }
 
         $friends = $user->friends()->when($showPubliclyOnly, function ($query) {
-                return $query->where('user_friends.show_friend_publicly', true);
+            return $query->where('user_friends.show_friend_publicly', true);
         })->paginate(2, ['*'], 'friendpage')->withQueryString();
         $currentUser = auth()->user();
 
@@ -73,26 +79,26 @@ class UserController extends Controller
         $enableScoreCharts = auth()->user()->enable_score_charts_system === 1;
 
         $reviews = AnimeReview::where('user_id', $user->id)
-                ->join('users', 'anime_reviews.user_id', '=', 'users.id')
-                ->where('anime_reviews.show_review_publicly', true)
-                ->when(!request('spoilers'), function ($query) {
-                        return $query->where('anime_reviews.contains_spoilers', false);
-                })
-                ->where('users.show_reviews_publicly', true)
-                ->where('users.is_banned', false)
-                ->latest('anime_reviews.created_at')
-                ->paginate(2, ['anime_reviews.*', 'users.username', 'users.avatar', 'users.id as user_id'], 'reviewpage');
+            ->join('users', 'anime_reviews.user_id', '=', 'users.id')
+            ->where('anime_reviews.show_review_publicly', true)
+            ->when(! request('spoilers'), function ($query) {
+                return $query->where('anime_reviews.contains_spoilers', false);
+            })
+            ->where('users.show_reviews_publicly', true)
+            ->where('users.is_banned', false)
+            ->latest('anime_reviews.created_at')
+            ->paginate(2, ['anime_reviews.*', 'users.username', 'users.avatar', 'users.id as user_id'], 'reviewpage');
 
         $totalReviewsCount = AnimeReview::where('user_id', $user->id)
-                  ->join('users', 'anime_reviews.user_id', '=', 'users.id')
-                  ->where('anime_reviews.show_review_publicly', true)
-                  ->where('users.show_reviews_publicly', true)
-                  ->where('users.is_banned', false)->count();
+            ->join('users', 'anime_reviews.user_id', '=', 'users.id')
+            ->where('anime_reviews.show_review_publicly', true)
+            ->where('users.show_reviews_publicly', true)
+            ->where('users.is_banned', false)->count();
         $friendUser = null;
-        if (!$isOwnProfile && $currentUser) {
+        if (! $isOwnProfile && $currentUser) {
             $friendUser = $currentUser->friends()
-                            ->where('users.id', $user->id)
-                            ->first();
+                ->where('users.id', $user->id)
+                ->first();
         }
         $userScoreDistribution = [];
         if ($user) {
@@ -112,7 +118,7 @@ class UserController extends Controller
 
     public function banUser(Request $request, $userId)
     {
-        if (auth()->user() == null || !auth()->user()->isAdmin()) {
+        if (auth()->user() == null || ! auth()->user()->isAdmin()) {
             return response()->json([], 404);
         }
         $user = User::findOrFail($userId);
@@ -122,7 +128,7 @@ class UserController extends Controller
         StaffActionLog::create([
             'user_id' => auth()->id(),
             'target_id' => $user->id,
-            'action' => 'ban'
+            'action' => 'ban',
         ]);
 
         return response()->json(['message' => 'User banned successfully']);
@@ -130,7 +136,7 @@ class UserController extends Controller
 
     public function unbanUser(Request $request, $userId)
     {
-        if (auth()->user() == null || !auth()->user()->isAdmin()) {
+        if (auth()->user() == null || ! auth()->user()->isAdmin()) {
             return response()->json([], 404);
         }
         $user = User::findOrFail($userId);
@@ -140,7 +146,7 @@ class UserController extends Controller
         StaffActionLog::create([
             'user_id' => auth()->id(),
             'target_id' => $user->id,
-            'action' => 'unban'
+            'action' => 'unban',
         ]);
 
         return response()->json(['message' => 'User unbanned successfully']);
@@ -148,7 +154,7 @@ class UserController extends Controller
 
     public function removeAvatar(Request $request, $userId)
     {
-        if (auth()->user() == null || !auth()->user()->isModerator()) {
+        if (auth()->user() == null || ! auth()->user()->isModerator()) {
             return response()->json([], 404);
         }
         $user = User::findOrFail($userId);
@@ -161,7 +167,7 @@ class UserController extends Controller
             'user_id' => auth()->id(),
             'target_id' => $user->id,
             'action' => 'remove_avatar',
-            'message' => "Removed avatar $avatar for user $username (ID: $userId)"
+            'message' => "Removed avatar $avatar for user $username (ID: $userId)",
         ]);
 
         return response()->json(['message' => 'Avatar removed successfully']);
@@ -184,6 +190,7 @@ class UserController extends Controller
         try {
             $user = Auth::user();
             $user->addFriend($friendId);
+
             return redirect()->back()->with('success', 'Friend added successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -195,6 +202,7 @@ class UserController extends Controller
         try {
             $user = Auth::user();
             $user->removeFriend($friendId);
+
             return redirect()->back()->with('success', 'Friend removed successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -206,12 +214,10 @@ class UserController extends Controller
         try {
             $user = Auth::user();
             $user->toggleFriendPublicly($friendId);
+
             return redirect()->back()->with('success', 'Friend visibility toggled successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-
-
-
 }
