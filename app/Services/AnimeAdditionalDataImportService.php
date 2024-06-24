@@ -68,7 +68,7 @@ class AnimeAdditionalDataImportService
             if ($malId) {
                 $response = Http::withHeaders([
                     'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
-                ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users');
+                ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users');
 
                 if ($response && $response->successful()) {
                     $data = $response->json();
