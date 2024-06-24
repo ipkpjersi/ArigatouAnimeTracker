@@ -106,7 +106,7 @@ class AnimeListExportService
                 'episodes' => $animeUser->anime->episodes,
                 'duration' => $animeUser->anime->duration ?? 'UNKNOWN',
                 'rating' => $animeUser->anime->rating ?? 'UNKNOWN',
-                'status' => $animeUser->anime_status?->status ?? 'UNKNOWN',
+                'anime_status' => $animeUser->anime->anime_status?->status ?? 'UNKNOWN',
                 'watch_status' => $animeUser->watch_status?->status ?? 'PLAN-TO-WATCH',
                 'score' => $animeUser->score,
                 'progress' => $animeUser->progress,
