@@ -101,7 +101,7 @@
 
                                     <!-- Progress -->
                                     <div class="mt-4">
-                                        <label for="progress" class="block text-sm font-medium text-gray-600 dark:text-gray-300">In Progress:</label>
+                                        <label for="progress" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Progress:</label>
                                         <select name="progress[]" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-select block w-full">
                                             @for ($i = 0; $i <= $anime->episodes; $i++)
                                                 <option value="{{ $i }}" {{ $i == ($currentUserProgress ?? 0) ? 'selected' : '' }}>{{ $i }}</option>
