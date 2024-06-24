@@ -255,9 +255,9 @@ class AnimeAdditionalDataImportService
             $description = !empty($description) ? addslashes($description) : $anime->description ?? 'NULL';
             $genres = !empty($genres) ? addslashes($genres) : $anime->genres ?? 'NULL';
             $averageDuration = !empty($averageDuration) ? $averageDuration : $anime->duration ?? 'NULL';
-            $durationDownloaded = !empty($averageDuration) ? 1 : 0;
+            $durationDownloaded = !empty($averageDuration) && $averageDuration !== 'NULL' ? 1 : 0;
             $rating = !empty($rating) ? addslashes($rating) : $anime->rating ?? 'NULL';
-            $ratingDownloaded = !empty($rating) ? 1 : 0;
+            $ratingDownloaded = !empty($rating) && $rating !== 'NULL' ? 1 : 0;
             $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers, duration = $averageDuration, duration_downloaded = $durationDownloaded, rating = $rating, rating_downloaded = $ratingDownloaded WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
