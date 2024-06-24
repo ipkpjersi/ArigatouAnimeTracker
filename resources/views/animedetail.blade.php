@@ -51,6 +51,9 @@
                                 @endif
                             </p>
                         @endif
+                        @if (!empty($anime->rating))
+                            <p><strong>Rating:</strong> {{ $anime->rating }}</p>
+                        @endif
                         @if (!empty($anime->synonyms))
                             @php
                                 $synonyms = explode(', ', $anime->synonyms);
@@ -178,7 +181,9 @@
                                 <div><a href="{{ route('anime.top', ['sort' => 'most_popular']) }}"><strong>MAL Popularity:</strong> {{ ($anime->mal_popularity ?? 0) > 0 ? '#' . number_format($anime->mal_popularity) : 'N/A' }}</a></div>
 
                                 <div><strong>MAL Members:</strong> {{ ($anime->mal_list_members ?? 0) > 0 ? number_format($anime->mal_list_members) : 'N/A' }}</div>
-                                <div><strong>AAT Score:</strong> {{ ($aas ?? 0) > 0 ? $aas : "N/A" }}</div>
+                                <div><strong>AAT Score:</strong> {{ ($aatScore ?? 0) > 0 ? $aatScore : "N/A" }}</div>
+                                <div><strong>AAT Members:</strong> {{ ($aatMembers ?? 0) > 0 ? $aatMembers : "N/A" }}</div>
+                                <div><strong>AAT Users:</strong> {{ ($aatUsers ?? 0) > 0 ? $aatUsers : "N/A" }}</div>
 
                                 @if (Auth::user() !== null)
                                     <div><strong>My Score:</strong> {{ $currentUserScore > 0 ? number_format($currentUserScore) : 'N/A' }}</div>
