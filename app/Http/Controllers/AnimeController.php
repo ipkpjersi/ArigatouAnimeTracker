@@ -541,7 +541,6 @@ class AnimeController extends Controller
                 if ($user->modifying_sort_order_on_detail_page_sorts_entire_list && $sortOrder !== null) {
                     $currentEntry = $user->anime()->where('anime_id', $animeId)->first();
                     $currentSortOrder = $currentEntry ? $currentEntry->pivot->sort_order : null;
-
                     if ($currentSortOrder === null) {
                         //New entry, insert and shift existing entries
                         $user->anime()->where('sort_order', '>=', $sortOrder)->increment('sort_order');
