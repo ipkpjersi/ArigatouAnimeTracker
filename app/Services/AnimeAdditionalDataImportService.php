@@ -95,7 +95,7 @@ class AnimeAdditionalDataImportService
                         $rating = $data['rating'] ?? null; //The rating of the series.
                         $source = $data['source'] ?? null; //Is it Manga, LN, etc.
                         $background = $data['background'] ?? null; //A brief description of the background, like it's a 2003 DVD that released in Japan but never released overseas, etc.
-                        $recommendations = safe_json_encode($data['background'] ?? []); // Recommended anime by other users.
+                        $recommendations = safe_json_encode($data['recommendations'] ?? []); // Recommended anime by other users.
                         $studios = safe_json_encode($data['studios'] ?? []); // Studio(s) that worked on this anime.
                         $broadcast = safe_json_encode($data['broadcast'] ?? []); // The date and time it was originally broadcast.
                         $relatedAnime = safe_json_encode($data['related_anime'] ?? []); // Any similarly related anime to this.
