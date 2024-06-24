@@ -247,16 +247,18 @@ class AnimeAdditionalDataImportService
             $year = empty($anime->year) ? 'NULL' : $anime->year;
             $season = empty($anime->season) ? 'NULL' : "'$anime->season'";
             $title = addslashes(str_replace('"', '', $anime->title));
-            $malMean = ! empty($malMean) ? $malMean : $anime->mal_mean ?? 'NULL';
-            $malRank = ! empty($malRank) ? $malRank : $anime->mal_rank ?? 'NULL';
-            $malPopularity = ! empty($malPopularity) ? $malPopularity : $anime->mal_popularity ?? 'NULL';
-            $malScoringUsers = ! empty($malScoringUsers) ? $malScoringUsers : $anime->mal_scoring_users ?? 'NULL';
-            $malListMembers = ! empty($malListMembers) ? $malListMembers : $anime->mal_list_members ?? 'NULL';
-            $description = ! empty($description) ? addslashes($description) : $anime->description ?? 'NULL';
-            $genres = ! empty($genres) ? addslashes($genres) : $anime->genres ?? 'NULL';
-            $averageDuration = ! empty($averageDuration) ? addslashes($averageDuration) : $anime->duration ?? 'NULL';
-            $rating = ! empty($rating) ? addslashes($rating) : $anime->rating ?? 'NULL';
-            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers, duration = $averageDuration WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
+            $malMean = !empty($malMean) ? $malMean : $anime->mal_mean ?? 'NULL';
+            $malRank = !empty($malRank) ? $malRank : $anime->mal_rank ?? 'NULL';
+            $malPopularity = !empty($malPopularity) ? $malPopularity : $anime->mal_popularity ?? 'NULL';
+            $malScoringUsers = !empty($malScoringUsers) ? $malScoringUsers : $anime->mal_scoring_users ?? 'NULL';
+            $malListMembers = !empty($malListMembers) ? $malListMembers : $anime->mal_list_members ?? 'NULL';
+            $description = !empty($description) ? addslashes($description) : $anime->description ?? 'NULL';
+            $genres = !empty($genres) ? addslashes($genres) : $anime->genres ?? 'NULL';
+            $averageDuration = !empty($averageDuration) ? $averageDuration : $anime->duration ?? 'NULL';
+            $durationDownloaded = !empty($averageDuration) ? 1 : 0;
+            $rating = !empty($rating) ? addslashes($rating) : $anime->rating ?? 'NULL';
+            $ratingDownloaded = !empty($rating) ? 1 : 0;
+            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers, duration = $averageDuration, duration_downloaded = $durationDownloaded, rating = $rating, rating_downloaded = $ratingDownloaded WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
     }
