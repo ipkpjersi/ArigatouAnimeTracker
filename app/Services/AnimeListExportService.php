@@ -101,7 +101,12 @@ class AnimeListExportService
             $animeArray[] = [
                 'title' => $animeUser->anime->title,
                 'type' => $animeUser->anime->anime_type->type,
+                'season' => $animeUser->anime->season,
+                'year' => $animeUser->anime->year,
                 'episodes' => $animeUser->anime->episodes,
+                'duration' => $animeUser->anime->duration ?? 'UNKNOWN',
+                'rating' => $animeUser->anime->rating ?? 'UNKNOWN',
+                'status' => $animeUser->anime_status?->status ?? 'UNKNOWN',
                 'watch_status' => $animeUser->watch_status?->status ?? 'PLAN-TO-WATCH',
                 'score' => $animeUser->score,
                 'progress' => $animeUser->progress,
