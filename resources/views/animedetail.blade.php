@@ -56,7 +56,7 @@
                                 $synonyms = explode(', ', $anime->synonyms);
                             @endphp
                             <h4 class="font-bold mt-4 cursor-pointer" onclick="toggleSynonyms()">Also known as:</h4>
-                            <div id="synonyms-div">
+                            <div id="synonyms-div" class="mb-2">
                                 <span>
                                     {{ implode(', ', array_slice($synonyms, 0, 4)) }}
                                     <span id="hidden-synonyms" class="hidden">
