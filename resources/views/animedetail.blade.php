@@ -109,7 +109,6 @@
                                         </select>
                                     </div>
 
-
                                     <!-- Score -->
                                     <label for="score" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mt-4">Score:</label>
                                     <select name="score[]" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-select block w-full">
