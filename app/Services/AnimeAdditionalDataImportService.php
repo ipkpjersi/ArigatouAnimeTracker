@@ -84,7 +84,6 @@ class AnimeAdditionalDataImportService
                         $malMembers = $data['num_list_users'] ?? null; //The members with this anime on their list.
                         $averageDuration = $data['average_episode_duration'] ?? null; //The average episode duration (or duration).
                         $rating = $data['rating'] ?? null; //The rating of the series.
-
                         $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
                     } elseif ($response) {
                         $data = $response->json();
