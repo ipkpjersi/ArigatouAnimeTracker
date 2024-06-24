@@ -75,6 +75,7 @@ class AnimeAdditionalDataImportService
             // Try MAL first
             if ($malId) {
                 try {
+                    //Sometimes the data for certain columns returned by the MAL API is unexpected/unclean even with safe_json_encode, so we could always SELECT DISTINCT columns if necessary and then even hardcode any arrays with said data for any input/display validation. It's better to have the format in an incorrect/weird format than to not have it at all.
                     $response = Http::withHeaders([
                         'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
                     ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users,source,background,recommendations,studios,broadcast,related_anime,related_manga');
