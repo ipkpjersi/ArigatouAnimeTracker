@@ -187,7 +187,7 @@ class AnimeAdditionalDataImportService
         $count = 0;
         $hasError = false;
         $sqlPath = database_path('seeders/anime_additional_data.sql');
-        if (! File::exists($sqlPath)) {
+        if (!File::exists($sqlPath)) {
             $this->unzipSqlFile();
         }
         $anime = DB::table('anime')->get();
@@ -210,7 +210,7 @@ class AnimeAdditionalDataImportService
                     }
                 }
             }
-            if (! $hasError) {
+            if (!$hasError) {
                 $logger && $logger("Imported {$count} out of {$total} additional anime data SQL queries successfully.");
                 Log::channel('anime_import')->info("Imported {$count} out of {$total} additional anime data SQL queries successfully.");
             }
