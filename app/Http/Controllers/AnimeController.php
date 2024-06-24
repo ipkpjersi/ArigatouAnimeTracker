@@ -548,13 +548,11 @@ class AnimeController extends Controller
                     } else {
                         if ($currentSortOrder < $sortOrder) {
                             //Moving downwards
-                            $user->anime()->where('sort_order', '>', $currentSortOrder)
-                                          ->where('sort_order', '<=', $sortOrder)
+                            $user->anime()->whereBetween('sort_order', [$currentSortOrder + 1, $sortOrder])
                                           ->decrement('sort_order');
                         } elseif ($currentSortOrder > $sortOrder) {
                             //Moving upwards
-                            $user->anime()->where('sort_order', '<', $currentSortOrder)
-                                          ->where('sort_order', '>=', $sortOrder)
+                            $user->anime()->whereBetween('sort_order', [$sortOrder, $currentSortOrder - 1])
                                           ->increment('sort_order');
                         }
                     }
