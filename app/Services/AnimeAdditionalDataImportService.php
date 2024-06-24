@@ -61,6 +61,7 @@ class AnimeAdditionalDataImportService
             $malPopularity = null;
             $malUsers = null;
             $malMembers = null;
+            $averageDuration = null;
 
             // Try MAL first
             if ($malId) {
@@ -78,8 +79,9 @@ class AnimeAdditionalDataImportService
                     $malRank = $data['rank'] ?? null;
                     $malMean = $data['mean'] ?? null;
                     $malPopularity = $data['popularity'] ?? null;
-                    $malUsers = $data['num_scoring_users'] ?? null; //The users who have scored/ranked the anime
+                    $malUsers = $data['num_scoring_users'] ?? null; //The users who have scored/ranked the anime.
                     $malMembers = $data['num_list_users'] ?? null; //The members with this anime on their list.
+                    $averageDuration = $data['average_episode_duration'] ?? null; //The average episode duration (or duration)
 
                     $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
                 } elseif ($response) {
@@ -119,7 +121,7 @@ class AnimeAdditionalDataImportService
             }
 
             if ($description) {
-                $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $sqlFile, $logger);
+                $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $averageDuration, $sqlFile, $logger);
                 $logger && $logger('Successfully updated description and genres for anime: '.$row->title);
                 Log::channel('anime_import')->info('Successfully updated description and genres for anime: '.$row->title);
                 $count++;
@@ -195,7 +197,7 @@ class AnimeAdditionalDataImportService
         ];
     }
 
-    private function updateAnimeData($anime, $description, $genres, $malRank, $malMean, $malPopularity, $malScoringUsers, $malListMembers, $sqlFile, $logger = null)
+    private function updateAnimeData($anime, $description, $genres, $malRank, $malMean, $malPopularity, $malScoringUsers, $malListMembers, $averageDuration, $sqlFile, $logger = null)
     {
         $updateData = [];
 
@@ -220,8 +222,11 @@ class AnimeAdditionalDataImportService
         if ($malListMembers !== null) {
             $updateData['mal_list_members'] = $malListMembers;
         }
+        if ($averageDuration !== null) {
+            $updateData['duration'] = $averageDuration;
+        }
 
-        if (! empty($updateData)) {
+        if (!empty($updateData)) {
             DB::table('anime')
                 ->where('id', $anime->id)
                 ->update($updateData);
@@ -238,7 +243,7 @@ class AnimeAdditionalDataImportService
             $malListMembers = ! empty($malListMembers) ? $malListMembers : $anime->mal_list_members ?? 'NULL';
             $description = ! empty($description) ? addslashes($description) : $anime->description ?? 'NULL';
             $genres = ! empty($genres) ? addslashes($genres) : $anime->genres ?? 'NULL';
-            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
+            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers, duration = $averageDuration WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
     }

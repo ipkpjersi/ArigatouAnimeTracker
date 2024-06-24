@@ -20,7 +20,7 @@ class DownloadAdditionalAnimeData extends Command
      *
      * @var string
      */
-    protected $description = 'Fetches additional data for anime from the MyAnimeList API.';
+    protected $description = 'Fetches and inserts additional data for anime from the MyAnimeList (or notify.moe or kitsu.io) API. Optionally generates an importable SQL file. Optionally runs for API empty descriptions only (to force a retry of fetching descriptions).';
 
     /**
      * Execute the console command.
