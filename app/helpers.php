@@ -45,11 +45,11 @@ if (! function_exists('rot19')) {
 
 if (! function_exists('safe_json_encode')) {
     function safe_json_encode($data) {
-        if (empty($data) || $data === "[]" || $data === "null") {
+        if (empty($data) || in_array($data, ['[]', '{}', 'null', 'NULL', ''])) {
             return null;
         }
         $encodedData = json_encode($data);
-        if ($encodedData === '[]' || $encodedData === '""' || $encodedData === 'null') {
+        if (in_array($encodedData, ['[]', '{}', '""', 'null', 'NULL'])) {
             return null;
         }
         return $encodedData;
