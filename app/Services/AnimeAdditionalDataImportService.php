@@ -66,29 +66,33 @@ class AnimeAdditionalDataImportService
 
             // Try MAL first
             if ($malId) {
-                $response = Http::withHeaders([
-                    'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
-                ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users');
+                try {
+                    $response = Http::withHeaders([
+                        'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
+                    ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users');
+                    if ($response && $response->successful()) {
+                        $data = $response->json();
+                        $description = $data['synopsis'] ?? null;
+                        $genres = array_map(function ($genre) {
+                            return str_replace('"', '', $genre['name']);
+                        }, $data['genres'] ?? []);
+                        $genres = $genres ? implode(',', $genres) : null;
+                        $malRank = $data['rank'] ?? null;
+                        $malMean = $data['mean'] ?? null;
+                        $malPopularity = $data['popularity'] ?? null;
+                        $malUsers = $data['num_scoring_users'] ?? null; //The users who have scored/ranked the anime.
+                        $malMembers = $data['num_list_users'] ?? null; //The members with this anime on their list.
+                        $averageDuration = $data['average_episode_duration'] ?? null; //The average episode duration (or duration).
+                        $rating = $data['rating'] ?? null; //The rating of the series.
 
-                if ($response && $response->successful()) {
-                    $data = $response->json();
-                    $description = $data['synopsis'] ?? null;
-                    $genres = array_map(function ($genre) {
-                        return str_replace('"', '', $genre['name']);
-                    }, $data['genres'] ?? []);
-                    $genres = $genres ? implode(',', $genres) : null;
-                    $malRank = $data['rank'] ?? null;
-                    $malMean = $data['mean'] ?? null;
-                    $malPopularity = $data['popularity'] ?? null;
-                    $malUsers = $data['num_scoring_users'] ?? null; //The users who have scored/ranked the anime.
-                    $malMembers = $data['num_list_users'] ?? null; //The members with this anime on their list.
-                    $averageDuration = $data['average_episode_duration'] ?? null; //The average episode duration (or duration).
-                    $rating = $data['rating'] ?? null; //The rating of the series.
-
-                    $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
-                } elseif ($response) {
-                    $data = $response->json();
-                    $logger && $logger('Failed update response from MAL for anime: '.$row->title.' '.print_r($data, true));
+                        $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
+                    } elseif ($response) {
+                        $data = $response->json();
+                        $logger && $logger('Failed update response from MAL for anime: '.$row->title.' '.print_r($data, true));
+                    }
+                } catch (\Exception $e) {
+                    $logger && $logger('Error fetching data from MAL for anime: ' . $row->title . '. Error: ' . $e->getMessage());
+                    Log::channel('anime_import')->error('Error fetching data from MAL for anime: ' . $row->title . '. Error: ' . $e->getMessage());
                 }
             } else {
                 //Optional logging, we likely don't need this logging unless we know it's not fetching descriptions from MAL when it should be.
@@ -97,28 +101,38 @@ class AnimeAdditionalDataImportService
 
             // Then try notify.moe if MAL fails
             if ((! $description || ! $genres) && $notifyMoeId) {
-                $response = Http::get('https://notify.moe/api/anime/'.$notifyMoeId);
-                if ($response && $response->successful()) {
-                    $data = $response->json();
-                    $description = $data['summary'] ?? null;
-                    $genres = $data['genres'] ? implode(',', $data['genres']) : null;
-                    $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from notify.moe');
+                try {
+                    $response = Http::get('https://notify.moe/api/anime/'.$notifyMoeId);
+                    if ($response && $response->successful()) {
+                        $data = $response->json();
+                        $description = $data['summary'] ?? null;
+                        $genres = $data['genres'] ? implode(',', $data['genres']) : null;
+                        $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from notify.moe');
+                    }
+                } catch (\Exception $e) {
+                    $logger && $logger('Error fetching data from notify.moe for anime: ' . $row->title . '. Error: ' . $e->getMessage());
+                    Log::channel('anime_import')->error('Error fetching data from notify.moe for anime: ' . $row->title . '. Error: ' . $e->getMessage());
                 }
             }
 
             // Finally, try kitsu.io if both MAL and notify.moe fail
             if ((! $description || ! $genres) && $kitsuId) {
-                $response = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId);
-                if ($response && $response->successful()) {
-                    $data = $response->json();
-                    $description = $data['data']['attributes']['synopsis'] ?? null;
-                    $genresResponse = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId.'/genres');
-                    $genresData = $genresResponse->json();
-                    $genres = array_map(function ($genre) {
-                        return $genre['attributes']['name'];
-                    }, $genresData['data'] ?? []);
-                    $genres = $genres ? implode(',', $genres) : null;
-                    $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from kitsu.io');
+                try {
+                    $response = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId);
+                    if ($response && $response->successful()) {
+                        $data = $response->json();
+                        $description = $data['data']['attributes']['synopsis'] ?? null;
+                        $genresResponse = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId.'/genres');
+                        $genresData = $genresResponse->json();
+                        $genres = array_map(function ($genre) {
+                            return $genre['attributes']['name'];
+                        }, $genresData['data'] ?? []);
+                        $genres = $genres ? implode(',', $genres) : null;
+                        $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from kitsu.io');
+                    }
+                } catch (\Exception $e) {
+                    $logger && $logger('Error fetching data from kitsu.io for anime: ' . $row->title . '. Error: ' . $e->getMessage());
+                    Log::channel('anime_import')->error('Error fetching data from kitsu.io for anime: ' . $row->title . '. Error: ' . $e->getMessage());
                 }
             }
 
