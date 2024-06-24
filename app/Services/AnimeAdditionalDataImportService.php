@@ -100,7 +100,6 @@ class AnimeAdditionalDataImportService
                         $relatedAnime = safe_json_encode($data['related_anime'] ?? []); // Any similarly related anime to this.
                         $relatedManga = safe_json_encode($data['related_manga'] ?? []); // Any similarly related manga to this.
 
-
                         $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
                     } elseif ($response) {
                         $data = $response->json();
