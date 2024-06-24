@@ -45,12 +45,10 @@ if (! function_exists('rot19')) {
 
 if (! function_exists('safe_json_encode')) {
     function safe_json_encode($data) {
-        // Check if data is empty, is an empty array, or is the string "null"
         if (empty($data) || $data === "[]" || $data === "null") {
             return null;
         }
         $encodedData = json_encode($data);
-        // Check if the encoded data is an empty array or null string
         if ($encodedData === '[]' || $encodedData === '""' || $encodedData === 'null') {
             return null;
         }
