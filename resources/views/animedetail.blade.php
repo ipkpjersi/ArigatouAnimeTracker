@@ -45,9 +45,9 @@
                             <p>
                                 <strong>Duration:</strong>
                                 @if ($anime->episodes > 1)
-                                    {{ $anime->duration }} per episode
+                                    {{ \Carbon\CarbonInterval::seconds($anime->duration)->cascade()->forHumans() }} per episode
                                 @else
-                                    {{ $anime->duration }}
+                                    {{ \Carbon\CarbonInterval::seconds($anime->duration)->cascade()->forHumans() }}
                                 @endif
                             </p>
                         @endif
