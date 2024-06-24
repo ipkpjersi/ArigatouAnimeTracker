@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use ZipArchive;
+use function App\Helpers\safe_json_encode;
 
 class AnimeAdditionalDataImportService
 {
@@ -76,7 +77,7 @@ class AnimeAdditionalDataImportService
                 try {
                     $response = Http::withHeaders([
                         'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
-                    ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users');
+                    ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users,source,background,recommendations,studios,broadcast,related_anime,related_manga');
                     if ($response && $response->successful()) {
                         $data = $response->json();
                         $description = $data['synopsis'] ?? null;
@@ -92,12 +93,14 @@ class AnimeAdditionalDataImportService
                         $averageDuration = $data['average_episode_duration'] ?? null; //The average episode duration (or duration).
                         $rating = $data['rating'] ?? null; //The rating of the series.
                         $source = $data['source'] ?? null; //Is it Manga, LN, etc.
-                        $background = $data['background'] ?? null; //A brief description of the background, like it's a 2003 DVD etc.
-                        $recommendations = $data['recommendations'] ?? null; //Recommended anime by other users.
-                        $studios = $data['studios'] ?? null; //Studio(s) that worked on this anime.
-                        $broadcast = $data['broadcast'] ?? null; //The date and time it was originally broadcast.
-                        $relatedAnime = $data['related_anime'] ?? null; //Any similarly related anime to this.
-                        $relatedManga = $data['related_manga'] ?? null; //Any similarly related manga to this.
+                        $background = $data['background'] ?? null; //A brief description of the background, like it's a 2003 DVD that released in Japan but never released overseas, etc.
+                        $recommendations = safe_json_encode($data['background'] ?? []); // Recommended anime by other users.
+                        $studios = safe_json_encode($data['studios'] ?? []); // Studio(s) that worked on this anime.
+                        $broadcast = safe_json_encode($data['broadcast'] ?? []); // The date and time it was originally broadcast.
+                        $relatedAnime = safe_json_encode($data['related_anime'] ?? []); // Any similarly related anime to this.
+                        $relatedManga = safe_json_encode($data['related_manga'] ?? []); // Any similarly related manga to this.
+
+
                         $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
                     } elseif ($response) {
                         $data = $response->json();
