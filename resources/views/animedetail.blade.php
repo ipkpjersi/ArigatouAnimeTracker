@@ -52,7 +52,21 @@
                             </p>
                         @endif
                         @if (!empty($anime->rating))
-                            <p><strong>Rating:</strong> {{ $anime->rating }}</p>
+                            @php
+                                $rating = strtoupper(str_replace('_', '-', $anime->rating));
+                            @endphp
+                            @switch($rating)
+                                @case('R')
+                                    @php $rating .= ' - Violence & Profanity'; @endphp
+                                    @break
+                                @case('R+')
+                                    @php $rating .= ' - ' . str_rot13('Ahqvgl'); @endphp
+                                    @break
+                                @case('RX')
+                                    @php $rating .= ' - ' . str_rot13('Uragnv'); @endphp
+                                    @break
+                            @endswitch
+                            <p><strong>Rating:</strong> {{ $rating }}</p>
                         @endif
                         @if (!empty($anime->synonyms))
                             @php
