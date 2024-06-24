@@ -41,6 +41,16 @@
                         <p><strong>Episodes:</strong> {{ $anime->episodes }}</p>
                         <p><strong>Season:</strong> {{ $anime->season }}</p>
                         <p><strong>Year:</strong> {{ $anime->year }}</p>
+                        @if (!empty($anime->duration))
+                            <p>
+                                <strong>Duration:</strong>
+                                @if ($anime->episodes > 1)
+                                    {{ $anime->duration }} per episode
+                                @else
+                                    {{ $anime->duration }}
+                                @endif
+                            </p>
+                        @endif
                         @if (!empty($anime->synonyms))
                             @php
                                 $synonyms = explode(', ', $anime->synonyms);
