@@ -63,6 +63,13 @@ class AnimeAdditionalDataImportService
             $malMembers = null;
             $averageDuration = null;
             $rating = null;
+            $source = null;
+            $background = null;
+            $recommendations = null;
+            $studios = null;
+            $broadcast = null;
+            $relatedAnime = null;
+            $relatedManga = null;
 
             // Try MAL first
             if ($malId) {
@@ -84,6 +91,13 @@ class AnimeAdditionalDataImportService
                         $malMembers = $data['num_list_users'] ?? null; //The members with this anime on their list.
                         $averageDuration = $data['average_episode_duration'] ?? null; //The average episode duration (or duration).
                         $rating = $data['rating'] ?? null; //The rating of the series.
+                        $source = $data['source'] ?? null; //Is it Manga, LN, etc.
+                        $background = $data['background'] ?? null; //A brief description of the background, like it's a 2003 DVD etc.
+                        $recommendations = $data['recommendations'] ?? null; //Recommended anime by other users.
+                        $studios = $data['studios'] ?? null; //Studio(s) that worked on this anime.
+                        $broadcast = $data['broadcast'] ?? null; //The date and time it was originally broadcast.
+                        $relatedAnime = $data['related_anime'] ?? null; //Any similarly related anime to this.
+                        $relatedManga = $data['related_manga'] ?? null; //Any similarly related manga to this.
                         $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
                     } elseif ($response) {
                         $data = $response->json();
@@ -136,7 +150,7 @@ class AnimeAdditionalDataImportService
             }
 
             if ($description) {
-                $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $averageDuration, $rating, $sqlFile, $logger);
+                $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $averageDuration, $rating,  $source, $background, $recommendations, $studios, $broadcast, $relatedAnime, $relatedManga, $sqlFile, $logger);
                 $logger && $logger('Successfully updated description and genres for anime: '.$row->title);
                 Log::channel('anime_import')->info('Successfully updated description and genres for anime: '.$row->title);
                 $count++;
@@ -212,7 +226,7 @@ class AnimeAdditionalDataImportService
         ];
     }
 
-    private function updateAnimeData($anime, $description, $genres, $malRank, $malMean, $malPopularity, $malScoringUsers, $malListMembers, $averageDuration, $rating, $sqlFile, $logger = null)
+    private function updateAnimeData($anime, $description, $genres, $malRank, $malMean, $malPopularity, $malScoringUsers, $malListMembers, $averageDuration, $rating,  $source, $background, $recommendations, $studios, $broadcast, $relatedAnime, $relatedManga, $sqlFile, $logger = null)
     {
         $updateData = [];
 
@@ -249,6 +263,27 @@ class AnimeAdditionalDataImportService
         if ($rating !== null) {
             $updateData['rating_downloaded'] = 1;
         }
+        if ($source !== null) {
+            $updateData['source'] = $source;
+        }
+        if ($background !== null) {
+            $updateData['background'] = $background;
+        }
+        if ($recommendations !== null) {
+            $updateData['recommendations'] = $recommendations;
+        }
+        if ($studios !== null) {
+            $updateData['studios'] = $studios;
+        }
+        if ($broadcast !== null) {
+            $updateData['broadcast'] = $broadcast;
+        }
+        if ($relatedAnime !== null) {
+            $updateData['related_anime'] = $relatedAnime;
+        }
+        if ($relatedManga !== null) {
+            $updateData['related_manga'] = $relatedAnime;
+        }
 
         if (!empty($updateData)) {
             DB::table('anime')
@@ -271,7 +306,15 @@ class AnimeAdditionalDataImportService
             $durationDownloaded = !empty($averageDuration) && $averageDuration !== 'NULL' ? 1 : 0;
             $rating = !empty($rating) ? addslashes($rating) : $anime->rating ?? 'NULL';
             $ratingDownloaded = !empty($rating) && $rating !== 'NULL' ? 1 : 0;
-            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers, duration = $averageDuration, duration_downloaded = $durationDownloaded, rating = $rating, rating_downloaded = $ratingDownloaded WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
+            $source = !empty($source) ? addslashes($source) : $anime->source ?? 'NULL';
+            $background = !empty($background) ? addslashes($background) : $anime->background ?? 'NULL';
+            $recommendations = !empty($recommendations) ? addslashes($recommendations) : $anime->recommendations ?? 'NULL';
+            $studios = !empty($studios) ? addslashes($studios) : $anime->studios ?? 'NULL';
+            $broadcast = !empty($broadcast) ? addslashes($broadcast) : $anime->broadcast ?? 'NULL';
+            $relatedAnime = !empty($relatedAnime) ? addslashes($relatedAnime) : $anime->related_anime ?? 'NULL';
+            $relatedManga = !empty($relatedManga) ? addslashes($relatedManga) : $anime->related_manga ?? 'NULL';
+
+            $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers, duration = $averageDuration, duration_downloaded = $durationDownloaded, rating = $rating, rating_downloaded = $ratingDownloaded, source = '$source', background = '$background', recommendations = '$recommendations', studios = '$studios', broadcast = '$broadcast', related_anime = '$relatedAnime', related_manga = '$relatedManga' WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
         }
     }

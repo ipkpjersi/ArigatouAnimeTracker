@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('studios')->nullable();
             $table->string('broadcast')->nullable();
             $table->text('related_anime')->nullable();
+            $table->text('related_manga')->nullable();
         });
     }
 
@@ -33,6 +34,7 @@ return new class extends Migration
             $table->dropColumn('studios');
             $table->dropColumn('broadcast');
             $table->dropColumn('related_anime');
+            $table->dropColumn('related_manga');
         });
     }
 };
