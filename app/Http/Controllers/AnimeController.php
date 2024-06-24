@@ -535,14 +535,28 @@ class AnimeController extends Controller
             //Is the user updating from the anime detail page (or possibly from the list page if their list has only one entry)?
             $updatingFromAnimeDetailPage = count($request->anime_ids) === 1;
             if ($updatingFromAnimeDetailPage) {
+                $animeId = $request->anime_ids[0];
                 $sortOrder = $request->sort_order[0] ?? null;
                 //Check if the user has the setting enabled and a sort_order is provided
                 if ($user->modifying_sort_order_on_detail_page_sorts_entire_list && $sortOrder !== null) {
-                    //Find the existing entry with the provided sort_order, if it even exists
-                    $existingEntry = $user->anime()->where('sort_order', $sortOrder)->first();
-                    if ($existingEntry) {
-                        //Increment the sort_order of the existing entry and all entries below it to move the other entries down
+                    $currentEntry = $user->anime()->where('anime_id', $animeId)->first();
+                    $currentSortOrder = $currentEntry ? $currentEntry->pivot->sort_order : null;
+
+                    if ($currentSortOrder === null) {
+                        //New entry, insert and shift existing entries
                         $user->anime()->where('sort_order', '>=', $sortOrder)->increment('sort_order');
+                    } else {
+                        if ($currentSortOrder < $sortOrder) {
+                            //Moving downwards
+                            $user->anime()->where('sort_order', '>', $currentSortOrder)
+                                          ->where('sort_order', '<=', $sortOrder)
+                                          ->decrement('sort_order');
+                        } elseif ($currentSortOrder > $sortOrder) {
+                            //Moving upwards
+                            $user->anime()->where('sort_order', '<', $currentSortOrder)
+                                          ->where('sort_order', '>=', $sortOrder)
+                                          ->increment('sort_order');
+                        }
                     }
                 }
             }
