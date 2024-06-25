@@ -32,6 +32,13 @@ class AnimeAdditionalDataImportService
         $downloading = $anime->count();
         $logger && $logger("Downloading additional anime data for $downloading out of $total anime.");
         $sqlFile = $generateSqlFile ? fopen(('database/seeders/anime_additional_data.sql'), 'a') : null;
+        $sqlFilePath = 'database/seeders/anime_additional_data.sql';
+        $zipFilePath = 'database/seeders/anime_additional_data.sql.zip';
+
+        if ($generateSqlFile && !file_exists($sqlFilePath) && file_exists($zipFilePath)) {
+            $logger && $logger("File anime_additional_data.sql does not exist, extracting anime_additional_data.sql.zip to append more data...");
+            $this->unzipSqlFile();
+        }
 
         foreach ($anime as $row) {
             $malId = null;
