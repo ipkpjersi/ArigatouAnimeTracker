@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('source')->nullable();
             $table->text('background')->nullable();
             $table->text('recommendations')->nullable();
-            $table->string('studios')->nullable();
+            $table->text('studios')->nullable();
             $table->string('broadcast')->nullable();
             $table->text('related_anime')->nullable();
             $table->text('related_manga')->nullable();
