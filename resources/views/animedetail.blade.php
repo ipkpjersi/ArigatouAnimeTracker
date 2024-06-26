@@ -191,7 +191,7 @@
                                 <div><strong>MAL Users:</strong> {{ ($anime->mal_scoring_users ?? 0) > 0 ? number_format($anime->mal_scoring_users) : 'N/A' }}</div>
 
                                 <!-- Second Row -->
-                                <div><a href="{{ route('anime.top', ['sort' => 'highest_rated']) }}"><strong>Ranked:</strong> {{ ($anime->mal_rank ?? 0) > 0 ? '#' . number_format($anime->mal_rank) : 'N/A' }}</a></div>
+                                <div><a href="{{ route('anime.top', ['sort' => 'highest_rated']) }}"><strong>MAL Ranked:</strong> {{ ($anime->mal_rank ?? 0) > 0 ? '#' . number_format($anime->mal_rank) : 'N/A' }}</a></div>
                                 <div><a href="{{ route('anime.top', ['sort' => 'most_popular']) }}"><strong>MAL Popularity:</strong> {{ ($anime->mal_popularity ?? 0) > 0 ? '#' . number_format($anime->mal_popularity) : 'N/A' }}</a></div>
 
                                 <div><strong>MAL Members:</strong> {{ ($anime->mal_list_members ?? 0) > 0 ? number_format($anime->mal_list_members) : 'N/A' }}</div>
