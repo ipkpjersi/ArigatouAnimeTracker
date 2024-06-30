@@ -1,12 +1,11 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Anime;
-use App\Models\AnimeUser;
 use App\Models\AnimeType;
-use App\Models\AnimeStatus;
+use App\Models\AnimeUser;
 use App\Models\WatchStatus;
-use Illuminate\Support\Facades\Auth;
 use SimpleXMLElement;
 
 class AnimeListImportService
@@ -19,27 +18,28 @@ class AnimeListImportService
             return $this->importFromArigatou($fileContent, $userId, $logger);
         } else {
             //Unknown file type
-            return "";
+            return '';
         }
     }
+
     private function importFromMyAnimeList(string $xmlContent, $userId, $logger = null)
     {
         $count = 0;
         $startTime = microtime(true);
-         try {
+        try {
             $xml = new SimpleXMLElement($xmlContent);
         } catch (\Exception $e) {
-            \Log::error("An exception has occurred importing a MyAnimeList export: "  . $e);
+            \Log::error('An exception has occurred importing a MyAnimeList export: '.$e);
         }
         $total = count($xml->anime);
         foreach ($xml->anime as $animeData) {
-            $title = str_replace('"', '', (string)$animeData->series_title);
-            $type = (string)$animeData->series_type;
-            $episodes = (int)$animeData->series_episodes;
-            $watchStatus = strtoupper(str_replace(" ", "-", (string)$animeData->my_status));
-            $score = (int)$animeData->my_score;
-            $progress = (int)$animeData->my_watched_episodes;
-            $comments = (string)$animeData->my_comments;
+            $title = str_replace('"', '', (string) $animeData->series_title);
+            $type = (string) $animeData->series_type;
+            $episodes = (int) $animeData->series_episodes;
+            $watchStatus = strtoupper(str_replace(' ', '-', (string) $animeData->my_status));
+            $score = (int) $animeData->my_score;
+            $progress = (int) $animeData->my_watched_episodes;
+            $comments = (string) $animeData->my_comments;
             $animeType = AnimeType::firstOrCreate(['type' => $type]);
             // Check for existing anime
             $existingAnime = Anime::where('title', $title)
@@ -49,9 +49,10 @@ class AnimeListImportService
 
             $animeId = $existingAnime->id ?? null;
 
-            if (!$animeId) {
+            if (! $animeId) {
                 \Log::info("Could not find match for anime $title with type {$animeType->type} and $episodes episodes");
                 $logger && $logger("Could not find match for anime $title with type {$animeType->type} and $episodes episodes");
+
                 continue;
             }
 
@@ -62,6 +63,7 @@ class AnimeListImportService
 
             if ($existingEntry) {
                 $logger && $logger("Skipping existing anime $title with type {$animeType->type} and $episodes episodes");
+
                 continue;
             }
 
@@ -75,14 +77,15 @@ class AnimeListImportService
                 'watch_status_id' => $watchStatusModel->id,
                 'score' => $score,
                 'progress' => $progress,
-                'notes' => $comments
+                'notes' => $comments,
             ]);
 
             $count++;
         }
 
         $duration = microtime(true) - $startTime;
-        return ["count" => $count, "total" => $total, "duration" => $duration];
+
+        return ['count' => $count, 'total' => $total, 'duration' => $duration];
     }
 
     private function importFromArigatou(string $jsonContent, $userId, $logger = null)
@@ -115,8 +118,9 @@ class AnimeListImportService
 
             $animeId = $existingAnime->id ?? null;
 
-            if (!$animeId) {
+            if (! $animeId) {
                 $logger && $logger("Could not find match for anime $title with type {$animeType->type} and $episodes episodes");
+
                 continue;
             }
 
@@ -127,6 +131,7 @@ class AnimeListImportService
 
             if ($existingEntry) {
                 $logger && $logger("Skipping existing anime $title with type {$animeType->type} and $episodes episodes");
+
                 continue;
             }
 
@@ -143,13 +148,14 @@ class AnimeListImportService
                 'notes' => $notes,
                 'show_anime_notes_publicly' => $showAnimeNotesPublicly,
                 'display_in_list' => $displayInList,
-                'sort_order' => $sortOrder
+                'sort_order' => $sortOrder,
             ]);
 
             $count++;
         }
 
         $duration = microtime(true) - $startTime;
-        return ["count" => $count, "total" => $total, "duration" => $duration];
+
+        return ['count' => $count, 'total' => $total, 'duration' => $duration];
     }
 }

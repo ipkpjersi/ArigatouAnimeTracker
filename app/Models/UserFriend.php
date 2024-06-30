@@ -11,5 +11,4 @@ class UserFriend extends Model
     protected $fillable = [
 
     ];
-
 }

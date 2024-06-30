@@ -4,11 +4,10 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ZipArchive;
+
 use function App\Helpers\rot19;
 
 class AnimeImageDownloadService
@@ -16,19 +15,19 @@ class AnimeImageDownloadService
     public function downloadImages($logger = null)
     {
         $anime = DB::table('anime')
-                    ->whereNot("image_downloaded", "=", true)
-                    ->where(function($query) {
-                        $query->whereNotNull('picture')
-                              ->orWhereNotNull('thumbnail');
-                    })
-                    ->get();
+            ->whereNot('image_downloaded', '=', true)
+            ->where(function ($query) {
+                $query->whereNotNull('picture')
+                    ->orWhereNotNull('thumbnail');
+            })
+            ->get();
         $downloaded = DB::table('anime')
-                    ->where("image_downloaded", "=", true)
-                    ->where(function($query) {
-                        $query->whereNotNull('picture')
-                              ->orWhereNotNull('thumbnail');
-                    })
-                    ->get();
+            ->where('image_downloaded', '=', true)
+            ->where(function ($query) {
+                $query->whereNotNull('picture')
+                    ->orWhereNotNull('thumbnail');
+            })
+            ->get();
         $startTime = microtime(true);
         $successful = 0;
         $imageFailed = 0;
@@ -55,20 +54,22 @@ class AnimeImageDownloadService
                     }
                 }
             } catch (\Exception $e) {
-                $logger && $logger('An error occurred during downloading an image: ' . $e);
+                $logger && $logger('An error occurred during downloading an image: '.$e);
+
                 continue;
             }
             if ($imageDownloaded) {
                 DB::table('anime')
-                  ->where('id', $current->id)
-                  ->limit(1)
-                  ->update(['image_downloaded' => true]);
+                    ->where('id', $current->id)
+                    ->limit(1)
+                    ->update(['image_downloaded' => true]);
             }
-            $sleepTime = rand(config("global.image_download_service_sleep_time_lower", 5), config("global.image_download_service_sleep_time_upper", 22));
+            $sleepTime = rand(config('global.image_download_service_sleep_time_lower', 5), config('global.image_download_service_sleep_time_upper', 22));
             $logger && $logger("Sleeping for $sleepTime seconds");
             sleep($sleepTime);
         }
         $duration = microtime(true) - $startTime;
+
         return [
             'successful' => $successful,
             'total' => $total,
@@ -85,26 +86,29 @@ class AnimeImageDownloadService
 
         // Create the directories if they don't exist
         $directory = dirname($fullPath);
-        if (!file_exists($directory)) {
-            if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
+        if (! file_exists($directory)) {
+            if (! mkdir($directory, 0755, true) && ! is_dir($directory)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $directory));
             }
         }
 
         // Check if the file already exists
-        if (!file_exists($fullPath)) {
+        if (! file_exists($fullPath)) {
             $response = Http::get($url);
             if ($response->successful()) {
                 file_put_contents($fullPath, $response->body());
-                $logger && $logger("Image $type downloaded successfully to: " . $fullPath);
+                $logger && $logger("Image $type downloaded successfully to: ".$fullPath);
+
                 return true;
             } else {
-                $logger && $logger("Failed to download $type image from: " . $url . " with response status: " . $response->status());
+                $logger && $logger("Failed to download $type image from: ".$url.' with response status: '.$response->status());
             }
         } else {
-            $logger && $logger("Image $type already exists at: " . $fullPath);
+            $logger && $logger("Image $type already exists at: ".$fullPath);
+
             return true; //Technically it's downloaded, if we manually downloaded might as well mark it true.
         }
+
         return false;
     }
 
@@ -112,14 +116,15 @@ class AnimeImageDownloadService
     {
         $parsedUrl = parse_url($url);
         $path = $parsedUrl['path'];
-        return "$type" . $path;
+
+        return "$type".$path;
     }
 
-        public function zipImages()
+    public function zipImages()
     {
         $directories = [
             public_path('picture'),
-            public_path('thumbnail')
+            public_path('thumbnail'),
         ];
 
         foreach ($directories as $dir) {
@@ -140,10 +145,10 @@ class AnimeImageDownloadService
                 $filePath = $path->getPathname();
                 $fileNameWithoutExtension = pathinfo($filePath, PATHINFO_FILENAME);
                 $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
-                $rot19Filename = rot19($fileNameWithoutExtension) . '.' . $fileExtension . '.zip';
-                $zipPath = dirname($filePath) . DIRECTORY_SEPARATOR . $rot19Filename;
+                $rot19Filename = rot19($fileNameWithoutExtension).'.'.$fileExtension.'.zip';
+                $zipPath = dirname($filePath).DIRECTORY_SEPARATOR.$rot19Filename;
                 $zip = new ZipArchive();
-                if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+                if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
                     //We probably don't want to maintain the subfolder inside the zips
                     //$zip->addFile($filePath, $iterator->getSubPathName());
                     //Add the file to the zip without subfolders
@@ -156,12 +161,11 @@ class AnimeImageDownloadService
         }
     }
 
-
     public function unzipImages()
     {
         $directories = [
             public_path('picture'),
-            public_path('thumbnail')
+            public_path('thumbnail'),
         ];
 
         foreach ($directories as $dir) {
@@ -188,7 +192,7 @@ class AnimeImageDownloadService
     private function unzipImage($zipPath)
     {
         $zip = new ZipArchive();
-        if ($zip->open($zipPath) === TRUE) {
+        if ($zip->open($zipPath) === true) {
             $extractPath = dirname($zipPath);  // Extract in the same directory where the zip file is located
             $zip->extractTo($extractPath);
             $zip->close();

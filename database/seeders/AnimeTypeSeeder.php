@@ -4,16 +4,13 @@ namespace Database\Seeders;
 
 use App\Models\AnimeType;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class AnimeTypeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         AnimeType::firstOrCreate(['type' => 'TV']);
         AnimeType::firstOrCreate(['type' => 'MOVIE']);

@@ -14,18 +14,20 @@ namespace PHPUnit\Event\TestData;
  *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class DataFromDataProvider extends TestData
+final readonly class DataFromDataProvider extends TestData
 {
-    private readonly int|string $dataSetName;
+    private int|string $dataSetName;
+    private string $dataAsStringForResultOutput;
 
-    public static function from(int|string $dataSetName, string $data): self
+    public static function from(int|string $dataSetName, string $data, string $dataAsStringForResultOutput): self
     {
-        return new self($dataSetName, $data);
+        return new self($dataSetName, $data, $dataAsStringForResultOutput);
     }
 
-    protected function __construct(int|string $dataSetName, string $data)
+    protected function __construct(int|string $dataSetName, string $data, string $dataAsStringForResultOutput)
     {
-        $this->dataSetName = $dataSetName;
+        $this->dataSetName                 = $dataSetName;
+        $this->dataAsStringForResultOutput = $dataAsStringForResultOutput;
 
         parent::__construct($data);
     }
@@ -33,6 +35,14 @@ final class DataFromDataProvider extends TestData
     public function dataSetName(): int|string
     {
         return $this->dataSetName;
+    }
+
+    /**
+     * @internal This method is not covered by the backward compatibility promise for PHPUnit
+     */
+    public function dataAsStringForResultOutput(): string
+    {
+        return $this->dataAsStringForResultOutput;
     }
 
     /**

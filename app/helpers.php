@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-if (!function_exists('get_client_ip_address')) {
+if (! function_exists('get_client_ip_address')) {
     function get_client_ip_address()
     {
         if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
@@ -24,8 +24,9 @@ if (!function_exists('get_client_ip_address')) {
     }
 }
 
-if (!function_exists('rot19')) {
-    function rot19($string) {
+if (! function_exists('rot19')) {
+    function rot19($string)
+    {
         $result = '';
         foreach (str_split($string) as $char) {
             $ascii = ord($char);
@@ -37,6 +38,20 @@ if (!function_exists('rot19')) {
                 $result .= $char;
             }
         }
+
         return $result;
+    }
+}
+
+if (! function_exists('safe_json_encode')) {
+    function safe_json_encode($data) {
+        if (empty($data) || in_array($data, ['[]', '{}', 'null', 'NULL', ''])) {
+            return null;
+        }
+        $encodedData = json_encode($data);
+        if (in_array($encodedData, ['[]', '{}', '""', 'null', 'NULL'])) {
+            return null;
+        }
+        return $encodedData;
     }
 }

@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\InviteCode;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 class RevokeUnusedInviteCodes extends Command
 {
@@ -31,6 +30,7 @@ class RevokeUnusedInviteCodes extends Command
         $deletedCount = InviteCode::where('used', false)->delete();
 
         $this->info("Successfully deleted {$deletedCount} unused invite codes.");
+
         return $deletedCount;
     }
 }

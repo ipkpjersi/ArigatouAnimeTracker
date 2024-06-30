@@ -12,16 +12,14 @@ namespace PHPUnit\Logging\JUnit;
 use PHPUnit\Event\InvalidArgumentException;
 use PHPUnit\Event\Test\Errored;
 use PHPUnit\Event\Test\ErroredSubscriber;
-use PHPUnit\Event\TestData\NoDataSetFromDataProviderException;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class TestErroredSubscriber extends Subscriber implements ErroredSubscriber
+final readonly class TestErroredSubscriber extends Subscriber implements ErroredSubscriber
 {
     /**
      * @throws InvalidArgumentException
-     * @throws NoDataSetFromDataProviderException
      */
     public function notify(Errored $event): void
     {

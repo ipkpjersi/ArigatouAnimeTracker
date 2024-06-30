@@ -17,7 +17,7 @@ use DOMXPath;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class MoveCoverageDirectoriesToSource implements Migration
+final readonly class MoveCoverageDirectoriesToSource implements Migration
 {
     /**
      * @throws MigrationException
@@ -50,5 +50,13 @@ final class MoveCoverageDirectoriesToSource implements Migration
                 $source->appendChild($node);
             }
         }
+
+        if ($coverage->childElementCount !== 0) {
+            return;
+        }
+
+        assert($coverage->parentNode !== null);
+
+        $coverage->parentNode->removeChild($coverage);
     }
 }

@@ -24,34 +24,32 @@ class DownloadAndImportAnimeData extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
-        $this->info("Starting the process of downloading and importing anime data...");
+        $this->info('Starting the process of downloading and importing anime data...');
 
         try {
             // Download and Import Anime Data
-            $this->info("Downloading and importing anime data...");
+            $this->info('Downloading and importing anime data...');
             Artisan::call('app:import-anime-data', ['--forceDownload' => true, '--fullUpdate' => true], new ConsoleOutput);
 
             // Download Additional Anime Data for existing anime data (already has API description empty)
-            $this->info("Downloading additional anime data for existing anime data...");
+            $this->info('Downloading additional anime data for existing anime data...');
             Artisan::call('app:download-anime-additional-data', ['generateSqlFile' => true, 'apiDescriptionsEmptyOnly' => true], new ConsoleOutput);
 
             // Download Additional Anime Data for new anime data (does not have API description empty yet)
-            $this->info("Downloading additional anime data for new anime data...");
+            $this->info('Downloading additional anime data for new anime data...');
             Artisan::call('app:download-anime-additional-data', ['generateSqlFile' => true, 'apiDescriptionsEmptyOnly' => false], new ConsoleOutput);
 
             // Download Anime Images
-            $this->info("Downloading anime images...");
+            $this->info('Downloading anime images...');
             Artisan::call('app:download-anime-images', [], new ConsoleOutput);
 
-            $this->info("All processes completed successfully.");
+            $this->info('All processes completed successfully.');
 
         } catch (\Exception $e) {
-            $this->error('An error occurred during the process: ' . $e);
+            $this->error('An error occurred during the process: '.$e);
         }
     }
 }

@@ -23,19 +23,16 @@ class UnzipAnimeImages extends Command
 
     /**
      * Execute the console command.
-     *
-     * @param AnimeImageDownloadService $animeImageDownloadService
-     * @return void
      */
-    public function handle(AnimeImageDownloadService $animeImageDownloadService)
+    public function handle(AnimeImageDownloadService $animeImageDownloadService): void
     {
-        $this->info("Starting to unzip anime images...");
+        $this->info('Starting to unzip anime images...');
 
         try {
             $animeImageDownloadService->unzipImages();
-            $this->info("Unzipping of anime images completed successfully.");
+            $this->info('Unzipping of anime images completed successfully.');
         } catch (\Exception $e) {
-            $this->error('An error occurred during the unzipping process: ' . $e);
+            $this->error('An error occurred during the unzipping process: '.$e);
         }
     }
 }

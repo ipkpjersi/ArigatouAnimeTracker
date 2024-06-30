@@ -14,7 +14,6 @@ use function class_exists;
 use function class_implements;
 use function in_array;
 use function sprintf;
-use PHPUnit\Event;
 use PHPUnit\Event\Facade as EventFacade;
 use PHPUnit\TextUI\Configuration\Configuration;
 use ReflectionClass;
@@ -23,10 +22,10 @@ use Throwable;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class ExtensionBootstrapper
+final readonly class ExtensionBootstrapper
 {
-    private readonly Configuration $configuration;
-    private readonly Facade $facade;
+    private Configuration $configuration;
+    private Facade $facade;
 
     public function __construct(Configuration $configuration, Facade $facade)
     {
@@ -65,27 +64,29 @@ final class ExtensionBootstrapper
 
         try {
             $instance = (new ReflectionClass($className))->newInstance();
+
+            assert($instance instanceof Extension);
+
+            $instance->bootstrap(
+                $this->configuration,
+                $this->facade,
+                ParameterCollection::fromArray($parameters),
+            );
         } catch (Throwable $t) {
             EventFacade::emitter()->testRunnerTriggeredWarning(
                 sprintf(
-                    'Cannot bootstrap extension because class %s cannot be instantiated: %s',
+                    'Bootstrapping of extension %s failed: %s%s%s',
                     $className,
                     $t->getMessage(),
+                    PHP_EOL,
+                    $t->getTraceAsString(),
                 ),
             );
 
             return;
         }
 
-        assert($instance instanceof Extension);
-
-        $instance->bootstrap(
-            $this->configuration,
-            $this->facade,
-            ParameterCollection::fromArray($parameters),
-        );
-
-        Event\Facade::emitter()->testRunnerBootstrappedExtension(
+        EventFacade::emitter()->testRunnerBootstrappedExtension(
             $className,
             $parameters,
         );

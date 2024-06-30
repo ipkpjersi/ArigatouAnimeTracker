@@ -17,26 +17,23 @@ class DownloadAdditionalAnimeData extends Command
 
     /**
      * The console command description.
-     *
+     * To force a re-download of only known existing API data, technically we could set description = null and genres = api_descriptions_empty where api_descriptions_empty is 0.
      * @var string
      */
-    protected $description = 'Fetches additional data for anime from the MyAnimeList API.';
+    protected $description = 'Fetches and inserts additional data for anime from the MyAnimeList (or notify.moe or kitsu.io) API. Optionally generates an importable SQL file. Optionally runs for API empty descriptions only (to force a retry of fetching descriptions).';
 
     /**
      * Execute the console command.
-     *
-     * @param AnimeAdditionalDataImportService $animeAdditionalDataImportService
-     * @return void
      */
-    public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService)
+    public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService): void
     {
         $generateSqlFile = $this->argument('generateSqlFile') ?? false;
         $apiDescriptionsEmptyOnly = $this->argument('apiDescriptionsEmptyOnly') ?? false;
 
-        $this->info("Starting to fetch additional anime data " . ($generateSqlFile ? "with generating an SQL file" : "without generating an SQL file") . "...");
-        Log::channel('anime_import')->info("Starting to fetch additional anime data " . ($generateSqlFile ? "with generating an SQL file" : "without generating an SQL file") . "...");
+        $this->info('Starting to fetch additional anime data '.($generateSqlFile ? 'with generating an SQL file' : 'without generating an SQL file').'...');
+        Log::channel('anime_import')->info('Starting to fetch additional anime data '.($generateSqlFile ? 'with generating an SQL file' : 'without generating an SQL file').'...');
         try {
-            $logger = function($message) {
+            $logger = function ($message) {
                 $this->info($message);
             };
 
@@ -46,8 +43,8 @@ class DownloadAdditionalAnimeData extends Command
             $this->info("Fetched and updated additional anime data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
             Log::channel('anime_import')->info("Fetched and updated additional anime data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");
         } catch (\Exception $e) {
-            $this->error('An error occurred during the additional anime data fetch: ' . $e);
-            Log::channel('anime_import')->info('An error occurred during the additional anime data fetch: ' . $e);
+            $this->error('An error occurred during the additional anime data fetch: '.$e);
+            Log::channel('anime_import')->info('An error occurred during the additional anime data fetch: '.$e);
         }
     }
 }

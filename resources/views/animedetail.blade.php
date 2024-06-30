@@ -41,12 +41,39 @@
                         <p><strong>Episodes:</strong> {{ $anime->episodes }}</p>
                         <p><strong>Season:</strong> {{ $anime->season }}</p>
                         <p><strong>Year:</strong> {{ $anime->year }}</p>
+                        @if (!empty($anime->duration))
+                            <p>
+                                <strong>Duration:</strong>
+                                @if ($anime->episodes > 1)
+                                    {{ \Carbon\CarbonInterval::seconds($anime->duration)->cascade()->forHumans() }} per episode
+                                @else
+                                    {{ \Carbon\CarbonInterval::seconds($anime->duration)->cascade()->forHumans() }}
+                                @endif
+                            </p>
+                        @endif
+                        @if (!empty($anime->rating))
+                            @php
+                                $rating = strtoupper(str_replace('_', '-', $anime->rating));
+                            @endphp
+                            @switch($rating)
+                                @case('R')
+                                    @php $rating .= ' - Violence & Profanity'; @endphp
+                                    @break
+                                @case('R+')
+                                    @php $rating .= ' - ' . str_rot13('Ahqvgl'); @endphp
+                                    @break
+                                @case('RX')
+                                    @php $rating .= ' - ' . str_rot13('Uragnv'); @endphp
+                                    @break
+                            @endswitch
+                            <p><strong>Rating:</strong> {{ $rating }}</p>
+                        @endif
                         @if (!empty($anime->synonyms))
                             @php
                                 $synonyms = explode(', ', $anime->synonyms);
                             @endphp
                             <h4 class="font-bold mt-4 cursor-pointer" onclick="toggleSynonyms()">Also known as:</h4>
-                            <div id="synonyms-div">
+                            <div id="synonyms-div" class="mb-2">
                                 <span>
                                     {{ implode(', ', array_slice($synonyms, 0, 4)) }}
                                     <span id="hidden-synonyms" class="hidden">
@@ -91,14 +118,13 @@
 
                                     <!-- Progress -->
                                     <div class="mt-4">
-                                        <label for="progress" class="block text-sm font-medium text-gray-600 dark:text-gray-300">In Progress:</label>
+                                        <label for="progress" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Progress:</label>
                                         <select name="progress[]" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-select block w-full">
                                             @for ($i = 0; $i <= $anime->episodes; $i++)
                                                 <option value="{{ $i }}" {{ $i == ($currentUserProgress ?? 0) ? 'selected' : '' }}>{{ $i }}</option>
                                             @endfor
                                         </select>
                                     </div>
-
 
                                     <!-- Score -->
                                     <label for="score" class="block text-sm font-medium text-gray-600 dark:text-gray-300 mt-4">Score:</label>
@@ -165,11 +191,13 @@
                                 <div><strong>MAL Users:</strong> {{ ($anime->mal_scoring_users ?? 0) > 0 ? number_format($anime->mal_scoring_users) : 'N/A' }}</div>
 
                                 <!-- Second Row -->
-                                <div><a href="{{ route('anime.top', ['sort' => 'highest_rated']) }}"><strong>Ranked:</strong> {{ ($anime->mal_rank ?? 0) > 0 ? '#' . number_format($anime->mal_rank) : 'N/A' }}</a></div>
+                                <div><a href="{{ route('anime.top', ['sort' => 'highest_rated']) }}"><strong>MAL Ranked:</strong> {{ ($anime->mal_rank ?? 0) > 0 ? '#' . number_format($anime->mal_rank) : 'N/A' }}</a></div>
                                 <div><a href="{{ route('anime.top', ['sort' => 'most_popular']) }}"><strong>MAL Popularity:</strong> {{ ($anime->mal_popularity ?? 0) > 0 ? '#' . number_format($anime->mal_popularity) : 'N/A' }}</a></div>
 
                                 <div><strong>MAL Members:</strong> {{ ($anime->mal_list_members ?? 0) > 0 ? number_format($anime->mal_list_members) : 'N/A' }}</div>
-                                <div><strong>AAT Score:</strong> {{ ($aas ?? 0) > 0 ? $aas : "N/A" }}</div>
+                                <div><strong>AAT Score:</strong> {{ ($aatScore ?? 0) > 0 ? $aatScore : "N/A" }}</div>
+                                <div><strong>AAT Members:</strong> {{ ($aatMembers ?? 0) > 0 ? $aatMembers : "N/A" }}</div>
+                                <div><strong>AAT Users:</strong> {{ ($aatUsers ?? 0) > 0 ? $aatUsers : "N/A" }}</div>
 
                                 @if (Auth::user() !== null)
                                     <div><strong>My Score:</strong> {{ $currentUserScore > 0 ? number_format($currentUserScore) : 'N/A' }}</div>

@@ -99,6 +99,10 @@ final class ProgressPrinter
 
     public function testTriggeredNotice(NoticeTriggered $event): void
     {
+        if ($event->ignoredByBaseline()) {
+            return;
+        }
+
         if ($this->source->restrictNotices() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -113,6 +117,10 @@ final class ProgressPrinter
 
     public function testTriggeredPhpNotice(PhpNoticeTriggered $event): void
     {
+        if ($event->ignoredByBaseline()) {
+            return;
+        }
+
         if ($this->source->restrictNotices() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -127,6 +135,22 @@ final class ProgressPrinter
 
     public function testTriggeredDeprecation(DeprecationTriggered $event): void
     {
+        if ($event->ignoredByBaseline() || $event->ignoredByTest()) {
+            return;
+        }
+
+        if ($this->source->ignoreSelfDeprecations() && $event->trigger()->isSelf()) {
+            return;
+        }
+
+        if ($this->source->ignoreDirectDeprecations() && $event->trigger()->isDirect()) {
+            return;
+        }
+
+        if ($this->source->ignoreIndirectDeprecations() && $event->trigger()->isIndirect()) {
+            return;
+        }
+
         if ($this->source->restrictDeprecations() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -141,6 +165,22 @@ final class ProgressPrinter
 
     public function testTriggeredPhpDeprecation(PhpDeprecationTriggered $event): void
     {
+        if ($event->ignoredByBaseline() || $event->ignoredByTest()) {
+            return;
+        }
+
+        if ($this->source->ignoreSelfDeprecations() && $event->trigger()->isSelf()) {
+            return;
+        }
+
+        if ($this->source->ignoreDirectDeprecations() && $event->trigger()->isDirect()) {
+            return;
+        }
+
+        if ($this->source->ignoreIndirectDeprecations() && $event->trigger()->isIndirect()) {
+            return;
+        }
+
         if ($this->source->restrictDeprecations() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -165,6 +205,10 @@ final class ProgressPrinter
 
     public function testTriggeredWarning(WarningTriggered $event): void
     {
+        if ($event->ignoredByBaseline()) {
+            return;
+        }
+
         if ($this->source->restrictWarnings() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -179,6 +223,10 @@ final class ProgressPrinter
 
     public function testTriggeredPhpWarning(PhpWarningTriggered $event): void
     {
+        if ($event->ignoredByBaseline()) {
+            return;
+        }
+
         if ($this->source->restrictWarnings() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;

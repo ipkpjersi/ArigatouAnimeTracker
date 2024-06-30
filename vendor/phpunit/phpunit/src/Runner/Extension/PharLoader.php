@@ -28,9 +28,11 @@ use Throwable;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class PharLoader
+final readonly class PharLoader
 {
     /**
+     * @psalm-param non-empty-string $directory
+     *
      * @psalm-return list<string>
      */
     public function loadPharExtensionsInDirectory(string $directory): array
