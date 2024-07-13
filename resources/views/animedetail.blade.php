@@ -195,12 +195,12 @@
                                 <div><a href="{{ route('anime.top', ['sort' => 'most_popular']) }}"><strong>MAL Popularity:</strong> {{ ($anime->mal_popularity ?? 0) > 0 ? '#' . number_format($anime->mal_popularity) : 'N/A' }}</a></div>
 
                                 <div><strong>MAL Members:</strong> {{ ($anime->mal_list_members ?? 0) > 0 ? number_format($anime->mal_list_members) : 'N/A' }}</div>
-                                <div><strong>AAT Score:</strong> {{ ($aatScore ?? 0) > 0 ? $aatScore : "N/A" }}</div>
+                                <div><strong>AAT Score:</strong> {{ ($aatScore ?? 0) > 0 ? number_format($aatScore, 2) : "N/A" }}</div>
                                 <div><strong>AAT Members:</strong> {{ ($aatMembers ?? 0) > 0 ? $aatMembers : "N/A" }}</div>
                                 <div><strong>AAT Users:</strong> {{ ($aatUsers ?? 0) > 0 ? $aatUsers : "N/A" }}</div>
 
                                 @if (Auth::user() !== null)
-                                    <div><strong>My Score:</strong> {{ $currentUserScore > 0 ? number_format($currentUserScore) : 'N/A' }}</div>
+                                    <div><strong>My Score:</strong> {{ $currentUserScore > 0 ? number_format($currentUserScore, 2) : 'N/A' }}</div>
                                     <div><strong>My Status:</strong> {{ $currentUserStatus > 0 ? $watchStatuses[$currentUserStatus]->status ?? "N/A" : "N/A" }}</div>
                                 @endif
                             </div>
