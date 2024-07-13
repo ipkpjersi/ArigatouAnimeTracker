@@ -30,11 +30,21 @@ class DuplicateAnimeService
 
     private function exportDuplicateCounts($date, $logger)
     {
-        $duplicates = DB::table('anime')
+        $titleDuplicates = DB::table('anime')
             ->select('title', DB::raw('COUNT(*) as occurrences'))
             ->groupBy('title')
             ->havingRaw('COUNT(*) > 1')
             ->get();
+        //Technically, duplicate pictures can generate false positives, like 139 entries with default spring picture would mean they aren't duplicates, but if there's two or three or four of the same picture, that's very likely a duplicate entry.
+        $pictureDuplicates = DB::table('anime')
+            ->select('picture', DB::raw('COUNT(*) as occurrences'))
+            ->whereNotNull('picture')
+            ->where('picture', '!=', '')
+            ->groupBy('picture')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        $duplicates = $titleDuplicates->merge($pictureDuplicates);
 
         return $this->saveToCsv($duplicates, "duplicate_counts_{$date}.csv", $logger);
     }
@@ -48,6 +58,14 @@ class DuplicateAnimeService
                     ->groupBy('title')
                     ->havingRaw('COUNT(*) > 1');
             })
+            ->orWhereIn('picture', function ($query) {
+                $query->select('picture')
+                    ->from('anime')
+                    ->whereNotNull('picture')
+                    ->where('picture', '!=', '')
+                    ->groupBy('picture')
+                    ->havingRaw('COUNT(*) > 1');
+            })
             ->count();
 
         $totalDuplicatesData = new \stdClass();
@@ -58,11 +76,20 @@ class DuplicateAnimeService
 
     private function exportAllDuplicateDetails($date, $logger)
     {
+        //Technically, duplicate pictures can generate false positives, like 139 entries with default spring picture would mean they aren't duplicates, but if there's two or three or four of the same picture, that's very likely a duplicate entry.
         $duplicates = DB::table('anime')
             ->whereIn('title', function ($query) {
                 $query->select('title')
                     ->from('anime')
                     ->groupBy('title')
+                    ->havingRaw('COUNT(*) > 1');
+            })
+            ->orWhereIn('picture', function ($query) {
+                $query->select('picture')
+                    ->from('anime')
+                    ->whereNotNull('picture')
+                    ->where('picture', '!=', '')
+                    ->groupBy('picture')
                     ->havingRaw('COUNT(*) > 1');
             })
             ->orderBy('title')
@@ -75,13 +102,13 @@ class DuplicateAnimeService
     {
         $csv = Writer::createFromString('');
 
-        // Check if $data is a Collection or an array
+        //Check if $data is a Collection or an array
         $firstRecord = is_array($data) ? reset($data) : $data->first();
 
-        // Convert the first record to an array and insert the keys as the first row in the CSV
+        //Convert the first record to an array and insert the keys as the first row in the CSV
         $csv->insertOne(array_keys((array) $firstRecord));
 
-        // Iterate over each record and insert into CSV
+        //Iterate over each record and insert into CSV
         foreach ($data as $record) {
             $csv->insertOne((array) $record);
         }
