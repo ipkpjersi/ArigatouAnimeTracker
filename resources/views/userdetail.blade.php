@@ -23,6 +23,16 @@
                         <a href="/animelist/{{ $user->username }}" class="inline-block">
                             <button id="animeListButton" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2">Anime List</button>
                         </a>
+                        <!-- Ban/Unban Button for Admins -->
+                        @if(auth()->user()->is_admin)
+                            <div class="w-full mt-4">
+                                @if ($user->is_banned)
+                                    <button data-user-id="{{ $user->id }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded unbanUser">Unban</button>
+                                @else
+                                    <button data-user-id="{{ $user->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded banUser">Ban</button>
+                                @endif
+                            </div>
+                        @endif
                         <!-- Friends Section -->
                         @if ($canViewFriends)
                             <div class="w-full md:w-3/5 mt-4">
@@ -300,6 +310,34 @@
                 type: 'pie',
                 data: data,
                 options: options
+            });
+        });
+
+        $(document).on('click', '.banUser', function() {
+            let userId = $(this).data('user-id');
+            let location = window.location.href;
+            axios.post(`/users/${userId}/ban`, {
+                _token: '{{ csrf_token() }}'
+            })
+            .then(function(response) {
+                window.location.href = location;
+            })
+            .catch(function(error) {
+                alert('Error banning user: ' + error);
+            });
+        });
+
+        $(document).on('click', '.unbanUser', function() {
+            let userId = $(this).data('user-id');
+            let location = window.location.href;
+            axios.post(`/users/${userId}/unban`, {
+                _token: '{{ csrf_token() }}'
+            })
+            .then(function(response) {
+                window.location.href = location;
+            })
+            .catch(function(error) {
+                alert('Error unbanning user: ' + error);
             });
         });
     </script>
