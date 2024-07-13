@@ -107,6 +107,7 @@ Route::middleware('auth', '2fa')->group(function () {
     Route::post('/anime/add-review', [AnimeController::class, 'addReview'])->name('anime.addReview');
     Route::put('/anime/{id}/update-review', [AnimeController::class, 'updateReview'])->name('anime.updateReview');
     Route::delete('/anime/{id}/delete-review', [AnimeController::class, 'deleteReview'])->name('anime.deleteReview');
+    Route::post('/reviews/{review}/remove', [UserController::class, 'removeReview'])->name('reviews.remove');
 
     Route::post('/toggle-friend-publicly/{id}', [UserController::class, 'toggleFriendPublicly'])->name('toggle-friend-publicly');
 

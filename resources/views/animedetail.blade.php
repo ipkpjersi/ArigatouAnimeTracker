@@ -290,6 +290,10 @@
                                             @endswitch
                                         </p>
                                         <p class="mt-1"><strong>By:</strong> <a href="{{route('users.detail', $review->user->username)}}"><img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y H:i:s A') }}</a></p>
+                                        <!-- Remove Review Button -->
+                                        @if (auth()->user() && auth()->user()->isAdmin())
+                                            <button data-review-id="{{ $review->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded removeReview mt-2 mb-3">Remove Review</button>
+                                        @endif
                                     </div>
                                 @empty
                                     <p>No reviews available.</p>
@@ -428,5 +432,20 @@
                 lessText.style.display = "inline";
             }
         }
+    </script>
+    <script type="module">
+        $(document).on('click', '.removeReview', function() {
+            let reviewId = $(this).data('review-id');
+            axios.post(`/reviews/${reviewId}/remove`, {
+                _token: '{{ csrf_token() }}'
+            })
+            .then(function(response) {
+                //alert(response.data.message);
+                location.reload();
+            })
+            .catch(function(error) {
+                alert('Error removing review: ' + error);
+            });
+        });
     </script>
 </x-app-layout>

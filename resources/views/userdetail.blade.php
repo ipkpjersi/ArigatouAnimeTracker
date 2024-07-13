@@ -88,7 +88,7 @@
                     </div>
 
                     <!-- Right Column -->
-                    <div class="w-full md:w-3/5 mt-0 flex flex-row flex-wrap">
+                    <div class="w-full md:w-3/5 mt-0 flex flex-row flex-wrap items-start">
                         @if($canViewReviews && request('view') == 'reviews')
                             <div class="mb-4 flex border-b items-end">
                                 <!-- Home Tab -->
@@ -148,6 +148,10 @@
                                             @endswitch
                                         </p>
                                         <p class="mt-1"><strong>By:</strong> <img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y H:i:s A') }}</p>
+                                        <!-- Remove Review Button -->
+                                        @if (auth()->user()->isAdmin())
+                                            <button data-review-id="{{ $review->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded removeReview mt-2 mb-3">Remove Review</button>
+                                        @endif
                                     </div>
                                 @endforeach
                                 {{-- Include Spoilers Checkbox --}}
@@ -315,12 +319,12 @@
 
         $(document).on('click', '.banUser', function() {
             let userId = $(this).data('user-id');
-            let location = window.location.href;
             axios.post(`/users/${userId}/ban`, {
                 _token: '{{ csrf_token() }}'
             })
             .then(function(response) {
-                window.location.href = location;
+                //alert(response.data.message);
+                location.reload();
             })
             .catch(function(error) {
                 alert('Error banning user: ' + error);
@@ -329,15 +333,29 @@
 
         $(document).on('click', '.unbanUser', function() {
             let userId = $(this).data('user-id');
-            let location = window.location.href;
             axios.post(`/users/${userId}/unban`, {
                 _token: '{{ csrf_token() }}'
             })
             .then(function(response) {
-                window.location.href = location;
+                //alert(response.data.message);
+                location.reload();
             })
             .catch(function(error) {
                 alert('Error unbanning user: ' + error);
+            });
+        });
+
+        $(document).on('click', '.removeReview', function() {
+            let reviewId = $(this).data('review-id');
+            axios.post(`/reviews/${reviewId}/remove`, {
+                _token: '{{ csrf_token() }}'
+            })
+            .then(function(response) {
+                //alert(response.data.message);
+                location.reload(); // Refresh the page
+            })
+            .catch(function(error) {
+                alert('Error removing review: ' + error);
             });
         });
     </script>
