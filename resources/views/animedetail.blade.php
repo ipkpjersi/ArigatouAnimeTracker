@@ -211,14 +211,14 @@
                         <p class="mb-4">{!! str_replace("\n", "<br>", empty(trim($anime->description)) ? "This title does not have a description yet." : $anime->description) !!}</p>
 
                         <h4 class="font-bold @if (!empty(trim($anime->description))) mt-4 @endif mb-2">More Details:</h4>
-                        <ul>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach (explode(', ', $anime->sources) as $source)
                                 <li><a href="{{ $source }}" target="_blank" rel="noopener">{{ $source }}</a></li>
                             @endforeach
                         </ul>
 
                         <h4 class="font-bold mt-4 mb-2">Related Anime:</h4>
-                        <ul>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach (explode(', ', $anime->relations) as $relation)
                                 <li><a href="{{ $relation }}" target="_blank" rel="noopener">{{ $relation }}</a></li>
                             @endforeach
