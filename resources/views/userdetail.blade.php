@@ -88,7 +88,7 @@
                     </div>
 
                     <!-- Right Column -->
-                    <div class="w-full md:w-3/5 mt-0 flex flex-row flex-wrap items-start">
+                    <div class="w-full md:w-3/5 mt-0 flex flex-col flex-wrap items-start">
                         @if($canViewReviews && request('view') == 'reviews')
                             <div class="mb-4 flex border-b items-end">
                                 <!-- Home Tab -->
