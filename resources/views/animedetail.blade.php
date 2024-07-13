@@ -224,6 +224,23 @@
                             @endforeach
                         </ul>
 
+                        @if (!empty($otherAnime))
+                            <h4 class="font-bold mt-4 mb-2">Other Anime:</h4>
+                            <div class="flex flex-wrap -mx-2" id="other-anime-list">
+                                @foreach ($otherAnime as $anime)
+                                    <div class="w-1/2 md:w-1/5 px-2 mb-4">
+                                        <a href="/anime/{{ $anime->id }}/{{ Str::slug($anime->title) }}" class="block border p-2 h-full">
+                                            <div class="h-full flex flex-col items-center">
+                                                <img src="{{ $anime->thumbnail }}" onerror="this.onerror=null; this.src='/img/notfound.gif';" alt="{{ $anime->title }}" class="h-16 w-12 mb-2">
+                                                <h5 class="text-center">{{ Str::limit($anime->title, 40) }}</h5>
+                                            </div>
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                            {{ $otherAnime->links() }}
+                        @endif
+
                         <!-- Anime Reviews Section -->
                         @if (auth()->user() === null || auth()->user()->show_others_reviews === 1)
                             <div class="mt-8">
@@ -371,6 +388,9 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            if (window.location.search.includes('otheranimepage')) {
+                document.getElementById('other-anime-list').scrollIntoView({ behavior: 'smooth' });
+            }
             // Check if the element exists
             const statusModal = document.getElementById('status-modal');
             if (statusModal) {
