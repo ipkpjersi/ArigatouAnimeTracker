@@ -86,6 +86,7 @@ class UserController extends Controller
             })
             ->where('users.show_reviews_publicly', true)
             ->where('users.is_banned', false)
+            ->where('anime_reviews.is_deleted', 0)
             ->latest('anime_reviews.created_at')
             ->paginate(2, ['anime_reviews.*', 'users.username', 'users.avatar', 'users.id as user_id'], 'reviewpage');
 
@@ -93,6 +94,7 @@ class UserController extends Controller
             ->join('users', 'anime_reviews.user_id', '=', 'users.id')
             ->where('anime_reviews.show_review_publicly', true)
             ->where('users.show_reviews_publicly', true)
+            ->where('anime_reviews.is_deleted', 0)
             ->where('users.is_banned', false)->count();
         $friendUser = null;
         if (! $isOwnProfile && $currentUser) {
@@ -150,6 +152,30 @@ class UserController extends Controller
         ]);
 
         return response()->json(['message' => 'User unbanned successfully']);
+    }
+
+    public function removeReview(Request $request, $reviewId)
+    {
+        // Ensure only admins can remove reviews
+        if (!auth()->user()->isAdmin()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $review = AnimeReview::findOrFail($reviewId);
+        $review->is_deleted = 1;
+        $review->save();
+
+        $anime = $review->anime()->first();
+        $user = $review->user()->first();
+
+        StaffActionLog::create([
+            'user_id' => auth()->id(),
+            'target_id' => $review->user_id,
+            'action' => 'remove_review',
+            'message' => 'Removed review of anime ' . $anime->title . ' (anime ID: ' . $anime->id . ') from user: ' . $user->username . ' (user ID: ' . $review->user_id . ')'
+        ]);
+
+        return response()->json(['message' => 'Review removed successfully']);
     }
 
     public function removeAvatar(Request $request, $userId)

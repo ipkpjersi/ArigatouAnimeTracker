@@ -9,6 +9,7 @@ use App\Models\WatchStatus;
 use App\Services\AnimeListExportService;
 use App\Services\AnimeListImportService;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -131,14 +132,16 @@ class AnimeController extends Controller
             })
             ->where('users.show_reviews_publicly', true)
             ->where('users.is_banned', false)
+            ->where('anime_reviews.is_deleted', 0)
             ->latest('anime_reviews.created_at')
             ->paginate(2, ['anime_reviews.*', 'users.username', 'users.avatar', 'users.id as user_id'], 'reviewpage')
             ->withQueryString(); //We could manually appends() instead of using withQueryString() but withQueryString() is simpler.
 
         $totalReviewsCount = AnimeReview::where('anime_id', $id)
             ->join('users', 'anime_reviews.user_id', '=', 'users.id')
-            ->where('anime_reviews.show_review_publicly', true)
             ->where('users.show_reviews_publicly', true)
+            ->where('anime_reviews.show_review_publicly', true)
+            ->where('anime_reviews.is_deleted', 0)
             ->where('users.is_banned', false)->count();
 
         $aatScore = DB::table('anime_user')
@@ -157,7 +160,47 @@ class AnimeController extends Controller
             ->whereNotNull('score')
             ->count();
 
-        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aatScore', 'aatMembers', 'aatUsers'));
+        $otherAnimeTags = [
+            'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Sci-Fi',
+            'Slice of Life', 'Supernatural', 'Thriller', 'Romantic Comedy', 'Coming of Age', 'School', 'Sports',
+            'Magic', 'Military', 'Mecha', 'Music', 'Historical', 'Psychological', 'Battle Royale',
+            'Isekai', 'Post-Apocalyptic', 'Space', 'Time Travel', 'Virtual Reality', 'Superpower', 'Cyberpunk',
+            'Mystery', 'Harem', 'Reverse Harem', 'Tsundere', 'Yandere', 'Parody', "Ojou-Sama", "Maids"
+        ];
+
+        $currentAnimeTags = array_map('strtolower', explode(', ', $anime->tags));
+        $otherAnimeTags = array_map('strtolower', $otherAnimeTags);
+        $filteredTags = array_intersect($currentAnimeTags, $otherAnimeTags);
+        $otherAnime = [];
+        if (!empty($filteredTags)) {
+            $tagConditions = array_map(function($tag) {
+                return "tags LIKE '%" . $tag . "%'";
+            }, $filteredTags);
+
+            $tagConditions = implode(' OR ', $tagConditions);
+
+            $otherAnime = DB::table('anime')
+                ->select('anime.*', DB::raw("(
+                    " . implode(' + ', array_map(function($tag) {
+                        return "IF(tags LIKE '%" . $tag . "%', 1, 0)";
+                    }, $filteredTags)) . "
+                ) as match_count"))
+                ->where('id', '!=', $id)
+                ->whereRaw("($tagConditions)")
+                ->orderBy('match_count', 'desc')
+                ->limit(500)
+                ->get();
+
+            $page = LengthAwarePaginator::resolveCurrentPage('otheranimepage');
+            $perPage = 5;
+            $offset = ($page * $perPage) - $perPage;
+            $paginatedItems = $otherAnime->slice($offset, $perPage)->values();
+            $otherAnime = new LengthAwarePaginator($paginatedItems, $otherAnime->count(), $perPage, $page, [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'otheranimepage',
+            ]);
+        }
+        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aatScore', 'aatMembers', 'aatUsers', 'otherAnime'));
     }
 
     public function addReview(Request $request)

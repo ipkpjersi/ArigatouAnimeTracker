@@ -23,6 +23,16 @@
                         <a href="/animelist/{{ $user->username }}" class="inline-block">
                             <button id="animeListButton" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2">Anime List</button>
                         </a>
+                        <!-- Ban/Unban Button for Admins -->
+                        @if(auth()->user()->is_admin)
+                            <div class="w-full mt-4">
+                                @if ($user->is_banned)
+                                    <button data-user-id="{{ $user->id }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded unbanUser">Unban</button>
+                                @else
+                                    <button data-user-id="{{ $user->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded banUser">Ban</button>
+                                @endif
+                            </div>
+                        @endif
                         <!-- Friends Section -->
                         @if ($canViewFriends)
                             <div class="w-full md:w-3/5 mt-4">
@@ -78,7 +88,7 @@
                     </div>
 
                     <!-- Right Column -->
-                    <div class="w-full md:w-3/5 mt-0 flex flex-row flex-wrap">
+                    <div class="w-full md:w-3/5 mt-0 flex flex-col flex-wrap items-start">
                         @if($canViewReviews && request('view') == 'reviews')
                             <div class="mb-4 flex border-b items-end">
                                 <!-- Home Tab -->
@@ -138,6 +148,10 @@
                                             @endswitch
                                         </p>
                                         <p class="mt-1"><strong>By:</strong> <img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y H:i:s A') }}</p>
+                                        <!-- Remove Review Button -->
+                                        @if (auth()->user()->isAdmin())
+                                            <button data-review-id="{{ $review->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded removeReview mt-2 mb-3">Remove Review</button>
+                                        @endif
                                     </div>
                                 @endforeach
                                 {{-- Include Spoilers Checkbox --}}
@@ -300,6 +314,48 @@
                 type: 'pie',
                 data: data,
                 options: options
+            });
+        });
+
+        $(document).on('click', '.banUser', function() {
+            let userId = $(this).data('user-id');
+            axios.post(`/users/${userId}/ban`, {
+                _token: '{{ csrf_token() }}'
+            })
+            .then(function(response) {
+                //alert(response.data.message);
+                location.reload();
+            })
+            .catch(function(error) {
+                alert('Error banning user: ' + error);
+            });
+        });
+
+        $(document).on('click', '.unbanUser', function() {
+            let userId = $(this).data('user-id');
+            axios.post(`/users/${userId}/unban`, {
+                _token: '{{ csrf_token() }}'
+            })
+            .then(function(response) {
+                //alert(response.data.message);
+                location.reload();
+            })
+            .catch(function(error) {
+                alert('Error unbanning user: ' + error);
+            });
+        });
+
+        $(document).on('click', '.removeReview', function() {
+            let reviewId = $(this).data('review-id');
+            axios.post(`/reviews/${reviewId}/remove`, {
+                _token: '{{ csrf_token() }}'
+            })
+            .then(function(response) {
+                //alert(response.data.message);
+                location.reload(); // Refresh the page
+            })
+            .catch(function(error) {
+                alert('Error removing review: ' + error);
             });
         });
     </script>

@@ -195,12 +195,12 @@
                                 <div><a href="{{ route('anime.top', ['sort' => 'most_popular']) }}"><strong>MAL Popularity:</strong> {{ ($anime->mal_popularity ?? 0) > 0 ? '#' . number_format($anime->mal_popularity) : 'N/A' }}</a></div>
 
                                 <div><strong>MAL Members:</strong> {{ ($anime->mal_list_members ?? 0) > 0 ? number_format($anime->mal_list_members) : 'N/A' }}</div>
-                                <div><strong>AAT Score:</strong> {{ ($aatScore ?? 0) > 0 ? $aatScore : "N/A" }}</div>
+                                <div><strong>AAT Score:</strong> {{ ($aatScore ?? 0) > 0 ? number_format($aatScore, 2) : "N/A" }}</div>
                                 <div><strong>AAT Members:</strong> {{ ($aatMembers ?? 0) > 0 ? $aatMembers : "N/A" }}</div>
                                 <div><strong>AAT Users:</strong> {{ ($aatUsers ?? 0) > 0 ? $aatUsers : "N/A" }}</div>
 
                                 @if (Auth::user() !== null)
-                                    <div><strong>My Score:</strong> {{ $currentUserScore > 0 ? number_format($currentUserScore) : 'N/A' }}</div>
+                                    <div><strong>My Score:</strong> {{ $currentUserScore > 0 ? number_format($currentUserScore, 2) : 'N/A' }}</div>
                                     <div><strong>My Status:</strong> {{ $currentUserStatus > 0 ? $watchStatuses[$currentUserStatus]->status ?? "N/A" : "N/A" }}</div>
                                 @endif
                             </div>
@@ -211,18 +211,35 @@
                         <p class="mb-4">{!! str_replace("\n", "<br>", empty(trim($anime->description)) ? "This title does not have a description yet." : $anime->description) !!}</p>
 
                         <h4 class="font-bold @if (!empty(trim($anime->description))) mt-4 @endif mb-2">More Details:</h4>
-                        <ul>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach (explode(', ', $anime->sources) as $source)
                                 <li><a href="{{ $source }}" target="_blank" rel="noopener">{{ $source }}</a></li>
                             @endforeach
                         </ul>
 
                         <h4 class="font-bold mt-4 mb-2">Related Anime:</h4>
-                        <ul>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach (explode(', ', $anime->relations) as $relation)
                                 <li><a href="{{ $relation }}" target="_blank" rel="noopener">{{ $relation }}</a></li>
                             @endforeach
                         </ul>
+
+                        @if (!empty($otherAnime))
+                            <h4 class="font-bold mt-4 mb-2">Other Anime:</h4>
+                            <div class="flex flex-wrap -mx-2" id="other-anime-list">
+                                @foreach ($otherAnime as $anime)
+                                    <div class="w-1/2 md:w-1/5 px-2 mb-4">
+                                        <a href="/anime/{{ $anime->id }}/{{ Str::slug($anime->title) }}" class="block border p-2 h-full">
+                                            <div class="h-full flex flex-col items-center">
+                                                <img src="{{ $anime->thumbnail }}" onerror="this.onerror=null; this.src='/img/notfound.gif';" alt="{{ $anime->title }}" class="h-16 w-12 mb-2">
+                                                <h5 class="text-center">{{ Str::limit($anime->title, 40) }}</h5>
+                                            </div>
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                            {{ $otherAnime->links() }}
+                        @endif
 
                         <!-- Anime Reviews Section -->
                         @if (auth()->user() === null || auth()->user()->show_others_reviews === 1)
@@ -273,6 +290,10 @@
                                             @endswitch
                                         </p>
                                         <p class="mt-1"><strong>By:</strong> <a href="{{route('users.detail', $review->user->username)}}"><img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y H:i:s A') }}</a></p>
+                                        <!-- Remove Review Button -->
+                                        @if (auth()->user() && auth()->user()->isAdmin())
+                                            <button data-review-id="{{ $review->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded removeReview mt-2 mb-3">Remove Review</button>
+                                        @endif
                                     </div>
                                 @empty
                                     <p>No reviews available.</p>
@@ -371,6 +392,9 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            if (window.location.search.includes('otheranimepage')) {
+                document.getElementById('other-anime-list').scrollIntoView({ behavior: 'smooth' });
+            }
             // Check if the element exists
             const statusModal = document.getElementById('status-modal');
             if (statusModal) {
@@ -408,5 +432,20 @@
                 lessText.style.display = "inline";
             }
         }
+    </script>
+    <script type="module">
+        $(document).on('click', '.removeReview', function() {
+            let reviewId = $(this).data('review-id');
+            axios.post(`/reviews/${reviewId}/remove`, {
+                _token: '{{ csrf_token() }}'
+            })
+            .then(function(response) {
+                //alert(response.data.message);
+                location.reload();
+            })
+            .catch(function(error) {
+                alert('Error removing review: ' + error);
+            });
+        });
     </script>
 </x-app-layout>
