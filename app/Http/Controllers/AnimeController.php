@@ -833,11 +833,12 @@ class AnimeController extends Controller
         ]);
 
         $userId = Auth::id();
+        $username = Auth::user()->username;
         $result = $exporter->export($exportType, $userId);
 
         // Generate filename with date
         $currentDateTime = Carbon::now()->format('Y-m-d_H-i-s');
-        $fileNameBase = "AnimeList_{$currentDateTime}";
+        $fileNameBase = "AnimeList_{$username}_{$currentDateTime}";
 
         if ($exportType === 'myanimelist') {
             $fileName = "{$fileNameBase}.xml";
