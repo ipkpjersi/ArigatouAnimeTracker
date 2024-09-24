@@ -50,6 +50,8 @@ class AnimeImageDownloadService
                         $successful++;
                         $imageDownloaded = true;
                     } else {
+                        //If it failed to download the regular picture after downloading the thumbnail, force a re-download.
+                        $imageDownloaded = false;
                         $imageFailed++;
                     }
                 }
