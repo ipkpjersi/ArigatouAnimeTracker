@@ -229,9 +229,9 @@
                             <div class="flex flex-wrap -mx-2" id="other-anime-list">
                                 @foreach ($otherAnime as $anime)
                                     <div class="w-1/2 md:w-1/5 px-2 mb-4">
-                                        <a href="/anime/{{ $anime->id }}/{{ Str::slug($anime->title) }}" class="block border p-2 h-full">
+                                        <a href="/anime/{{ $anime->id }}/{{ Str::slug($anime->title) }}" class="block border p-2 h-full rounded-lg">
                                             <div class="h-full flex flex-col items-center">
-                                                <img src="{{ $anime->thumbnail }}" onerror="this.onerror=null; this.src='/img/notfound.gif';" alt="{{ $anime->title }}" class="h-16 w-12 mb-2">
+                                                <img src="{{ $anime->thumbnail }}" onerror="this.onerror=null; this.src='/img/notfound.gif';" alt="{{ $anime->title }}" class="h-16 w-12 mb-2 mt-1 rounded">
                                                 <h5 class="text-center">{{ Str::limit($anime->title, 40) }}</h5>
                                             </div>
                                         </a>
