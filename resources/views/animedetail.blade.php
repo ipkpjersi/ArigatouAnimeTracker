@@ -217,12 +217,14 @@
                             @endforeach
                         </ul>
 
-                        <h4 class="font-bold mt-4 mb-2">Related Anime:</h4>
-                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            @foreach (explode(', ', $anime->relations) as $relation)
-                                <li><a href="{{ $relation }}" target="_blank" rel="noopener">{{ $relation }}</a></li>
-                            @endforeach
-                        </ul>
+                        @if (!empty($anime->relations))
+                            <h4 class="font-bold mt-4 mb-2">Related Anime:</h4>
+                            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                @foreach (explode(', ', $anime->relations) as $relation)
+                                    <li><a href="{{ $relation }}" target="_blank" rel="noopener">{{ $relation }}</a></li>
+                                @endforeach
+                            </ul>
+                        @endif
 
                         @if (!empty($otherAnime))
                             <h4 class="font-bold mt-4 mb-2">Other Anime:</h4>
