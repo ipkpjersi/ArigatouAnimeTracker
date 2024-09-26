@@ -9,4 +9,4 @@ Since the data changes over time, in general, when a duplicate entry is created,
 
 # How to find duplicates
 
-We have some commands to find possible duplicate anime entries, it is: `php artisan app:check-anime-duplicates` and it generates 3 CSV files you can look through to find any possible duplicate anime entries.
+We have a command to find possible duplicate anime entries, it is: `php artisan app:check-anime-duplicates` and it generates 3 CSV files you can look through to find any possible duplicate anime entries.
