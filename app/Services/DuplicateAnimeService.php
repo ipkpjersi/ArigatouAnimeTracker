@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Anime;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use League\Csv\Writer;
 
@@ -121,5 +123,53 @@ class DuplicateAnimeService
             'count' => is_array($data) ? count($data) : $data->count(),
             'filePath' => $filePath,
         ];
+    }
+
+    public function mergeDuplicateAnime($oldAnimeId, $newAnimeId, $logger = null)
+    {
+        DB::beginTransaction();
+
+        try {
+            //Log start of process
+            $logger && $logger("Starting merge of anime ID $oldAnimeId into $newAnimeId");
+
+            //Update references in anime_user table
+            DB::table('anime_user')
+                ->where('anime_id', $oldAnimeId)
+                ->update(['anime_id' => $newAnimeId]);
+
+            $logger && $logger("Updated anime_user references from $oldAnimeId to $newAnimeId");
+
+            //Update references in anime_reviews table
+            DB::table('anime_reviews')
+                ->where('anime_id', $oldAnimeId)
+                ->update(['anime_id' => $newAnimeId]);
+
+            $logger && $logger("Updated anime_reviews references from $oldAnimeId to $newAnimeId");
+
+            //Delete the old anime entry
+            DB::table('anime')
+                ->where('id', $oldAnimeId)
+                ->delete();
+
+            $logger && $logger("Deleted old anime entry with ID $oldAnimeId");
+
+            DB::commit();
+
+            return ['status' => 'success', 'message' => "Anime with ID $oldAnimeId merged into $newAnimeId successfully"];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $logger && $logger("Error during merge: " . $e->getMessage());
+            Log::error("Error merging anime IDs $oldAnimeId into $newAnimeId: " . $e->getMessage());
+
+            return ['status' => 'error', 'message' => 'Merge failed: ' . $e->getMessage()];
+        }
+    }
+
+    public function getAnimeDetails($animeId)
+    {
+        return Anime::select('id', 'title', 'year', 'season', 'anime_type_id', 'episodes', 'synonyms')
+            ->with('anime_type', 'anime_status')
+            ->find($animeId);
     }
 }
