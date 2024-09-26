@@ -76,6 +76,14 @@ class AnimeController extends Controller
                     $query->whereRaw('LOWER(tags) LIKE ?', ["%$tag%"]);
                 }
             })
+            ->filterColumn('synonyms', function ($query, $keyword) {
+                //We could add a junction table for anime and synonyms, but this is probably fine.
+                $searchTags = collect(explode(',', $keyword))
+                    ->map(fn ($synonym) => trim(strtolower($synonym)));
+                foreach ($searchTags as $synonym) {
+                    $query->whereRaw('LOWER(synonyms) LIKE ?', ["%$synonym%"]);
+                }
+            })
             ->make(true);
     }
 
