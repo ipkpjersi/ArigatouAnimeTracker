@@ -50,6 +50,8 @@ class AnimeImageDownloadService
                         $successful++;
                         $imageDownloaded = true;
                     } else {
+                        //If it failed to download the regular picture after downloading the thumbnail, force a re-download.
+                        $imageDownloaded = false;
                         $imageFailed++;
                     }
                 }
@@ -94,7 +96,10 @@ class AnimeImageDownloadService
 
         // Check if the file already exists
         if (! file_exists($fullPath)) {
-            $response = Http::get($url);
+            $response = Http::withHeaders([
+                'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+                'Accept' => 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+            ])->get($url);
             if ($response->successful()) {
                 file_put_contents($fullPath, $response->body());
                 $logger && $logger("Image $type downloaded successfully to: ".$fullPath);

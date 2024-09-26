@@ -36,3 +36,4 @@ database/seeders/anime_additional_data.sql
 /public/thumbnail/**/*.webp
 /public/thumbnail/**/*.tiff
 !/public/thumbnail/**/*.zip
+laravel_server.log

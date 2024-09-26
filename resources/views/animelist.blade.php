@@ -60,6 +60,7 @@
                     { data: 'year', name: 'year', width: "10%", render: function(data, type, row) {
                         return data === null ? 'UNKNOWN' : data;
                     }},
+                    { data: 'synonyms', name: 'synonyms', visible: false },
                 ],
                 search: { search: initialSearch },
                 initComplete: function() {
