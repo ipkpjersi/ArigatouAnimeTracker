@@ -13,7 +13,7 @@ class DownloadAnimeImages extends Command
      *
      * @var string
      */
-    protected $signature = 'app:download-anime-images';
+    protected $signature = 'app:download-anime-images {--force}';
 
     /**
      * The console command description.
@@ -35,7 +35,7 @@ class DownloadAnimeImages extends Command
                 $this->info($message);
             };
 
-            $result = $animeImageDownloadService->downloadImages($logger);
+            $result = $animeImageDownloadService->downloadImages($logger, $this->option('force'));
             $duration = round($result['duration'], 2);
             $this->info("Downloaded {$result['successful']} out of {$result['totalImages']} images for {$result['total']} anime records successfully in {$duration} seconds.");
             Log::channel('anime_import')->info("Downloaded {$result['successful']} out of {$result['totalImages']} images for {$result['total']} anime records successfully in {$duration} seconds.");

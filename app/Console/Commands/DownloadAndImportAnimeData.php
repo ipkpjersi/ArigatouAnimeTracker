@@ -44,7 +44,7 @@ class DownloadAndImportAnimeData extends Command
 
             // Download Anime Images
             $this->info('Downloading anime images...');
-            Artisan::call('app:download-anime-images', [], new ConsoleOutput);
+            Artisan::call('app:download-anime-images', ['--force' => true], new ConsoleOutput);
 
             $this->info('All processes completed successfully.');
 
