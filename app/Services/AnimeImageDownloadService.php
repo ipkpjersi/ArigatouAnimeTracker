@@ -12,8 +12,12 @@ use function App\Helpers\rot19;
 
 class AnimeImageDownloadService
 {
-    public function downloadImages($logger = null)
+    public function downloadImages($logger = null, $force = false)
     {
+        if ($force) {
+            DB::table('anime')->update(['image_downloaded' => false]);
+            $logger && $logger("Force downloading: Resetting image_downloaded to false for all anime.");
+        }
         $anime = DB::table('anime')
             ->whereNot('image_downloaded', '=', true)
             ->where(function ($query) {
