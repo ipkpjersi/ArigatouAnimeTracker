@@ -44,7 +44,7 @@ class DownloadAndImportAnimeData extends Command
 
             // Download Anime Images
             $this->info('Downloading anime images...');
-            //We could technically force this to re-download all anime images, except with our sleep timers it means it takes a week or more, so let's leave it off for now.
+            //We could technically force this to re-download all anime images, except with our sleep timers it means it takes a week or more, so let's leave it off for now. The JSON anime database file is what sets the image URLs, which means it will only ever be delta updates, which means we probably don't really need to re-download all images. 
             //Artisan::call('app:download-anime-images', ['--force' => true], new ConsoleOutput);
             Artisan::call('app:download-anime-images', [], new ConsoleOutput);
 
