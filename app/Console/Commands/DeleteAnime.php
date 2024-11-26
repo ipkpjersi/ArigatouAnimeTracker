@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Anime;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +33,7 @@ class DeleteAnime extends Command
         $this->info("Fetching details for anime ID $animeId...");
 
         // Fetch the anime details
-        $anime = DB::table('anime')->find($animeId);
+        $anime = Anime::getAnimeDetails($animeId);
 
         if (!$anime) {
             $this->error('Anime ID is invalid or does not exist.');
@@ -85,7 +86,8 @@ class DeleteAnime extends Command
         $this->info("Title: $anime->title");
         $this->info("Year: " . ($anime->year ?? 'UNKNOWN'));
         $this->info("Season: " . ($anime->season ?? 'UNKNOWN'));
-        $this->info("Type: " . ($anime->anime_type_id ?? 'UNKNOWN'));
+        $this->info("Type: " . optional($anime->anime_type)->type ?: 'UNKNOWN');
+        $this->info("Status: " . optional($anime->anime_status)->status ?: 'UNKNOWN');
         $this->info("Episodes: " . ($anime->episodes ?? 'UNKNOWN'));
         $this->info("Synonyms: " . ($anime->synonyms ?? 'NONE'));
         $this->info("-----------------------");
