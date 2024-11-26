@@ -168,7 +168,7 @@ class DuplicateAnimeService
 
     public function getAnimeDetails($animeId)
     {
-        return Anime::select('id', 'title', 'year', 'season', 'anime_type_id', 'episodes', 'synonyms')
+        return Anime::select('id', 'title', 'year', 'season', 'anime_type_id', 'anime_status_id', 'episodes', 'synonyms')
             ->with('anime_type', 'anime_status')
             ->find($animeId);
     }
