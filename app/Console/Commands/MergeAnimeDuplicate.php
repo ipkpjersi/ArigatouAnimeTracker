@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Anime;
 use App\Services\DuplicateAnimeService;
 use Illuminate\Console\Command;
 
@@ -32,8 +33,8 @@ class MergeAnimeDuplicate extends Command
         $this->info("Fetching details for anime ID $oldAnimeId and $newAnimeId...");
 
         // Fetch anime details for both old and new anime
-        $oldAnime = $duplicateAnimeService->getAnimeDetails($oldAnimeId);
-        $newAnime = $duplicateAnimeService->getAnimeDetails($newAnimeId);
+        $oldAnime = Anime::getAnimeDetails($oldAnimeId);
+        $newAnime = Anime::getAnimeDetails($newAnimeId);
 
         if (!$oldAnime || !$newAnime) {
             $this->error('One or both of the anime IDs are invalid.');
