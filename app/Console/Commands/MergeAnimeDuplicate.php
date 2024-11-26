@@ -77,6 +77,7 @@ class MergeAnimeDuplicate extends Command
         $this->info("Year: " . ($anime->year ?: 'UNKNOWN'));
         $this->info("Season: " . ($anime->season ?: 'UNKNOWN'));
         $this->info("Type: " . optional($anime->anime_type)->type ?: 'UNKNOWN');
+        $this->info("Status: " . optional($anime->anime_status)->status ?: 'UNKNOWN');
         $this->info("Episodes: " . ($anime->episodes ?: 'UNKNOWN'));
         $this->info("Synonyms: " . ($anime->synonyms ?: 'NONE'));
         $this->info("--------------------");
