@@ -145,6 +145,7 @@ class AnimeListExportService
                 'show_publicly' => $favourite->show_publicly,
                 'sort_order' => $favourite->sort_order,
                 'created_at' => $favourite->created_at,
+                'updated_at' => $favourite->updated_at,
             ];
         }
 
@@ -174,6 +175,7 @@ class AnimeListExportService
                 'recommendation' => $review->recommendation,
                 'contains_spoilers' => $review->contains_spoilers,
                 'show_publicly' => $review->show_review_publicly,
+                'is_deleted' => $review->is_deleted,
                 'created_at' => $review->created_at,
                 'updated_at' => $review->updated_at,
             ];

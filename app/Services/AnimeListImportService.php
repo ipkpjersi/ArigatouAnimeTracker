@@ -6,6 +6,7 @@ use App\Models\Anime;
 use App\Models\AnimeType;
 use App\Models\AnimeUser;
 use App\Models\WatchStatus;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use SimpleXMLElement;
 
@@ -94,8 +95,8 @@ class AnimeListImportService
         $count = 0;
         $startTime = microtime(true);
         $animeDataArray = json_decode($jsonContent, true)['animeList'] ?? [];
-        $favouritesArray = $data['favourites'] ?? [];
-        $reviewsArray = $data['reviews'] ?? [];
+        $favouritesArray = json_decode($jsonContent, true)['favourites'] ?? [];
+        $reviewsArray = json_decode($jsonContent, true)['reviews'] ?? [];
 
         $total = count($animeDataArray);
 
@@ -168,8 +169,7 @@ class AnimeListImportService
                     ->first();
 
                 if ($existingFavourite) {
-                    $logger && $logger("Skipping existing favourite for anime {$favourite['title']}");
-
+                    $logger && $logger("Skipping existing favourite for anime {$anime->title} id {$anime->id}");
                     continue;
                 }
 
@@ -179,6 +179,8 @@ class AnimeListImportService
                         'anime_id' => $anime->id,
                         'show_publicly' => $favourite['show_publicly'],
                         'sort_order' => $favourite['sort_order'],
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
                     ]
                 );
             }
@@ -195,8 +197,7 @@ class AnimeListImportService
                     ->first();
 
                 if ($existingReview) {
-                    $logger && $logger("Skipping existing review for anime {$review['anime_title']}");
-
+                    $logger && $logger("Skipping existing review for anime {$anime->title} id {$anime->id}");
                     continue;
                 }
 
@@ -204,13 +205,14 @@ class AnimeListImportService
                     [
                         'user_id' => $userId,
                         'anime_id' => $anime->id,
-                        'title' => $review['title'],
-                        'body' => $review['body'],
-                        'show_review_publicly' => $review['show_review_publicly'],
+                        'title' => $review['review_title'],
+                        'body' => $review['review_body'],
+                        'show_review_publicly' => $review['show_publicly'],
                         'recommendation' => $review['recommendation'],
                         'contains_spoilers' => $review['contains_spoilers'],
                         'is_deleted' => $review['is_deleted'],
-                        'created_at' => $review['created_at'],
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
                     ]
                 );
             }
