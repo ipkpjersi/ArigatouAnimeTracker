@@ -147,6 +147,13 @@ class DuplicateAnimeService
 
             $logger && $logger("Updated anime_reviews references from $oldAnimeId to $newAnimeId");
 
+            //Update references in anime_favourites table
+            DB::table('anime_favourites')
+                ->where('anime_id', $oldAnimeId)
+                ->update(['anime_id' => $newAnimeId]);
+
+            $logger && $logger("Updated anime_favourites references from $oldAnimeId to $newAnimeId");
+
             //Delete the old anime entry
             DB::table('anime')
                 ->where('id', $oldAnimeId)
