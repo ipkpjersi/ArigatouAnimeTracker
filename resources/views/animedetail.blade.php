@@ -101,7 +101,7 @@
                                         Delete from My Anime List
                                     </button>
                                 </form>
-                                <form action="{{ route('user.anime.update',  ['username' => Auth::user()->username, 'redirectBack' => true]) }}" method="POST" class="bg-white dark:bg-gray-700 p-4 rounded shadow mt-4">
+                                <form action="{{ route('user.anime.update',  ['username' => Auth::user()->username, 'redirectBack' => true]) }}" method="POST" class="bg-white dark:bg-gray-700 p-4 rounded shadow mt-2">
                                     @csrf
                                     @method('POST')
 
@@ -172,6 +172,55 @@
 
                             @endif
                         @endif
+
+                        @if ($favouriteSystemEnabled)
+                            @if (!auth()->user()->favourites->contains($anime->id))
+                                <!-- Add to Favourites Button -->
+                                <form action="{{ route('anime.addToFavourites', $anime->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                        Add to Favourites
+                                    </button>
+                                </form>
+                            @else
+                                <!-- Remove from Favourites Button -->
+                                <form action="{{ route('anime.removeFromFavourites', $anime->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                        Remove from Favourites
+                                    </button>
+                                </form>
+                                <!-- Manage Favourites Form -->
+                                <form action="{{ route('anime.updateFavourite', $anime->id) }}" method="POST" class="bg-white dark:bg-gray-700 p-4 rounded shadow mt-2">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <!-- Hidden input for anime_id -->
+                                    <input type="hidden" name="anime_id" value="{{ $anime->id }}">
+
+                                    <!-- Show Publicly -->
+                                    <div class="mt-1">
+                                        <label for="show_publicly" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Show Publicly:</label>
+                                        <select name="show_publicly" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-select block w-full">
+                                            <option value="1" {{ $favourite->pivot->show_publicly === 1 ? 'selected' : '' }}>Yes</option>
+                                            <option value="0" {{ $favourite->pivot->show_publicly === 0 ? 'selected' : '' }}>No</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Sort Order -->
+                                    <div class="mt-4">
+                                        <label for="sort_order" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Sort Order:</label>
+                                        <input type="number" name="sort_order" value="{{ $favourite->sort_order ?? 0 }}" min="0" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-input block w-full">
+                                    </div>
+
+                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                        Update Favourites
+                                    </button>
+                                </form>
+                            @endif
+                        @endif
+
                         <h4 class="font-bold mt-4">Tags:</h4>
                         <ul>
                             @foreach (explode(', ', $anime->tags) as $tag)

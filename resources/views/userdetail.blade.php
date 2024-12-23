@@ -85,10 +85,15 @@
                                 <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}" class="text-clickable-link-blue">All Reviews ({{ $totalReviewsCount }})</a>
                             </div>
                         @endif
+                        @if ($enableFavouritesSystem)
+                            <div class="flex justify-between mb-4">
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'favourites']) }}" class="text-clickable-link-blue">All Favourites ({{ $totalFavouritesCount }})</a>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Right Column -->
-                    <div class="w-full md:w-3/5 mt-0 flex flex-col flex-wrap items-start">
+                    <div class="w-full md:w-3/5 mt-0 flex {{ $flexCol }} flex-wrap items-start"> <!-- flex-col to fix pagination button layout on different detail page tabs like friends or reviews-->
                         @if($canViewReviews && request('view') == 'reviews')
                             <div class="mb-4 flex border-b items-end">
                                 <!-- Home Tab -->
@@ -97,6 +102,9 @@
                                 <a href="{{ route('users.detail', [$user->username, 'view' => 'friends']) }}" class="tab-button {{ request()->get('view') == 'friends' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Friends</a>
                                 <!-- Reviews Tab -->
                                 <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}" class="tab-button {{ request()->get('view') == 'reviews' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Reviews</a>
+                                <!-- Favourites Tab -->
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'favourites']) }}"
+                                   class="tab-button {{ request()->get('view') == 'favourites' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Favourites</a>
                             </div>
 
                             {{-- Display Reviews --}}
@@ -176,6 +184,9 @@
                                 <a href="{{ route('users.detail', [$user->username, 'view' => 'friends']) }}" class="tab-button {{ request()->get('view') == 'friends' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Friends</a>
                                 <!-- Reviews Tab -->
                                 <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}" class="tab-button {{ request()->get('view') == 'reviews' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Reviews</a>
+                                <!-- Favourites Tab -->
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'favourites']) }}"
+                                   class="tab-button {{ request()->get('view') == 'favourites' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Favourites</a>
                             </div>
 
                             <!-- Grid View for Friends -->
@@ -207,6 +218,54 @@
                             {{-- We need flex-grow because the parent is a flex container/element. --}}
                             <div class="mt-4 flex-grow">
                                 {{ $friends->appends(['view' => 'friends'])->links() }}
+                            </div>
+                        @elseif($canViewFavourites && request('view') == 'favourites')
+                            <div class="mb-4 flex border-b items-end">
+                                <!-- Home Tab -->
+                                <a href="{{ route('users.detail', $user->username) }}"
+                                   class="tab-button {{ !request()->get('view') ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Home</a>
+                                <!-- Friends Tab -->
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'friends']) }}"
+                                   class="tab-button {{ request()->get('view') == 'friends' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Friends</a>
+                                <!-- Reviews Tab -->
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'reviews']) }}"
+                                   class="tab-button {{ request()->get('view') == 'reviews' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Reviews</a>
+                                <!-- Favourites Tab -->
+                                <a href="{{ route('users.detail', [$user->username, 'view' => 'favourites']) }}"
+                                   class="tab-button {{ request()->get('view') == 'favourites' ? 'bg-blue-500 text-white' : 'dark:text-white' }} py-2 px-4">Favourites</a>
+                            </div>
+
+                            <!-- Grid View for Favourites -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                                @foreach ($favourites as $favourite)
+                                    <div class="m-2 p-4 rounded-lg shadow-lg bg-gray-100 dark:bg-gray-700 flex flex-col justify-between max-w-[200px] min-h-[125px] relative">
+                                        <div class="relative z-20">
+                                            <a href="{{ route('anime.detail', $favourite->id) }}">
+                                                <h3 class="text-xl font-semibold mb-2">{{ $favourite->title }}</h3>
+                                                <img src="{{ $favourite->thumbnail }}" alt="{{ $favourite->title }}" class="rounded mb-4 avatar-image"
+                                                     onerror="this.onerror=null; this.src='/img/notfound.gif';">
+                                            </a>
+                                            <p class="text-sm">Added on: {{ $favourite->pivot->created_at->format('M d, Y h:i:s A') }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                                @if ($isOwnProfile)
+                                    {{-- Show All Favourites Checkbox --}}
+                                    <div class="mt-4 col-span-full">
+                                        <form action="{{ route('users.detail', $user->username) }}" method="GET">
+                                            <input type="hidden" name="view" value="favourites">
+                                            <label for="showallfavourites" class="inline-flex items-center">
+                                                <input type="checkbox" id="showallfavourites" name="showallfavourites" value="1"
+                                                       {{ request('showallfavourites') ? 'checked' : '' }} onchange="this.form.submit()">
+                                                <span class="ml-2">Show All Favourites</span>
+                                            </label>
+                                        </form>
+                                    </div>
+                                @endif
+                            </div>
+                            {{-- Pagination Links --}}
+                            <div class="mt-4 flex-grow">
+                                {{ $favourites->appends(['view' => 'favourites'])->links() }}
                             </div>
                         @else
                             <!-- Left sub-column for days watched and watch status -->
@@ -247,6 +306,24 @@
                                 <p>Total Anime Completed: {{ $stats['totalCompleted'] }}</p>
                                 <p>Total Episodes Watched: {{ $stats['totalEpisodes'] }}</p>
                             </div>
+                            <!-- Favorites Section -->
+                                <h5 class="font-bold mt-4 mb-2">Favourites:</h5>
+                                <div class="mt-1 flex flex-wrap items-center justify-between">
+                                    <!-- Thumbnails -->
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        @foreach ($favourites as $favourite)
+                                            <a href="{{ route('anime.detail', $favourite->id) }}" class="relative group">
+                                                <img src="{{ $favourite->thumbnail }}"
+                                                     alt="{{ $favourite->title }}"
+                                                     class="rounded-lg shadow-md w-16 h-24 object-cover"
+                                                     onerror="this.onerror=null; this.src='/img/notfound.gif';">
+                                                <span class="absolute bottom-1 left-1 text-xs bg-black text-white px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    {{ $favourite->title }}
+                                                </span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
                         @endif
                     </div>
                 </div>

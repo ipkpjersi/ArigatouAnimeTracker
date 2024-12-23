@@ -54,7 +54,7 @@ class ProfileController extends Controller
             $request->user()->show_others_reviews = false;
         }
 
-        // If show_friends_on_profile_when_logged_in is turned off, turn off show_friends_on_profile_publicly too
+        // If show_reviews_when_logged_in is turned off, turn off show_reviews_publicly too
         if ($request->input('show_reviews_when_logged_in') == false) {
             $request->user()->show_reviews_publicly = false;
         }
@@ -69,6 +69,19 @@ class ProfileController extends Controller
         // If enable_score_charts_own_profile_when_logged_in is turned off, turn off enable_score_charts_own_profile_publicly too
         if ($request->input('enable_score_charts_own_profile_when_logged_in') == false) {
             $request->user()->enable_score_charts_own_profile_publicly = false;
+        }
+
+        // If enabling the favourites system is turned off, turn off all related settings
+        if ($request->input('enable_favourites_system') == false) {
+            $request->user()->show_own_favourites_when_logged_in = false;
+            $request->user()->show_favourites_publicly = false;
+            $request->user()->show_others_favourites = false;
+            $request->user()->show_favourites_in_nav_dropdown = false;
+        }
+
+        // If show_own_favourites_when_logged_in is turned off, turn off show_favourites_publicly too
+        if ($request->input('show_own_favourites_when_logged_in') == false) {
+            $request->user()->show_favourites_publicly = false;
         }
 
         if ($request->hasFile('avatar')) {

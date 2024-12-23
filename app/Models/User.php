@@ -49,6 +49,11 @@ class User extends Authenticatable
         'show_anime_list_publicly',
         'show_clear_anime_list_sort_orders_button',
         'modifying_sort_order_on_detail_page_sorts_entire_list',
+        'enable_favourites_system',
+        'show_own_favourites_when_logged_in',
+        'show_favourites_publicly',
+        'show_favourites_in_nav_dropdown',
+        'show_others_favourites',
     ];
 
     /**
@@ -93,6 +98,13 @@ class User extends Authenticatable
     public function reviews(): HasMany
     {
         return $this->hasMany(AnimeReview::class, 'user_id');
+    }
+
+    public function favourites()
+    {
+        return $this->belongsToMany(Anime::class, 'anime_favourites')
+            ->withPivot('show_publicly', 'sort_order')
+            ->withTimestamps();
     }
 
     public function animeStatistics()

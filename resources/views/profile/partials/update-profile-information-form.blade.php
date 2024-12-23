@@ -487,6 +487,88 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('modifying_sort_order_on_detail_page_sorts_entire_list')"/>
 
+            <!-- Enable Favourites System -->
+            <x-input-label class="mt-4" for="enable_favourites_system" :value="__('Enable Favourites System')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="enable_favourites_system" type="radio" name="enable_favourites_system" value="1" class="form-radio"
+                           @if (old('enable_favourites_system', $user->enable_favourites_system) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="enable_favourites_system" type="radio" name="enable_favourites_system" value="0" class="form-radio"
+                           @if (old('enable_favourites_system', $user->enable_favourites_system) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('enable_favourites_system')" />
+
+            <!-- Show Own Favourites When Logged In -->
+            <x-input-label class="mt-4" for="show_own_favourites_when_logged_in" :value="__('Show Own Favourites When Logged In')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_own_favourites_when_logged_in" type="radio" name="show_own_favourites_when_logged_in" value="1" class="form-radio"
+                           @if (old('show_own_favourites_when_logged_in', $user->show_own_favourites_when_logged_in) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_own_favourites_when_logged_in" type="radio" name="show_own_favourites_when_logged_in" value="0" class="form-radio"
+                           @if (old('show_own_favourites_when_logged_in', $user->show_own_favourites_when_logged_in) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_own_favourites_when_logged_in')" />
+
+            <!-- Show Favourites Publicly -->
+            <x-input-label class="mt-4" for="show_favourites_publicly" :value="__('Show Favourites Publicly')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_favourites_publicly" type="radio" name="show_favourites_publicly" value="1" class="form-radio"
+                           @if (old('show_favourites_publicly', $user->show_favourites_publicly) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_favourites_publicly" type="radio" name="show_favourites_publicly" value="0" class="form-radio"
+                           @if (old('show_favourites_publicly', $user->show_favourites_publicly) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_favourites_publicly')" />
+
+            <!-- Show Others' Favourites -->
+            <x-input-label class="mt-4" for="show_others_favourites" :value="__('Show Others\' Favourites')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_others_favourites" type="radio" name="show_others_favourites" value="1" class="form-radio"
+                           @if (old('show_others_favourites', $user->show_others_favourites) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_others_favourites" type="radio" name="show_others_favourites" value="0" class="form-radio"
+                           @if (old('show_others_favourites', $user->show_others_favourites) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_others_favourites')" />
+
+            <!-- Show Favourites in Navigation Dropdown -->
+            <x-input-label class="mt-4" for="show_favourites_in_nav_dropdown" :value="__('Show Favourites in Navigation Dropdown')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <label class="inline-flex items-center">
+                    <input id="show_favourites_in_nav_dropdown" type="radio" name="show_favourites_in_nav_dropdown" value="1" class="form-radio"
+                           @if (old('show_favourites_in_nav_dropdown', $user->show_favourites_in_nav_dropdown) === 1) checked @endif>
+                    <span class="ml-2">Yes</span>
+                </label>
+                <label class="inline-flex items-center ml-6">
+                    <input id="show_favourites_in_nav_dropdown" type="radio" name="show_favourites_in_nav_dropdown" value="0" class="form-radio"
+                           @if (old('show_favourites_in_nav_dropdown', $user->show_favourites_in_nav_dropdown) !== 1) checked @endif>
+                    <span class="ml-2">No</span>
+                </label>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('show_favourites_in_nav_dropdown')" />
+
+            <!-- ADD MORE USERS COLUMNS HERE AS NECESSARY -->
+
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
@@ -670,6 +752,47 @@
 
             setScoreChartsFieldsDisabled(document.querySelector('input[name="enable_score_charts"]:checked').value === '0');
             adjustScoreChartsPubliclySetting();
+
+            // Function to disable or enable related fields for the favourites system
+            function setFavouritesFieldsDisabled(disabled) {
+                ['show_own_favourites_when_logged_in', 'show_favourites_publicly', 'show_favourites_in_nav_dropdown', 'show_others_favourites'].forEach(name => {
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+                        radio.disabled = disabled;
+                        if (disabled) {
+                            // Set to 'No' if disabled
+                            radio.checked = radio.value === '0';
+                        }
+                    });
+                });
+            }
+
+            // Event listener for 'Enable Favourites System' radio buttons
+            document.querySelectorAll('input[name="enable_favourites_system"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    setFavouritesFieldsDisabled(this.value === '0');
+                });
+            });
+
+            // Function to ensure logical consistency for the favourites system
+            function adjustFavouritesPubliclySetting() {
+                const showWhenLoggedIn = document.querySelector('input[name="show_own_favourites_when_logged_in"]:checked').value;
+                const showPubliclyRadios = document.querySelectorAll('input[name="show_favourites_publicly"]');
+                if (showWhenLoggedIn === '0') {
+                    // If 'Show Own Favourites When Logged In' is 'No', 'Show Favourites Publicly' must also be 'No'
+                    showPubliclyRadios.forEach(radio => radio.checked = radio.value === '0');
+                }
+                // Disable 'Show Favourites Publicly' radios if 'Show Own Favourites When Logged In' is 'No'
+                showPubliclyRadios.forEach(radio => radio.disabled = showWhenLoggedIn === '0');
+            }
+
+            // Event listener for 'Show Own Favourites When Logged In' radio buttons
+            document.querySelectorAll('input[name="show_own_favourites_when_logged_in"]').forEach(radio => {
+                radio.addEventListener('change', adjustFavouritesPubliclySetting);
+            });
+
+            // Initialize favourites settings on load
+            setFavouritesFieldsDisabled(document.querySelector('input[name="enable_favourites_system"]:checked').value === '0');
+            adjustFavouritesPubliclySetting();
         });
 
     </script>

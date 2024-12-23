@@ -108,6 +108,8 @@ class AnimeController extends Controller
         $currentUserNotes = null;
         $currentUserDisplayInList = true;
         $currentUserShowAnimeNotesPublicly = true;
+        $favouriteSystemEnabled = false;
+        $favourite = null;
 
         $user = auth()->user();
         $userHasReview = false;
@@ -130,6 +132,8 @@ class AnimeController extends Controller
                 ->where('user_id', $user->id)
                 ->first();
             $userHasReview = $userReview != null;
+            $favouriteSystemEnabled = auth()->user()->enable_favourites_system;
+            $favourite = $favouriteSystemEnabled ? auth()->user()->favourites->where('id', $id)->first() : null;
         }
 
         $reviews = AnimeReview::where('anime_reviews.anime_id', $id)
@@ -208,7 +212,7 @@ class AnimeController extends Controller
                 'pageName' => 'otheranimepage',
             ]);
         }
-        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aatScore', 'aatMembers', 'aatUsers', 'otherAnime'));
+        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aatScore', 'aatMembers', 'aatUsers', 'otherAnime', 'favouriteSystemEnabled', 'favourite'));
     }
 
     public function addReview(Request $request)
