@@ -238,7 +238,7 @@
                             <!-- Grid View for Favourites -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
                                 @foreach ($favourites as $favourite)
-                                    <div class="m-2 p-4 rounded-lg shadow-lg bg-gray-100 dark:bg-gray-700 flex flex-col justify-between max-w-[200px] min-h-[125px] relative">
+                                    <div class="m-2 p-4 rounded-lg shadow-lg bg-gray-100 dark:bg-gray-700 flex flex-col justify-between w-[200px] min-h-[125px] relative">
                                         <div class="relative z-20">
                                             <a href="{{ route('anime.detail', $favourite->id) }}">
                                                 <h3 class="text-xl font-semibold mb-2">{{ $favourite->title }}</h3>
