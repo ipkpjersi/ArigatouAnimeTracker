@@ -307,7 +307,7 @@
                                 <p>Total Episodes Watched: {{ $stats['totalEpisodes'] }}</p>
                             </div>
                             <!-- Favorites Section -->
-                                <h5 class="font-bold mt-4 mb-2">Favourites:</h5>
+                                <h5 class="font-bold mt-4 mb-2 w-full">Favourites:</h5>
                                 <div class="mt-1 flex flex-wrap items-center justify-between">
                                     <!-- Thumbnails -->
                                     <div class="flex flex-wrap items-center gap-2">

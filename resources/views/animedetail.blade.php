@@ -89,7 +89,7 @@
                             @if (!auth()->user()->anime->contains($anime->id))
                                 <form action="{{ route('anime.addToList', $anime->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
                                         Add to My Anime List
                                     </button>
                                 </form>
@@ -97,7 +97,7 @@
                                 <form action="{{ route('anime.deleteFromList', $anime->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    <button type="submit" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full">
                                         Delete from My Anime List
                                     </button>
                                 </form>
@@ -178,7 +178,7 @@
                                 <!-- Add to Favourites Button -->
                                 <form action="{{ route('anime.addToFavourites', $anime->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
                                         Add to Favourites
                                     </button>
                                 </form>
@@ -187,7 +187,7 @@
                                 <form action="{{ route('anime.removeFromFavourites', $anime->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    <button type="submit" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full">
                                         Remove from Favourites
                                     </button>
                                 </form>
@@ -214,7 +214,7 @@
                                         <input type="number" name="sort_order" value="{{ $favourite->sort_order ?? 0 }}" min="0" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-input block w-full">
                                     </div>
 
-                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
                                         Update Favourites
                                     </button>
                                 </form>
@@ -278,12 +278,12 @@
                         @if (!empty($otherAnime))
                             <h4 class="font-bold mt-4 mb-2">Other Anime:</h4>
                             <div class="flex flex-wrap -mx-2" id="other-anime-list">
-                                @foreach ($otherAnime as $anime)
+                                @foreach ($otherAnime as $other)
                                     <div class="w-1/2 md:w-1/5 px-2 mb-4">
-                                        <a href="/anime/{{ $anime->id }}/{{ Str::slug($anime->title) }}" class="block border p-2 h-full rounded-lg">
+                                        <a href="/anime/{{ $other->id }}/{{ Str::slug($other->title) }}" class="block border p-2 h-full rounded-lg">
                                             <div class="h-full flex flex-col items-center">
-                                                <img src="{{ $anime->thumbnail }}" onerror="this.onerror=null; this.src='/img/notfound.gif';" alt="{{ $anime->title }}" class="h-16 w-12 mb-2 mt-1 rounded">
-                                                <h5 class="text-center">{{ Str::limit($anime->title, 40) }}</h5>
+                                                <img src="{{ $other->thumbnail }}" onerror="this.onerror=null; this.src='/img/notfound.gif';" alt="{{ $other->title }}" class="h-16 w-12 mb-2 mt-1 rounded">
+                                                <h5 class="text-center">{{ Str::limit($other->title, 40) }}</h5>
                                             </div>
                                         </a>
                                     </div>

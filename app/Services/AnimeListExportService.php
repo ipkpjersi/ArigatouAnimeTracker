@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\AnimeFavourite;
+use App\Models\AnimeReview;
 use App\Models\AnimeUser;
+use Illuminate\Support\Facades\DB;
 use SimpleXMLElement;
 
 class AnimeListExportService
@@ -91,12 +94,13 @@ class AnimeListExportService
     private function exportToArigatou($userId, $logger = null)
     {
         $startTime = microtime(true);
+        // Fetch anime list
         $animeList = AnimeUser::with('anime', 'watch_status')
             ->where('user_id', $userId)
             ->get();
         $total = count($animeList);
-        $animeArray = [];
 
+        $animeArray = [];
         foreach ($animeList as $animeUser) {
             $animeArray[] = [
                 'title' => $animeUser->anime->title,
@@ -117,7 +121,70 @@ class AnimeListExportService
             ];
         }
 
-        $formattedJson = json_encode(['animeList' => $animeArray], JSON_PRETTY_PRINT);
+        // Fetch favourites with all related details
+        $favourites = AnimeFavourite::with([
+            'anime.anime_type',
+            'anime.anime_status'
+        ])->whereHas('user', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
+
+        $favouritesArray = [];
+        foreach ($favourites as $favourite) {
+            $favouritesArray[] = [
+                'anime_id' => $favourite->anime->id,
+                'user_id' => $userId,
+                'title' => $favourite->anime->title,
+                'type' => $favourite->anime->anime_type->type,
+                'season' => $favourite->anime->season,
+                'year' => $favourite->anime->year,
+                'episodes' => $favourite->anime->episodes,
+                'duration' => $favourite->anime->duration ?? 'UNKNOWN',
+                'rating' => $favourite->anime->rating ?? 'UNKNOWN',
+                'anime_status' => $favourite->anime->anime_status?->status ?? 'UNKNOWN',
+                'show_publicly' => $favourite->show_publicly,
+                'sort_order' => $favourite->sort_order,
+                'created_at' => $favourite->created_at,
+            ];
+        }
+
+        // Fetch reviews with all related details
+        $reviews = AnimeReview::with([
+            'anime.anime_type',
+            'anime.anime_status'
+        ])->whereHas('user', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
+
+        $reviewsArray = [];
+        foreach ($reviews as $review) {
+            $reviewsArray[] = [
+                'anime_id' => $review->anime->id,
+                'user_id' => $userId,
+                'title' => $review->anime->title,
+                'type' => $review->anime->anime_type->type,
+                'season' => $review->anime->season,
+                'year' => $review->anime->year,
+                'episodes' => $review->anime->episodes,
+                'duration' => $review->anime->duration ?? 'UNKNOWN',
+                'rating' => $review->anime->rating ?? 'UNKNOWN',
+                'anime_status' => $review->anime->anime_status?->status ?? 'UNKNOWN',
+                'review_title' => $review->title,
+                'review_body' => $review->body,
+                'recommendation' => $review->recommendation,
+                'contains_spoilers' => $review->contains_spoilers,
+                'show_publicly' => $review->show_review_publicly,
+                'created_at' => $review->created_at,
+                'updated_at' => $review->updated_at,
+            ];
+        }
+
+
+        $formattedJson = json_encode([
+            'animeList' => $animeArray,
+            'favourites' => $favouritesArray,
+            'reviews' => $reviewsArray,
+        ], JSON_PRETTY_PRINT);
         $duration = microtime(true) - $startTime;
 
         return ['total' => $total, 'duration' => $duration, 'output' => $formattedJson];
