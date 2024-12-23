@@ -21,7 +21,7 @@ class ProfileUpdateRequest extends FormRequest
             'dark_mode' => ['nullable', 'in:1,0'],
             'show_adult_content' => ['nullable', 'in:1,0'],
             'avatar' => ['nullable', 'image', 'max:2048'],
-            'anime_list_pagination_size' => ['integer', 'min:2', 'max:250'],
+            'anime_list_pagination_size' => ['integer', 'min:2', 'max:1000'],
             'show_anime_list_number' => ['nullable', 'in:1,0'],
             'show_clear_anime_list_button' => ['nullable', 'in:1,0'],
             'display_anime_cards' => ['nullable', 'in:1,0'],
