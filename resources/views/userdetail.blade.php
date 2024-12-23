@@ -24,7 +24,7 @@
                             <button id="animeListButton" class="p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md mt-2">Anime List</button>
                         </a>
                         <!-- Ban/Unban Button for Admins -->
-                        @if(auth()->user()->is_admin)
+                        @if(auth()->user()?->is_admin)
                             <div class="w-full mt-4">
                                 @if ($user->is_banned)
                                     <button data-user-id="{{ $user->id }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded unbanUser">Unban</button>

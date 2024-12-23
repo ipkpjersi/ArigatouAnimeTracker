@@ -87,11 +87,12 @@ class UserController extends Controller
             }
         }
 
-        $enableFriendsSystem = auth()->user()->enable_friends_system === 1;
-        $enableReviewsSystem = auth()->user()->enable_reviews_system === 1;
-        $enableScoreCharts = auth()->user()->enable_score_charts_system === 1;
-        $enableFavouritesSystem = auth()->user()->enable_favourites_system === 1;
+        $enableFriendsSystem = auth()->user()?->enable_friends_system === 1;
+        $enableReviewsSystem = auth()->user()?->enable_reviews_system === 1;
+        $enableScoreCharts = auth()->user()?->enable_score_charts_system === 1;
+        $enableFavouritesSystem = auth()->user()?->enable_favourites_system === 1;
 
+        //Check favourites of viewed user.
         $favouritesQuery = $user->favourites()
             ->join('users', 'anime_favourites.user_id', '=', 'users.id')
             ->when($showFavouritesPubliclyOnly, function ($query) {
@@ -100,29 +101,33 @@ class UserController extends Controller
                     ->where('users.show_favourites_publicly', true);
             });
 
-
-        if ($isOwnProfile) {
-            if ($user->favourites_sort_own === 'random') {
-                $favouritesQuery->inRandomOrder();
-            } elseif ($user->favourites_sort_own === 'sort_order') {
-                $favouritesQuery->orderBy('anime_favourites.sort_order', $user->favourites_sort_own_order);
+        if (auth()->user() !== null) {
+            //Check sorting preferences of authenticated user, not viewed user.
+            if ($isOwnProfile) {
+                if (auth()->user()->favourites_sort_own === 'random') {
+                    $favouritesQuery->inRandomOrder();
+                } elseif (auth()->user()->favourites_sort_own === 'sort_order') {
+                    $favouritesQuery->orderBy('anime_favourites.sort_order');
+                } else {
+                    $favouritesQuery->orderBy(
+                        auth()->user()->favourites_sort_own === 'date_added' ? 'anime_favourites.created_at' : "anime.{auth()->user()->favourites_sort_own}",
+                        auth()->user()->favourites_sort_own_order
+                    );
+                }
             } else {
-                $favouritesQuery->orderBy(
-                    $user->favourites_sort_own === 'date_added' ? 'anime_favourites.created_at' : "anime.{$user->favourites_sort_own}",
-                    $user->favourites_sort_own_order
-                );
+                if (auth()->user()->favourites_sort_others === 'random') {
+                    $favouritesQuery->inRandomOrder();
+                } elseif (auth()->user()->favourites_sort_others === 'sort_order') {
+                    $favouritesQuery->orderBy('anime_favourites.sort_order');
+                } else {
+                    $favouritesQuery->orderBy(
+                        auth()->user()->favourites_sort_others === 'date_added' ? 'anime_favourites.created_at' : "anime.{auth()->user()->favourites_sort_others}",
+                        auth()->user()->favourites_sort_others_order
+                    );
+                }
             }
         } else {
-            if ($user->favourites_sort_others === 'random') {
-                $favouritesQuery->inRandomOrder();
-            } elseif ($user->favourites_sort_others === 'sort_order') {
-                $favouritesQuery->orderBy('anime_favourites.sort_order', $user->favourites_sort_others_order);
-            } else {
-                $favouritesQuery->orderBy(
-                    $user->favourites_sort_others === 'date_added' ? 'anime_favourites.created_at' : "anime.{$user->favourites_sort_others}",
-                    $user->favourites_sort_others_order
-                );
-            }
+            $favouritesQuery->orderBy('anime_favourites.created_at', 'DESC');
         }
 
         if (request('view') == 'favourites') {
