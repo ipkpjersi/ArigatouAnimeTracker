@@ -159,7 +159,7 @@ class AnimeListImportService
 
         // Import favourites
         foreach ($favouritesArray as $favourite) {
-            $anime = Anime::where('title', $favourite['title'])->first();
+            $anime = Anime::where('id', $favourite['anime_id'])->first();
             if ($anime) {
                 // Check for duplicate entry
                 $existingFavourite = DB::table('anime_favourites')
@@ -186,7 +186,7 @@ class AnimeListImportService
 
         // Import reviews
         foreach ($reviewsArray as $review) {
-            $anime = Anime::where('title', $review['anime_title'])->first();
+            $anime = Anime::where('id', $review['anime_id'])->first();
             if ($anime) {
                 // Check for duplicate entry
                 $existingReview = DB::table('anime_reviews')
