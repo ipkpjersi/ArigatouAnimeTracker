@@ -43,6 +43,11 @@ class ProfileUpdateRequest extends FormRequest
             'show_anime_list_publicly' => ['nullable', 'in:1,0'],
             'show_clear_anime_list_sort_orders_button' => ['nullable', 'in:1,0'],
             'modifying_sort_order_on_detail_page_sorts_entire_list' => ['nullable', 'in:1,0'],
+            'enable_favourites_system' => ['nullable', 'in:1,0'],
+            'show_own_favourites_when_logged_in' => ['nullable', 'in:1,0'],
+            'show_favourites_publicly' => ['nullable', 'in:1,0'],
+            'show_favourites_in_nav_dropdown' => ['nullable', 'in:1,0'],
+            'show_others_favourites' => ['nullable', 'in:1,0'],
         ];
     }
 }
