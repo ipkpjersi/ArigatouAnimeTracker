@@ -470,7 +470,7 @@
 
             <!-- Enable Modifying Sort Order on Anime Detail Page Sorts Entire User Anime List -->
             <x-input-label class="mt-4" for="modifying_sort_order_on_detail_page_sorts_entire_list"
-                           :value="__('Enable Modifying Sort Order on Anime Detail Page Sorts Entire User Anime List')"/>
+                           :value="__('Enable Modifying Sort Order on Anime Detail Page Sorts Entire User Anime List (Recommended to leave enabled)')"/>
             <div class="mt-1 text-gray-800 dark:text-gray-200">
                 <label class="inline-flex items-center">
                     <input id="modifying_sort_order_on_detail_page_sorts_entire_list" type="radio"
