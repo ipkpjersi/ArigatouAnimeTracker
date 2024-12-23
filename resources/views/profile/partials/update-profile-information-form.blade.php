@@ -568,8 +568,8 @@
 
             <!-- Sort Favourites on Own Profile -->
             <x-input-label class="mt-4" for="favourites_sort_own" :value="__('Sort Favourites on Own Profile By')" />
-            <div class="mt-1 text-gray-800 dark:text-gray-200">
-                <select name="favourites_sort_own" id="favourites_sort_own" class="form-select">
+            <div class="mt-1">
+                <select name="favourites_sort_own" id="favourites_sort_own" class="form-select  text-gray-800 dark:text-gray-900">
                     <option value="title" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'title') selected @endif>Title</option>
                     <option value="episodes" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'episodes') selected @endif>Episodes</option>
                     <option value="year" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'year') selected @endif>Year</option>
@@ -581,8 +581,8 @@
                 </select>
             </div>
             <x-input-label class="mt-4" for="favourites_sort_own_order" :value="__('Sort Order')" />
-            <div class="mt-1 text-gray-800 dark:text-gray-200">
-                <select name="favourites_sort_own_order" id="favourites_sort_own_order" class="form-select">
+            <div class="mt-1">
+                <select name="favourites_sort_own_order" id="favourites_sort_own_order" class="form-select text-gray-800 dark:text-gray-900">
                     <option value="asc" @if (old('favourites_sort_own_order', $user->favourites_sort_own_order) === 'asc') selected @endif>Ascending</option>
                     <option value="desc" @if (old('favourites_sort_own_order', $user->favourites_sort_own_order) === 'desc') selected @endif>Descending</option>
                 </select>
@@ -590,8 +590,8 @@
 
             <!-- Sort Favourites on Others' Profiles -->
             <x-input-label class="mt-4" for="favourites_sort_others" :value="__('Sort Favourites on Others\' Profiles By')" />
-            <div class="mt-1 text-gray-800 dark:text-gray-200">
-                <select name="favourites_sort_others" id="favourites_sort_others" class="form-select">
+            <div class="mt-1">
+                <select name="favourites_sort_others" id="favourites_sort_others" class="form-select text-gray-800 dark:text-gray-900">
                     <option value="title" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'title') selected @endif>Title</option>
                     <option value="episodes" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'episodes') selected @endif>Episodes</option>
                     <option value="year" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'year') selected @endif>Year</option>
@@ -603,8 +603,8 @@
                 </select>
             </div>
             <x-input-label class="mt-4" for="favourites_sort_others_order" :value="__('Sort Order')" />
-            <div class="mt-1 text-gray-800 dark:text-gray-200">
-                <select name="favourites_sort_others_order" id="favourites_sort_others_order" class="form-select">
+            <div class="mt-1">
+                <select name="favourites_sort_others_order" id="favourites_sort_others_order" class="form-select text-gray-800 dark:text-gray-900">
                     <option value="asc" @if (old('favourites_sort_others_order', $user->favourites_sort_others_order) === 'asc') selected @endif>Ascending</option>
                     <option value="desc" @if (old('favourites_sort_others_order', $user->favourites_sort_others_order) === 'desc') selected @endif>Descending</option>
                 </select>
