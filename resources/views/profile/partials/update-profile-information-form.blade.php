@@ -467,7 +467,6 @@
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('enable_score_charts_other_profiles')"/>
 
-
             <!-- Enable Modifying Sort Order on Anime Detail Page Sorts Entire User Anime List -->
             <x-input-label class="mt-4" for="modifying_sort_order_on_detail_page_sorts_entire_list"
                            :value="__('Enable Modifying Sort Order on Anime Detail Page Sorts Entire User Anime List (Recommended to leave enabled)')"/>
@@ -566,6 +565,50 @@
                 </label>
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('show_favourites_in_nav_dropdown')" />
+
+            <!-- Sort Favourites on Own Profile -->
+            <x-input-label class="mt-4" for="favourites_sort_own" :value="__('Sort Favourites on Own Profile By')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <select name="favourites_sort_own" id="favourites_sort_own" class="form-select">
+                    <option value="title" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'title') selected @endif>Title</option>
+                    <option value="episodes" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'episodes') selected @endif>Episodes</option>
+                    <option value="year" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'year') selected @endif>Year</option>
+                    <option value="type" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'type') selected @endif>Type</option>
+                    <option value="status" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'status') selected @endif>Status</option>
+                    <option value="date_added" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'date_added') selected @endif>Date Added</option>
+                    <option value="sort_order" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'sort_order') selected @endif>Sort Order</option>
+                    <option value="random" @if (old('favourites_sort_own', $user->favourites_sort_own) === 'random') selected @endif>Random</option>
+                </select>
+            </div>
+            <x-input-label class="mt-4" for="favourites_sort_own_order" :value="__('Sort Order')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <select name="favourites_sort_own_order" id="favourites_sort_own_order" class="form-select">
+                    <option value="asc" @if (old('favourites_sort_own_order', $user->favourites_sort_own_order) === 'asc') selected @endif>Ascending</option>
+                    <option value="desc" @if (old('favourites_sort_own_order', $user->favourites_sort_own_order) === 'desc') selected @endif>Descending</option>
+                </select>
+            </div>
+
+            <!-- Sort Favourites on Others' Profiles -->
+            <x-input-label class="mt-4" for="favourites_sort_others" :value="__('Sort Favourites on Others\' Profiles By')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <select name="favourites_sort_others" id="favourites_sort_others" class="form-select">
+                    <option value="title" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'title') selected @endif>Title</option>
+                    <option value="episodes" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'episodes') selected @endif>Episodes</option>
+                    <option value="year" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'year') selected @endif>Year</option>
+                    <option value="type" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'type') selected @endif>Type</option>
+                    <option value="status" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'status') selected @endif>Status</option>
+                    <option value="date_added" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'date_added') selected @endif>Date Added</option>
+                    <option value="sort_order" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'sort_order') selected @endif>Sort Order</option>
+                    <option value="random" @if (old('favourites_sort_others', $user->favourites_sort_others) === 'random') selected @endif>Random</option>
+                </select>
+            </div>
+            <x-input-label class="mt-4" for="favourites_sort_others_order" :value="__('Sort Order')" />
+            <div class="mt-1 text-gray-800 dark:text-gray-200">
+                <select name="favourites_sort_others_order" id="favourites_sort_others_order" class="form-select">
+                    <option value="asc" @if (old('favourites_sort_others_order', $user->favourites_sort_others_order) === 'asc') selected @endif>Ascending</option>
+                    <option value="desc" @if (old('favourites_sort_others_order', $user->favourites_sort_others_order) === 'desc') selected @endif>Descending</option>
+                </select>
+            </div>
 
             <!-- ADD MORE USERS COLUMNS HERE AS NECESSARY -->
 

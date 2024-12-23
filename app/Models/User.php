@@ -54,6 +54,10 @@ class User extends Authenticatable
         'show_favourites_publicly',
         'show_favourites_in_nav_dropdown',
         'show_others_favourites',
+        'favourites_sort_own',
+        'favourites_sort_own_order',
+        'favourites_sort_others',
+        'favourites_sort_others_order',
     ];
 
     /**

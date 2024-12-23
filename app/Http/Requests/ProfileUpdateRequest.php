@@ -48,6 +48,10 @@ class ProfileUpdateRequest extends FormRequest
             'show_favourites_publicly' => ['nullable', 'in:1,0'],
             'show_favourites_in_nav_dropdown' => ['nullable', 'in:1,0'],
             'show_others_favourites' => ['nullable', 'in:1,0'],
+            'favourites_sort_own' => ['nullable', 'in:title,episodes,year,type,status,date_added,sort_order,random'],
+            'favourites_sort_own_order' => ['nullable', 'in:asc,desc'],
+            'favourites_sort_others' => ['nullable', 'in:title,episodes,year,type,status,date_added,sort_order,random'],
+            'favourites_sort_others_order' => ['nullable', 'in:asc,desc'],
         ];
     }
 }

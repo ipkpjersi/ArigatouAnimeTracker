@@ -92,17 +92,44 @@ class UserController extends Controller
         $enableScoreCharts = auth()->user()->enable_score_charts_system === 1;
         $enableFavouritesSystem = auth()->user()->enable_favourites_system === 1;
 
-        //Fetch all favourites for own profile
-        if (request('view') == 'favourites') {
-            $favourites = $user->favourites()->when($showFavouritesPubliclyOnly, function ($query) {
-                return $query->where('anime_favourites.show_publicly', true);
-            })->orderBy('anime_favourites.created_at', 'ASC')->paginate(10, ['*'], 'favouritepage')->withQueryString();
+        $favouritesQuery = $user->favourites()
+            ->join('users', 'anime_favourites.user_id', '=', 'users.id')
+            ->when($showFavouritesPubliclyOnly, function ($query) {
+                return $query
+                    ->where('anime_favourites.show_publicly', true)
+                    ->where('users.show_favourites_publicly', true);
+            });
+
+
+        if ($isOwnProfile) {
+            if ($user->favourites_sort_own === 'random') {
+                $favouritesQuery->inRandomOrder();
+            } elseif ($user->favourites_sort_own === 'sort_order') {
+                $favouritesQuery->orderBy('anime_favourites.sort_order', $user->favourites_sort_own_order);
+            } else {
+                $favouritesQuery->orderBy(
+                    $user->favourites_sort_own === 'date_added' ? 'anime_favourites.created_at' : "anime.{$user->favourites_sort_own}",
+                    $user->favourites_sort_own_order
+                );
+            }
         } else {
-            $favourites = $user->favourites()
-                ->take(9)
-                //->latest('anime_favourites.created_at')
-                ->inRandomOrder() //Random order is more fun. Maybe we can add more settings for sorting later.
-                ->get();
+            if ($user->favourites_sort_others === 'random') {
+                $favouritesQuery->inRandomOrder();
+            } elseif ($user->favourites_sort_others === 'sort_order') {
+                $favouritesQuery->orderBy('anime_favourites.sort_order', $user->favourites_sort_others_order);
+            } else {
+                $favouritesQuery->orderBy(
+                    $user->favourites_sort_others === 'date_added' ? 'anime_favourites.created_at' : "anime.{$user->favourites_sort_others}",
+                    $user->favourites_sort_others_order
+                );
+            }
+        }
+
+        if (request('view') == 'favourites') {
+            $favourites = $favouritesQuery->paginate(10, ['*'], 'favouritepage')->withQueryString();
+        } else {
+            //We could add pagination here, in which case we'd paginate 9, instead of take 9.
+            $favourites = $favouritesQuery->take(9)->get();
         }
 
         $reviews = AnimeReview::where('user_id', $user->id)
