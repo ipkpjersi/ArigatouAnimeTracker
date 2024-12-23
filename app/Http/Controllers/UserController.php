@@ -100,7 +100,8 @@ class UserController extends Controller
         } else {
             $favourites = $user->favourites()
                 ->take(9)
-                ->latest('anime_favourites.created_at')
+                //->latest('anime_favourites.created_at')
+                ->inRandomOrder() //Random order is more fun. Maybe we can add more settings for sorting later.
                 ->get();
         }
 
