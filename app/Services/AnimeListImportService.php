@@ -6,6 +6,8 @@ use App\Models\Anime;
 use App\Models\AnimeType;
 use App\Models\AnimeUser;
 use App\Models\WatchStatus;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use SimpleXMLElement;
 
 class AnimeListImportService
@@ -93,6 +95,8 @@ class AnimeListImportService
         $count = 0;
         $startTime = microtime(true);
         $animeDataArray = json_decode($jsonContent, true)['animeList'] ?? [];
+        $favouritesArray = json_decode($jsonContent, true)['favourites'] ?? [];
+        $reviewsArray = json_decode($jsonContent, true)['reviews'] ?? [];
 
         $total = count($animeDataArray);
 
@@ -152,6 +156,66 @@ class AnimeListImportService
             ]);
 
             $count++;
+        }
+
+        // Import favourites
+        foreach ($favouritesArray as $favourite) {
+            $anime = Anime::where('id', $favourite['anime_id'])->first();
+            if ($anime) {
+                // Check for duplicate entry
+                $existingFavourite = DB::table('anime_favourites')
+                    ->where('user_id', $userId)
+                    ->where('anime_id', $anime->id)
+                    ->first();
+
+                if ($existingFavourite) {
+                    $logger && $logger("Skipping existing favourite for anime {$anime->title} id {$anime->id}");
+                    continue;
+                }
+
+                DB::table('anime_favourites')->insert(
+                    [
+                        'user_id' => $userId,
+                        'anime_id' => $anime->id,
+                        'show_publicly' => $favourite['show_publicly'],
+                        'sort_order' => $favourite['sort_order'],
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+            }
+        }
+
+        // Import reviews
+        foreach ($reviewsArray as $review) {
+            $anime = Anime::where('id', $review['anime_id'])->first();
+            if ($anime) {
+                // Check for duplicate entry
+                $existingReview = DB::table('anime_reviews')
+                    ->where('user_id', $userId)
+                    ->where('anime_id', $anime->id)
+                    ->first();
+
+                if ($existingReview) {
+                    $logger && $logger("Skipping existing review for anime {$anime->title} id {$anime->id}");
+                    continue;
+                }
+
+                DB::table('anime_reviews')->insert(
+                    [
+                        'user_id' => $userId,
+                        'anime_id' => $anime->id,
+                        'title' => $review['review_title'],
+                        'body' => $review['review_body'],
+                        'show_review_publicly' => $review['show_publicly'],
+                        'recommendation' => $review['recommendation'],
+                        'contains_spoilers' => $review['contains_spoilers'],
+                        'is_deleted' => $review['is_deleted'],
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+            }
         }
 
         $duration = microtime(true) - $startTime;

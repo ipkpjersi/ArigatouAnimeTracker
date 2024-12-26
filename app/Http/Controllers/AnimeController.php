@@ -108,6 +108,8 @@ class AnimeController extends Controller
         $currentUserNotes = null;
         $currentUserDisplayInList = true;
         $currentUserShowAnimeNotesPublicly = true;
+        $favouriteSystemEnabled = false;
+        $favourite = null;
 
         $user = auth()->user();
         $userHasReview = false;
@@ -130,6 +132,8 @@ class AnimeController extends Controller
                 ->where('user_id', $user->id)
                 ->first();
             $userHasReview = $userReview != null;
+            $favouriteSystemEnabled = auth()->user()->enable_favourites_system;
+            $favourite = $favouriteSystemEnabled ? auth()->user()->favourites->where('id', $id)->first() : null;
         }
 
         $reviews = AnimeReview::where('anime_reviews.anime_id', $id)
@@ -208,7 +212,7 @@ class AnimeController extends Controller
                 'pageName' => 'otheranimepage',
             ]);
         }
-        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aatScore', 'aatMembers', 'aatUsers', 'otherAnime'));
+        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aatScore', 'aatMembers', 'aatUsers', 'otherAnime', 'favouriteSystemEnabled', 'favourite'));
     }
 
     public function addReview(Request $request)
@@ -445,7 +449,7 @@ class AnimeController extends Controller
         if ($request->has('showallanime') && $request->input('showallanime') === '1' && Auth::user() !== null && strtolower(Auth::user()->username) === strtolower($user->username)) {
             $showAllAnime = true;
         }
-        $pagination = $user->anime_list_pagination_size ?? 15;
+        $pagination = Auth::user()?->anime_list_pagination_size ?? $user->anime_list_pagination_size ?? 15;
         if ($request->has('size') || $request->has('pageSize') || $request->has('pagesize')) {
             $pagination = $request->get('size') ?? $request->get('pageSize') ?? $request->get('pagesize');
             $pagination = max(1, min((int) $pagination, 1000)); //Clamp between 1 and 1000

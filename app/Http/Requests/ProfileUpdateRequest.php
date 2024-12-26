@@ -21,7 +21,7 @@ class ProfileUpdateRequest extends FormRequest
             'dark_mode' => ['nullable', 'in:1,0'],
             'show_adult_content' => ['nullable', 'in:1,0'],
             'avatar' => ['nullable', 'image', 'max:2048'],
-            'anime_list_pagination_size' => ['integer', 'min:2', 'max:250'],
+            'anime_list_pagination_size' => ['integer', 'min:2', 'max:1000'],
             'show_anime_list_number' => ['nullable', 'in:1,0'],
             'show_clear_anime_list_button' => ['nullable', 'in:1,0'],
             'display_anime_cards' => ['nullable', 'in:1,0'],
@@ -43,6 +43,15 @@ class ProfileUpdateRequest extends FormRequest
             'show_anime_list_publicly' => ['nullable', 'in:1,0'],
             'show_clear_anime_list_sort_orders_button' => ['nullable', 'in:1,0'],
             'modifying_sort_order_on_detail_page_sorts_entire_list' => ['nullable', 'in:1,0'],
+            'enable_favourites_system' => ['nullable', 'in:1,0'],
+            'show_own_favourites_when_logged_in' => ['nullable', 'in:1,0'],
+            'show_favourites_publicly' => ['nullable', 'in:1,0'],
+            'show_favourites_in_nav_dropdown' => ['nullable', 'in:1,0'],
+            'show_others_favourites' => ['nullable', 'in:1,0'],
+            'favourites_sort_own' => ['nullable', 'in:title,episodes,year,type,status,date_added,sort_order,random'],
+            'favourites_sort_own_order' => ['nullable', 'in:asc,desc'],
+            'favourites_sort_others' => ['nullable', 'in:title,episodes,year,type,status,date_added,sort_order,random'],
+            'favourites_sort_others_order' => ['nullable', 'in:asc,desc'],
         ];
     }
 }
