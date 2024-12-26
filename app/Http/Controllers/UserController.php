@@ -347,7 +347,7 @@ class UserController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('message', 'Anime added to favourites!');
+        return redirect()->back()->with('popup', 'Anime added to favourites!');
     }
 
     public function updateFavourite(Request $request, $animeId)
@@ -362,7 +362,7 @@ class UserController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('message', 'Favourite updated!');
+        return redirect()->back()->with('popup', 'Favourite updated!');
     }
 
     public function removeFromFavourites($animeId)
@@ -373,6 +373,6 @@ class UserController extends Controller
             $user->favourites()->detach($animeId);
         }
 
-        return redirect()->back()->with('message', 'Anime removed from favourites!');
+        return redirect()->back()->with('popup', 'Anime removed from favourites!');
     }
 }

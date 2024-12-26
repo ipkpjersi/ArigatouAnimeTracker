@@ -756,10 +756,10 @@ class AnimeController extends Controller
 
         $user->anime()->attach($anime, ['watch_status_id' => WatchStatus::where('status', 'PLAN-TO-WATCH')->first()->id]);
         if ($redirect == true) {
-            return redirect()->back()->with('message', 'Anime added to your list.');
+            return redirect()->back()->with('popup', 'Anime added to your list.');
         }
 
-        return response()->json(['message' => 'Anime added to your list.'], 200);
+        return response()->json(['popup' => 'Anime added to your list.'], 200);
     }
 
     public function removeFromList($animeId, $redirect = true)
@@ -767,10 +767,10 @@ class AnimeController extends Controller
         $user = Auth::user();
         $user->anime()->detach($animeId);
         if ($redirect == true) {
-            return redirect()->back()->with('message', 'Anime removed from your list.');
+            return redirect()->back()->with('popup', 'Anime removed from your list.');
         }
 
-        return response()->json(['message' => 'Anime removed from your list.'], 200);
+        return response()->json(['popup' => 'Anime removed from your list.'], 200);
     }
 
     public function clearAnimeList($username)
