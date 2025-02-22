@@ -424,6 +424,12 @@
                 scales: {
                     x: {
                         beginAtZero: false, // Ensure it starts from 1
+                        ticks: {
+                            // Format the tick labels on the x-axis to show no decimals
+                            callback: function(value) {
+                                return Number.isInteger(value) ? value : ''; // Hide the decimal ticks from the x-axis ticks
+                            }
+                        }
                     },
                     y: {
                         reverse: true, //This will reverse the order of the y-axis
