@@ -433,8 +433,11 @@
                     },
                     datalabels: {
                         display: true, // Enable data labels
-                        align: 'end', // Position the label at the end of each bar
-                        anchor: 'end', // Anchor the label to the end of the bar
+                        //align: 'end', // Position the label at the end of each bar
+                        //anchor: 'end', // Anchor the label to the end of the bar
+                        align: 'start', // Position the label at the start of the bar
+                        anchor: 'start', // Anchor the label to the start of the bar
+                        offset: '-185', // Offset the label to the right side of the bar
                         color: '#FFFFFF', // Text color (you can change this as needed)
                         font: {
                             weight: 'bold', // Make the text bold
