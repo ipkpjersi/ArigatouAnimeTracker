@@ -357,6 +357,7 @@
 
             let ctxPie = document.getElementById('userScoreChart').getContext('2d');
             let userScoreDistribution = @json($userScoreDistribution);
+            let isDataEmpty = Object.values(userScoreDistribution).every(value => value === 0);
             const scoreToColorMap = {
                 1: '#FF0000', // red
                 2: '#FF4500', // orange-red
@@ -371,7 +372,7 @@
             };
             let dynamicScoreColors = Object.keys(userScoreDistribution).map(score => scoreToColorMap[score]);
 
-            let data = {
+            let dataPie = {
                 labels: Object.keys(userScoreDistribution),
                 datasets: [{
                     label: 'Score Distribution',
@@ -397,12 +398,13 @@
                 }
                 // other options...
             };
-
-            let chartPie = new Chart(ctxPie, {
-                type: 'pie',
-                data: data,
-                options: optionsPie
-            });
+            if (!isDataEmpty) {
+                let chartPie = new Chart(ctxPie, {
+                    type: 'pie',
+                    data: dataPie,
+                    options: optionsPie
+                });
+            }
 
             // Horizontal Bar Chart for score distribution 1-10
             let ctxBar = document.getElementById('userScoreBarChart').getContext('2d');
@@ -448,12 +450,13 @@
                 }
             };
 
-
-            let chartBar = new Chart(ctxBar, {
-                type: 'bar',
-                data: dataBar,
-                options: optionsBar
-            });
+            if (!isDataEmpty) {
+                let chartBar = new Chart(ctxBar, {
+                    type: 'bar',
+                    data: dataBar,
+                    options: optionsBar
+                });
+            }
 
         });
 
