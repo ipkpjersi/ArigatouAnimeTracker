@@ -353,11 +353,12 @@
         import '/js/chart.js';
         import '/js/chartjs-plugin-datalabels.js';
         document.addEventListener('DOMContentLoaded', function () {
+            let userScoreDistribution = @json($userScoreDistribution);
+            let isDataEmpty = Object.values(userScoreDistribution).every(value => value === 0);
+            // Register the data labels for charts
             Chart.register(ChartDataLabels);
 
             let ctxPie = document.getElementById('userScoreChart').getContext('2d');
-            let userScoreDistribution = @json($userScoreDistribution);
-            let isDataEmpty = Object.values(userScoreDistribution).every(value => value === 0);
             const scoreToColorMap = {
                 1: '#FF0000', // red
                 2: '#FF4500', // orange-red
