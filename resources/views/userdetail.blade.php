@@ -305,6 +305,11 @@
                                 <h4 class="font-bold mb-2">Statistics:</h4>
                                 <p>Total Anime Completed: {{ $stats['totalCompleted'] }}</p>
                                 <p>Total Episodes Watched: {{ $stats['totalEpisodes'] }}</p>
+                                @if ($enableScoreCharts && $showChart)
+                                    <div class="max-w-[220px] max-h-[300px] mb-2 lg:mb-0">
+                                        <canvas id="userScoreBarChart" width="220" height="300"></canvas>
+                                    </div>
+                                @endif
                             </div>
                             <!-- Favorites Section -->
                                 <h5 class="font-bold mt-4 mb-2 w-full">Favourites:</h5>
@@ -346,9 +351,14 @@
     </script>
     <script type="module">
         import '/js/chart.js';
+        import '/js/chartjs-plugin-datalabels.js';
         document.addEventListener('DOMContentLoaded', function () {
-            let ctx = document.getElementById('userScoreChart').getContext('2d');
             let userScoreDistribution = @json($userScoreDistribution);
+            let isDataEmpty = Object.values(userScoreDistribution).every(value => value === 0);
+            // Register the data labels for charts
+            Chart.register(ChartDataLabels);
+
+            let ctxPie = document.getElementById('userScoreChart').getContext('2d');
             const scoreToColorMap = {
                 1: '#FF0000', // red
                 2: '#FF4500', // orange-red
@@ -363,7 +373,7 @@
             };
             let dynamicScoreColors = Object.keys(userScoreDistribution).map(score => scoreToColorMap[score]);
 
-            let data = {
+            let dataPie = {
                 labels: Object.keys(userScoreDistribution),
                 datasets: [{
                     label: 'Score Distribution',
@@ -376,22 +386,85 @@
                 const isLightMode = document.documentElement.classList.contains('light');
                 return isLightMode ? '#000000' : '#FFFFFF';
             }
-            let options = {
+            let optionsPie = {
                 plugins: {
                     legend: {
                         labels: {
                             color: getLabelTextColor() // set label text color
                         }
+                    },
+                    datalabels: {
+                        display: false
                     }
                 }
                 // other options...
             };
+            if (!isDataEmpty) {
+                let chartPie = new Chart(ctxPie, {
+                    type: 'pie',
+                    data: dataPie,
+                    options: optionsPie
+                });
+            }
 
-            let chart = new Chart(ctx, {
-                type: 'pie',
-                data: data,
-                options: options
-            });
+            // Horizontal Bar Chart for score distribution 1-10
+            let ctxBar = document.getElementById('userScoreBarChart').getContext('2d');
+            let dataBar = {
+                labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], // Scores 1-10
+                datasets: [{
+                    label: 'Score Distribution',
+                    data: Array.from({ length: 10 }, (_, i) => userScoreDistribution[i + 1] || 0), // Get counts for each score
+                    backgroundColor: '#1E90FF', // Change the bar color if needed
+                    borderWidth: 1
+                }]
+            };
+
+            let optionsBar = {
+                responsive: true,
+                indexAxis: 'y', // Make it horizontal
+                scales: {
+                    x: {
+                        beginAtZero: false, // Ensure it starts from 1
+                        ticks: {
+                            // Format the tick labels on the x-axis to show no decimals
+                            callback: function(value) {
+                                return Number.isInteger(value) ? value : ''; // Hide the decimal ticks from the x-axis ticks
+                            }
+                        }
+                    },
+                    y: {
+                        reverse: true, //This will reverse the order of the y-axis
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false // Hide the legend for this chart
+                    },
+                    datalabels: {
+                        display: true, // Enable data labels
+                        //align: 'end', // Position the label at the end of each bar
+                        //anchor: 'end', // Anchor the label to the end of the bar
+                        align: 'start', // Position the label at the start of the bar
+                        anchor: 'start', // Anchor the label to the start of the bar
+                        offset: '-185', // Offset the label to the right side of the bar
+                        color: '#FFFFFF', // Text color (you can change this as needed)
+                        font: {
+                            weight: 'bold', // Make the text bold
+                            size: 12 // Size of the label font
+                        },
+                        formatter: (value) => value // Display the value itself
+                    }
+                }
+            };
+
+            if (!isDataEmpty) {
+                let chartBar = new Chart(ctxBar, {
+                    type: 'bar',
+                    data: dataBar,
+                    options: optionsBar
+                });
+            }
+
         });
 
         $(document).on('click', '.banUser', function() {
