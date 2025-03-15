@@ -863,7 +863,7 @@ class AnimeController extends Controller
             return redirect()->back()->with('message', 'Export failed due to unknown file type.');
         }
 
-        return response()->download(storage_path("app/exports/{$fileName}"));
+        return response()->download(storage_path("app/private/exports/{$fileName}"));
     }
 
     public function exportAnimeListView()
