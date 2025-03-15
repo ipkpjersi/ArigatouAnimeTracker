@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('anime_type', function (Blueprint $table) {
             $table->id();
-            $table->string('type'); //Enum of [TV, MOVIE, OVA, ONA, SPECIAL, UNKNOWN]
+            $table->string('type'); // Enum of [TV, MOVIE, OVA, ONA, SPECIAL, UNKNOWN]
             $table->timestamps();
         });
     }

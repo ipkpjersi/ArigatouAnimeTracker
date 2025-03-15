@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use ZipArchive;
+
 use function App\Helpers\safe_json_encode;
 
 class AnimeAdditionalDataImportService
@@ -35,8 +36,8 @@ class AnimeAdditionalDataImportService
         $sqlFilePath = 'database/seeders/anime_additional_data.sql';
         $zipFilePath = 'database/seeders/anime_additional_data.sql.zip';
 
-        if ($generateSqlFile && !file_exists($sqlFilePath) && file_exists($zipFilePath)) {
-            $logger && $logger("File anime_additional_data.sql does not exist, extracting anime_additional_data.sql.zip to append more data...");
+        if ($generateSqlFile && ! file_exists($sqlFilePath) && file_exists($zipFilePath)) {
+            $logger && $logger('File anime_additional_data.sql does not exist, extracting anime_additional_data.sql.zip to append more data...');
             $this->unzipSqlFile();
         }
 
@@ -58,7 +59,7 @@ class AnimeAdditionalDataImportService
                     }
                 }
             } else {
-                //This probably shouldn't ever happen, sources should probably always be set, or maybe not.
+                // This probably shouldn't ever happen, sources should probably always be set, or maybe not.
                 $logger && $logger('Sources not set for anime: '.$row->title.' row: '.print_r($row, true));
             }
 
@@ -82,7 +83,7 @@ class AnimeAdditionalDataImportService
             // Try MAL first
             if ($malId) {
                 try {
-                    //Sometimes the data for certain columns returned by the MAL API is unexpected/unclean even with safe_json_encode, so we could always SELECT DISTINCT columns if necessary and then even hardcode any arrays with said data for any input/display validation. It's better to have the format in an incorrect/weird format than to not have it at all.
+                    // Sometimes the data for certain columns returned by the MAL API is unexpected/unclean even with safe_json_encode, so we could always SELECT DISTINCT columns if necessary and then even hardcode any arrays with said data for any input/display validation. It's better to have the format in an incorrect/weird format than to not have it at all.
                     $response = Http::withHeaders([
                         'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
                     ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users,source,background,recommendations,studios,broadcast,related_anime,related_manga');
@@ -96,12 +97,12 @@ class AnimeAdditionalDataImportService
                         $malRank = $data['rank'] ?? null;
                         $malMean = $data['mean'] ?? null;
                         $malPopularity = $data['popularity'] ?? null;
-                        $malUsers = $data['num_scoring_users'] ?? null; //The users who have scored/ranked the anime.
-                        $malMembers = $data['num_list_users'] ?? null; //The members with this anime on their list.
-                        $averageDuration = $data['average_episode_duration'] ?? null; //The average episode duration (or duration).
-                        $rating = $data['rating'] ?? null; //The rating of the series.
-                        $source = $data['source'] ?? null; //Is it Manga, LN, etc.
-                        $background = $data['background'] ?? null; //A brief description of the background, like it's a 2003 DVD that released in Japan but never released overseas, etc.
+                        $malUsers = $data['num_scoring_users'] ?? null; // The users who have scored/ranked the anime.
+                        $malMembers = $data['num_list_users'] ?? null; // The members with this anime on their list.
+                        $averageDuration = $data['average_episode_duration'] ?? null; // The average episode duration (or duration).
+                        $rating = $data['rating'] ?? null; // The rating of the series.
+                        $source = $data['source'] ?? null; // Is it Manga, LN, etc.
+                        $background = $data['background'] ?? null; // A brief description of the background, like it's a 2003 DVD that released in Japan but never released overseas, etc.
                         $recommendations = safe_json_encode($data['recommendations'] ?? []); // Recommended anime by other users.
                         $studios = safe_json_encode($data['studios'] ?? []); // Studio(s) that worked on this anime.
                         $broadcast = safe_json_encode($data['broadcast'] ?? []); // The date and time it was originally broadcast.
@@ -114,12 +115,12 @@ class AnimeAdditionalDataImportService
                         $logger && $logger('Failed update response from MAL for anime: '.$row->title.' '.print_r($data, true));
                     }
                 } catch (\Exception $e) {
-                    $logger && $logger('Error fetching data from MAL for anime: ' . $row->title . '. Error: ' . $e->getMessage());
-                    Log::channel('anime_import')->error('Error fetching data from MAL for anime: ' . $row->title . '. Error: ' . $e->getMessage());
+                    $logger && $logger('Error fetching data from MAL for anime: '.$row->title.'. Error: '.$e->getMessage());
+                    Log::channel('anime_import')->error('Error fetching data from MAL for anime: '.$row->title.'. Error: '.$e->getMessage());
                 }
             } else {
-                //Optional logging, we likely don't need this logging unless we know it's not fetching descriptions from MAL when it should be.
-                //$logger && $logger("No MAL ID for anime: " . $row->title . ", verify versus DB to see if MAL source exists for this anime");
+                // Optional logging, we likely don't need this logging unless we know it's not fetching descriptions from MAL when it should be.
+                // $logger && $logger("No MAL ID for anime: " . $row->title . ", verify versus DB to see if MAL source exists for this anime");
             }
 
             // Then try notify.moe if MAL fails
@@ -133,8 +134,8 @@ class AnimeAdditionalDataImportService
                         $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from notify.moe');
                     }
                 } catch (\Exception $e) {
-                    $logger && $logger('Error fetching data from notify.moe for anime: ' . $row->title . '. Error: ' . $e->getMessage());
-                    Log::channel('anime_import')->error('Error fetching data from notify.moe for anime: ' . $row->title . '. Error: ' . $e->getMessage());
+                    $logger && $logger('Error fetching data from notify.moe for anime: '.$row->title.'. Error: '.$e->getMessage());
+                    Log::channel('anime_import')->error('Error fetching data from notify.moe for anime: '.$row->title.'. Error: '.$e->getMessage());
                 }
             }
 
@@ -154,13 +155,13 @@ class AnimeAdditionalDataImportService
                         $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from kitsu.io');
                     }
                 } catch (\Exception $e) {
-                    $logger && $logger('Error fetching data from kitsu.io for anime: ' . $row->title . '. Error: ' . $e->getMessage());
-                    Log::channel('anime_import')->error('Error fetching data from kitsu.io for anime: ' . $row->title . '. Error: ' . $e->getMessage());
+                    $logger && $logger('Error fetching data from kitsu.io for anime: '.$row->title.'. Error: '.$e->getMessage());
+                    Log::channel('anime_import')->error('Error fetching data from kitsu.io for anime: '.$row->title.'. Error: '.$e->getMessage());
                 }
             }
 
             if ($description) {
-                $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $averageDuration, $rating,  $source, $background, $recommendations, $studios, $broadcast, $relatedAnime, $relatedManga, $sqlFile, $logger);
+                $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $averageDuration, $rating, $source, $background, $recommendations, $studios, $broadcast, $relatedAnime, $relatedManga, $sqlFile, $logger);
                 $logger && $logger('Successfully updated description and genres for anime: '.$row->title);
                 Log::channel('anime_import')->info('Successfully updated description and genres for anime: '.$row->title);
                 $count++;
@@ -197,7 +198,7 @@ class AnimeAdditionalDataImportService
         $count = 0;
         $hasError = false;
         $sqlPath = database_path('seeders/anime_additional_data.sql');
-        if (!File::exists($sqlPath)) {
+        if (! File::exists($sqlPath)) {
             $this->unzipSqlFile();
         }
         $anime = DB::table('anime')->get();
@@ -220,7 +221,7 @@ class AnimeAdditionalDataImportService
                     }
                 }
             }
-            if (!$hasError) {
+            if (! $hasError) {
                 $logger && $logger("Imported {$count} out of {$total} additional anime data SQL queries successfully.");
                 Log::channel('anime_import')->info("Imported {$count} out of {$total} additional anime data SQL queries successfully.");
             }
@@ -295,7 +296,7 @@ class AnimeAdditionalDataImportService
             $updateData['related_manga'] = $relatedAnime;
         }
 
-        if (!empty($updateData)) {
+        if (! empty($updateData)) {
             DB::table('anime')
                 ->where('id', $anime->id)
                 ->update($updateData);
@@ -305,24 +306,24 @@ class AnimeAdditionalDataImportService
             $year = empty($anime->year) ? 'NULL' : $anime->year;
             $season = empty($anime->season) ? 'NULL' : "'$anime->season'";
             $title = addslashes(str_replace('"', '', $anime->title));
-            $malMean = !empty($malMean) ? $malMean : $anime->mal_mean ?? 'NULL';
-            $malRank = !empty($malRank) ? $malRank : $anime->mal_rank ?? 'NULL';
-            $malPopularity = !empty($malPopularity) ? $malPopularity : $anime->mal_popularity ?? 'NULL';
-            $malScoringUsers = !empty($malScoringUsers) ? $malScoringUsers : $anime->mal_scoring_users ?? 'NULL';
-            $malListMembers = !empty($malListMembers) ? $malListMembers : $anime->mal_list_members ?? 'NULL';
-            $description = !empty($description) ? addslashes($description) : $anime->description ?? 'NULL';
-            $genres = !empty($genres) ? addslashes($genres) : $anime->genres ?? 'NULL';
-            $averageDuration = !empty($averageDuration) ? $averageDuration : $anime->duration ?? 'NULL';
-            $durationDownloaded = !empty($averageDuration) && $averageDuration !== 'NULL' ? 1 : 0;
-            $rating = !empty($rating) ? addslashes($rating) : $anime->rating ?? 'NULL';
-            $ratingDownloaded = !empty($rating) && $rating !== 'NULL' ? 1 : 0;
-            $source = !empty($source) ? addslashes($source) : $anime->source ?? 'NULL';
-            $background = !empty($background) ? addslashes($background) : $anime->background ?? 'NULL';
-            $recommendations = !empty($recommendations) ? addslashes($recommendations) : $anime->recommendations ?? 'NULL';
-            $studios = !empty($studios) ? addslashes($studios) : $anime->studios ?? 'NULL';
-            $broadcast = !empty($broadcast) ? addslashes($broadcast) : $anime->broadcast ?? 'NULL';
-            $relatedAnime = !empty($relatedAnime) ? addslashes($relatedAnime) : $anime->related_anime ?? 'NULL';
-            $relatedManga = !empty($relatedManga) ? addslashes($relatedManga) : $anime->related_manga ?? 'NULL';
+            $malMean = ! empty($malMean) ? $malMean : $anime->mal_mean ?? 'NULL';
+            $malRank = ! empty($malRank) ? $malRank : $anime->mal_rank ?? 'NULL';
+            $malPopularity = ! empty($malPopularity) ? $malPopularity : $anime->mal_popularity ?? 'NULL';
+            $malScoringUsers = ! empty($malScoringUsers) ? $malScoringUsers : $anime->mal_scoring_users ?? 'NULL';
+            $malListMembers = ! empty($malListMembers) ? $malListMembers : $anime->mal_list_members ?? 'NULL';
+            $description = ! empty($description) ? addslashes($description) : $anime->description ?? 'NULL';
+            $genres = ! empty($genres) ? addslashes($genres) : $anime->genres ?? 'NULL';
+            $averageDuration = ! empty($averageDuration) ? $averageDuration : $anime->duration ?? 'NULL';
+            $durationDownloaded = ! empty($averageDuration) && $averageDuration !== 'NULL' ? 1 : 0;
+            $rating = ! empty($rating) ? addslashes($rating) : $anime->rating ?? 'NULL';
+            $ratingDownloaded = ! empty($rating) && $rating !== 'NULL' ? 1 : 0;
+            $source = ! empty($source) ? addslashes($source) : $anime->source ?? 'NULL';
+            $background = ! empty($background) ? addslashes($background) : $anime->background ?? 'NULL';
+            $recommendations = ! empty($recommendations) ? addslashes($recommendations) : $anime->recommendations ?? 'NULL';
+            $studios = ! empty($studios) ? addslashes($studios) : $anime->studios ?? 'NULL';
+            $broadcast = ! empty($broadcast) ? addslashes($broadcast) : $anime->broadcast ?? 'NULL';
+            $relatedAnime = ! empty($relatedAnime) ? addslashes($relatedAnime) : $anime->related_anime ?? 'NULL';
+            $relatedManga = ! empty($relatedManga) ? addslashes($relatedManga) : $anime->related_manga ?? 'NULL';
 
             $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers, duration = $averageDuration, duration_downloaded = $durationDownloaded, rating = '$rating', rating_downloaded = $ratingDownloaded, source = '$source', background = '$background', recommendations = '$recommendations', studios = '$studios', broadcast = '$broadcast', related_anime = '$relatedAnime', related_manga = '$relatedManga' WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
@@ -334,7 +335,7 @@ class AnimeAdditionalDataImportService
         $sqlPath = database_path('seeders/anime_additional_data.sql');
         $zipPath = database_path('seeders/anime_additional_data.zip');
 
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
             $zip->addFile($sqlPath, 'anime_additional_data.sql');
             $zip->close();
@@ -348,7 +349,7 @@ class AnimeAdditionalDataImportService
         $zipPath = database_path('seeders/anime_additional_data.zip');
         $sqlPath = database_path('seeders/anime_additional_data.sql');
 
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         if ($zip->open($zipPath) === true) {
             $zip->extractTo(database_path('seeders/'));
             $zip->close();

@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\AnimeFavourite;
 use App\Models\AnimeReview;
 use App\Models\AnimeUser;
-use Illuminate\Support\Facades\DB;
 use SimpleXMLElement;
 
 class AnimeListExportService
@@ -33,8 +32,8 @@ class AnimeListExportService
         $total = count($animeList);
         $xml = new SimpleXMLElement('<myanimelist></myanimelist>');
         $myinfo = $xml->addChild('myinfo');
-        $myinfo->addChild('user_id', ''); //TODO: maybe fill these in from some user profile settings?
-        $myinfo->addChild('user_name', ''); //TODO: maybe fill these in from some user profile settings?
+        $myinfo->addChild('user_id', ''); // TODO: maybe fill these in from some user profile settings?
+        $myinfo->addChild('user_name', ''); // TODO: maybe fill these in from some user profile settings?
         $myinfo->addChild('user_export_type', '1');
         $myinfo->addChild('user_total_anime', $animeList->count());
 
@@ -124,7 +123,7 @@ class AnimeListExportService
         // Fetch favourites with all related details
         $favourites = AnimeFavourite::with([
             'anime.anime_type',
-            'anime.anime_status'
+            'anime.anime_status',
         ])->whereHas('user', function ($query) use ($userId) {
             $query->where('user_id', $userId);
         })->get();
@@ -152,7 +151,7 @@ class AnimeListExportService
         // Fetch reviews with all related details
         $reviews = AnimeReview::with([
             'anime.anime_type',
-            'anime.anime_status'
+            'anime.anime_status',
         ])->whereHas('user', function ($query) use ($userId) {
             $query->where('user_id', $userId);
         })->get();
@@ -181,7 +180,6 @@ class AnimeListExportService
             ];
         }
 
-
         $formattedJson = json_encode([
             'animeList' => $animeArray,
             'favourites' => $favouritesArray,
@@ -205,7 +203,7 @@ class AnimeListExportService
             ->get();
         $total = count($animeList);
         $cssOutput = '';
-        //These seem to be the min and max orders MAL allows, starting from -1000 and going up to 3000.
+        // These seem to be the min and max orders MAL allows, starting from -1000 and going up to 3000.
         $minOrder = -1000;
         $maxOrder = 3000;
         $currentOrder = $minOrder;
@@ -217,9 +215,9 @@ class AnimeListExportService
                 preg_match('/myanimelist\.net\/anime\/(\d+)/', $source, $matches);
                 $animeId = $matches[1] ?? null;
                 if ($animeId) {
-                    //If we wanted to use just the provided sort order, from 1 to 3000, we could just use sort_order.
-                    //$order = $animeUser->sort_order;
-                    //Technically, by default the order is limited from 1 to 3000, maybe we want more anime total, so let's scale it from min to max for a total of 4000 anime.
+                    // If we wanted to use just the provided sort order, from 1 to 3000, we could just use sort_order.
+                    // $order = $animeUser->sort_order;
+                    // Technically, by default the order is limited from 1 to 3000, maybe we want more anime total, so let's scale it from min to max for a total of 4000 anime.
                     $order = $currentOrder;
                     $cssOutput .= ".list-container .list-block .completed table.list-table > tbody.list-item:has(a[href*=\"anime/{$animeId}/\"]) {\n";
                     $cssOutput .= "  visibility: unset;\n";

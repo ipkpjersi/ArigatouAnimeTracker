@@ -20,11 +20,11 @@ class AnimeImportService
         $dbIdCounter = 1;
         foreach ($data['data'] as $animeData) {
             $title = str_replace('"', '', $animeData['title']);
-            //It's unlikely that full updates will ever be as good as clean database setup since anime can be deleted which we don't really handle and possibly also updated in ways we might not expect, but it's better than not having it, especially with all of our logging for full updates. Full updates are important since re-creating the entire database isn't feasible because the anime data is very relational and used in reviews, user anime lists, etc.
+            // It's unlikely that full updates will ever be as good as clean database setup since anime can be deleted which we don't really handle and possibly also updated in ways we might not expect, but it's better than not having it, especially with all of our logging for full updates. Full updates are important since re-creating the entire database isn't feasible because the anime data is very relational and used in reviews, user anime lists, etc.
             if ($fullUpdate) {
-                //We can use dbIdCounter for testing purposes.
-                //$dbIdCounter++;
-                //if ($dbIdCounter > 100) exit;
+                // We can use dbIdCounter for testing purposes.
+                // $dbIdCounter++;
+                // if ($dbIdCounter > 100) exit;
                 $animeWithSameTitle = Anime::where('title', $title)->get();
                 if ($animeWithSameTitle->count() === 1) {
                     $existingAnime = $animeWithSameTitle->first();
@@ -105,9 +105,9 @@ class AnimeImportService
                 $logger && $logger("No existing anime found for title $title, continuing to add...");
             }
 
-            //We have to be very careful with incremental imports. It's very easy to not be able to uniquely identify anime,
-            //since anime could have an unknown season in the current year, then get updated with a season,
-            //then it won't match. That's one example. There's so many other examples.
+            // We have to be very careful with incremental imports. It's very easy to not be able to uniquely identify anime,
+            // since anime could have an unknown season in the current year, then get updated with a season,
+            // then it won't match. That's one example. There's so many other examples.
             $existingAnime = Anime::where('title', $title)
                 ->where('year', $animeData['animeSeason']['year'])
                 ->whereHas('anime_type', function ($query) use ($animeData) {
@@ -115,8 +115,8 @@ class AnimeImportService
                 })
                 ->where('episodes', $animeData['episodes'])
                 ->where('season', $animeData['animeSeason']['season'])
-                //->where('thumbnail', $animeData['thumbnail'])
-                //->where('sources', implode(', ', $animeData['sources']))
+                // ->where('thumbnail', $animeData['thumbnail'])
+                // ->where('sources', implode(', ', $animeData['sources']))
                 ->first();
 
             if ($existingAnime) {
@@ -153,9 +153,9 @@ class AnimeImportService
             $status = $status->status;
             $season = $animeData['animeSeason']['season'];
             $year = $animeData['animeSeason']['year'];
-            //Technically, we could check if there's any anime with a title match, although there would likely be many false positive matches if we're not careful.
+            // Technically, we could check if there's any anime with a title match, although there would likely be many false positive matches if we're not careful.
             $logger && $logger("New anime created: $title, Episodes: $episodes, Type: $type, Status ID: $status, Season: $season, Year: $year");
-            //Let's also log this to a file since it's important.
+            // Let's also log this to a file since it's important.
             Log::channel('anime_import')->info("New anime imported: $title, Episodes: $episodes, Type: $type, Status: $status, Season: $season, Year: $year");
             $count++;
         }

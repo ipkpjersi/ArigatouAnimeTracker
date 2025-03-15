@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Unprotected routes
+// Unprotected routes
 Route::get('/', function () {
     if (Auth::user() !== null) {
         return redirect('home');
@@ -59,7 +59,7 @@ Route::get('/categories', [AnimeController::class, 'categories'])->name('anime.c
 
 Route::get('/category/{category}/{view?}', [AnimeController::class, 'category'])->name('anime.category')->middleware('2fa');
 
-//Protected routes
+// Protected routes
 Route::middleware('auth', '2fa')->group(function () {
     Route::get('/2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');
     Route::post('/generate2faSecret', [PasswordSecurityController::class, 'generate2faSecret'])->name('generate2faSecret');
@@ -104,7 +104,7 @@ Route::middleware('auth', '2fa')->group(function () {
     Route::post('/add-friend/{friendId}', [UserController::class, 'addFriend'])->name('add-friend');
     Route::post('/remove-friend/{friendId}', [UserController::class, 'removeFriend'])->name('remove-friend');
 
-     Route::post('/anime/{animeId}/add-to-favourites', [UserController::class, 'addToFavourites'])->name('anime.addToFavourites');
+    Route::post('/anime/{animeId}/add-to-favourites', [UserController::class, 'addToFavourites'])->name('anime.addToFavourites');
     Route::put('/anime/{animeId}/update-favourite', [UserController::class, 'updateFavourite'])->name('anime.updateFavourite');
     Route::delete('/anime/{animeId}/remove-from-favourites', [UserController::class, 'removeFromFavourites'])->name('anime.removeFromFavourites');
 

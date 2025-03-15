@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('watch_status', function (Blueprint $table) {
             $table->id();
-            $table->string('status'); //Enum of [WATCHING, COMPLETED, ON-HOLD, DROPPED, PLAN-TO-WATCH]
+            $table->string('status'); // Enum of [WATCHING, COMPLETED, ON-HOLD, DROPPED, PLAN-TO-WATCH]
             $table->timestamps();
         });
     }
