@@ -104,7 +104,7 @@ class User extends Authenticatable
         return $this->hasMany(AnimeReview::class, 'user_id');
     }
 
-    public function favourites()
+    public function favourites(): BelongsToMany
     {
         return $this->belongsToMany(Anime::class, 'anime_favourites')
             ->withPivot('show_publicly', 'sort_order')
