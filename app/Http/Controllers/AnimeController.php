@@ -870,4 +870,18 @@ class AnimeController extends Controller
     {
         return view('exportanimelist');
     }
+
+    public function testLocalImageUrl($id)
+    {
+        $anime = Anime::find($id);
+
+        if (!$anime) {
+            return response()->json(['error' => 'Anime not found'], 404);
+        }
+
+        return response()->json([
+            'local_picture_url' => $anime->getLocalPictureUrl(),
+            'local_thumbnail_url' => $anime->getLocalThumbnailUrl(),
+        ]);
+    }
 }

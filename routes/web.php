@@ -59,6 +59,10 @@ Route::get('/categories', [AnimeController::class, 'categories'])->name('anime.c
 
 Route::get('/category/{category}/{view?}', [AnimeController::class, 'category'])->name('anime.category')->middleware('2fa');
 
+Route::get('/testanimelocalimageurl/{id}', [AnimeController::class, 'testLocalImageUrl'])
+    ->name('anime.testLocalImageUrl')
+    ->middleware('2fa');
+
 // Protected routes
 Route::middleware('auth', '2fa')->group(function () {
     Route::get('/2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');
