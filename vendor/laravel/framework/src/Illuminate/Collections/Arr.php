@@ -158,7 +158,7 @@ class Arr
      * Determine if the given key exists in the provided array.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|int  $key
+     * @param  string|int|float  $key
      * @return bool
      */
     public static function exists($array, $key)
@@ -216,10 +216,14 @@ class Arr
     /**
      * Return the last element in an array passing a given truth test.
      *
-     * @param  array  $array
-     * @param  callable|null  $callback
-     * @param  mixed  $default
-     * @return mixed
+     * @template TKey
+     * @template TValue
+     * @template TLastDefault
+     *
+     * @param  iterable<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  TLastDefault|(\Closure(): TLastDefault)  $default
+     * @return TValue|TLastDefault
      */
     public static function last($array, ?callable $callback = null, $default = null)
     {
@@ -485,7 +489,7 @@ class Arr
      */
     public static function keyBy($array, $keyBy)
     {
-        return Collection::make($array)->keyBy($keyBy)->all();
+        return (new Collection($array))->keyBy($keyBy)->all();
     }
 
     /**
@@ -642,11 +646,12 @@ class Arr
     /**
      * Run a map over each nested chunk of items.
      *
-     * @template TMapSpreadValue
+     * @template TKey
+     * @template TValue
      *
-     * @param  array  $array
-     * @param  callable(mixed...): TMapSpreadValue  $callback
-     * @return array<TKey, TMapSpreadValue>
+     * @param  array<TKey, array>  $array
+     * @param  callable(mixed...): TValue  $callback
+     * @return array<TKey, TValue>
      */
     public static function mapSpread(array $array, callable $callback)
     {
@@ -811,7 +816,7 @@ class Arr
      */
     public static function sort($array, $callback = null)
     {
-        return Collection::make($array)->sortBy($callback)->all();
+        return (new Collection($array))->sortBy($callback)->all();
     }
 
     /**
@@ -823,7 +828,7 @@ class Arr
      */
     public static function sortDesc($array, $callback = null)
     {
-        return Collection::make($array)->sortByDesc($callback)->all();
+        return (new Collection($array))->sortByDesc($callback)->all();
     }
 
     /**
@@ -844,12 +849,12 @@ class Arr
 
         if (! array_is_list($array)) {
             $descending
-                    ? krsort($array, $options)
-                    : ksort($array, $options);
+                ? krsort($array, $options)
+                : ksort($array, $options);
         } else {
             $descending
-                    ? rsort($array, $options)
-                    : sort($array, $options);
+                ? rsort($array, $options)
+                : sort($array, $options);
         }
 
         return $array;
@@ -923,6 +928,44 @@ class Arr
     public static function where($array, callable $callback)
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * Filter the array using the negation of the given callback.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function reject($array, callable $callback)
+    {
+        return static::where($array, fn ($value, $key) => ! $callback($value, $key));
+    }
+
+    /**
+     * Partition the array into two arrays using the given callback.
+     *
+     * @template TKey of array-key
+     * @template TValue of mixed
+     *
+     * @param  iterable<TKey, TValue>  $array
+     * @param  callable(TValue, TKey): bool  $callback
+     * @return array<int<0, 1>, array<TKey, TValue>>
+     */
+    public static function partition($array, callable $callback)
+    {
+        $passed = [];
+        $failed = [];
+
+        foreach ($array as $key => $item) {
+            if ($callback($item, $key)) {
+                $passed[$key] = $item;
+            } else {
+                $failed[$key] = $item;
+            }
+        }
+
+        return [$passed, $failed];
     }
 
     /**

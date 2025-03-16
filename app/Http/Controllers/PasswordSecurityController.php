@@ -38,7 +38,7 @@ class PasswordSecurityController extends Controller
         $user = Auth::user();
         $google2fa = app('pragmarx.google2fa');
 
-        $passwordSecurity = new PasswordSecurity();
+        $passwordSecurity = new PasswordSecurity;
         $passwordSecurity->user_id = $user->id;
         $passwordSecurity->google2fa_enable = 0;
         $passwordSecurity->google2fa_secret = $google2fa->generateSecretKey();

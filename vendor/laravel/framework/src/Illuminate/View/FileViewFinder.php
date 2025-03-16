@@ -53,7 +53,7 @@ class FileViewFinder implements ViewFinderInterface
     public function __construct(Filesystem $files, array $paths, ?array $extensions = null)
     {
         $this->files = $files;
-        $this->paths = array_map([$this, 'resolvePath'], $paths);
+        $this->paths = array_map($this->resolvePath(...), $paths);
 
         if (isset($extensions)) {
             $this->extensions = $extensions;
@@ -130,7 +130,7 @@ class FileViewFinder implements ViewFinderInterface
             foreach ($this->getPossibleViewFiles($name) as $file) {
                 $viewPath = $path.'/'.$file;
 
-                if (strlen($viewPath) <= PHP_MAXPATHLEN && $this->files->exists($viewPath)) {
+                if (strlen($viewPath) < (PHP_MAXPATHLEN - 1) && $this->files->exists($viewPath)) {
                     return $viewPath;
                 }
             }

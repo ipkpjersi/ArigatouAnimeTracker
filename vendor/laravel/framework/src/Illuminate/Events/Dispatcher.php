@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
@@ -80,19 +81,19 @@ class Dispatcher implements DispatcherContract
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  \Closure|string|array  $events
-     * @param  \Closure|string|array|null  $listener
+     * @param  \Illuminate\Events\QueuedClosure|callable|array|class-string|string  $events
+     * @param  \Illuminate\Events\QueuedClosure|callable|array|class-string|null  $listener
      * @return void
      */
     public function listen($events, $listener = null)
     {
         if ($events instanceof Closure) {
-            return collect($this->firstClosureParameterTypes($events))
+            return (new Collection($this->firstClosureParameterTypes($events)))
                 ->each(function ($event) use ($events) {
                     $this->listen($event, $events);
                 });
         } elseif ($events instanceof QueuedClosure) {
-            return collect($this->firstClosureParameterTypes($events->closure))
+            return (new Collection($this->firstClosureParameterTypes($events->closure)))
                 ->each(function ($event) use ($events) {
                     $this->listen($event, $events->resolve());
                 });
@@ -343,7 +344,7 @@ class Dispatcher implements DispatcherContract
     protected function broadcastWhen($event)
     {
         return method_exists($event, 'broadcastWhen')
-                ? $event->broadcastWhen() : true;
+            ? $event->broadcastWhen() : true;
     }
 
     /**
@@ -371,8 +372,8 @@ class Dispatcher implements DispatcherContract
         );
 
         return class_exists($eventName, false)
-                    ? $this->addInterfaceListeners($eventName, $listeners)
-                    : $listeners;
+            ? $this->addInterfaceListeners($eventName, $listeners)
+            : $listeners;
     }
 
     /**
@@ -488,8 +489,8 @@ class Dispatcher implements DispatcherContract
     protected function createClassCallable($listener)
     {
         [$class, $method] = is_array($listener)
-                            ? $listener
-                            : $this->parseClassCallable($listener);
+            ? $listener
+            : $this->parseClassCallable($listener);
 
         if (! method_exists($class, $method)) {
             $method = '__invoke';
@@ -502,8 +503,8 @@ class Dispatcher implements DispatcherContract
         $listener = $this->container->make($class);
 
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
-                    ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
-                    : [$listener, $method];
+            ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
+            : [$listener, $method];
     }
 
     /**

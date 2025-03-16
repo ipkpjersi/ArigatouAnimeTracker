@@ -45,9 +45,9 @@
                             </thead>
                             <tbody>
                                 @foreach ($categoryAnime as $anime)
-                                    <tr>
+                                    <tr class="border-b-4 border-transparent">
                                         <td>
-                                            <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }}" class="inline-block" width="50" height="70" onerror="this.onerror=null; this.src='/img/notfound.gif';">
+                                            <img src="{{ $anime->picture }}" alt="{{ $anime->title }}" class="inline-block" width="50" height="70" onerror="this.onerror=null; this.src='/img/notfound.gif';">
                                             <a href="{{ route('anime.detail', $anime->id) }}" class="ml-4">{{ $anime->title }}</a>
                                         </td>
                                         <td>{{ $anime->anime_type->type }}</td>
@@ -61,7 +61,7 @@
                                                 @php
                                                     $watchStatusId = $userAnimeStatuses[$anime->id] ?? null;
                                                 @endphp
-                                                <div class="no_dropdown_arrow_blank_select-wrapper bg-blue-500">
+                                                <div class="no_dropdown_arrow_blank_select-wrapper @if ($watchStatusId === null) bg-blue-500 @else bg-gray-500 @endif">
                                                     <select
                                                         class="text-sm text-white rounded p-1 flex-1 focus:outline-none z-50 update-anime-status no_dropdown_arrow_blank"
                                                         data-anime-id="{{ $anime->id }}"
@@ -98,7 +98,7 @@
                                                 $watchStatusId = $userAnime?->pivot->watch_status_id ?? null;
                                                 $selectedStatus = $watchStatusId ? $watchStatuses[$watchStatusId] : null;
                                             @endphp
-                                        <div class="no_dropdown_arrow_blank_select-wrapper bg-blue-500">
+                                        <div class="no_dropdown_arrow_blank_select-wrapper @if ($watchStatusId === null) bg-blue-500 @else bg-gray-500 @endif">
                                             <select
                                                 class="text-sm text-white rounded p-1 flex-1 focus:outline-none z-50 update-anime-status no_dropdown_arrow_blank"
                                                 data-anime-id="{{ $anime->id }}"

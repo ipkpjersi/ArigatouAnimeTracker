@@ -44,7 +44,8 @@ if (! function_exists('rot19')) {
 }
 
 if (! function_exists('safe_json_encode')) {
-    function safe_json_encode($data) {
+    function safe_json_encode($data)
+    {
         if (empty($data) || in_array($data, ['[]', '{}', 'null', 'NULL', ''])) {
             return null;
         }
@@ -52,6 +53,7 @@ if (! function_exists('safe_json_encode')) {
         if (in_array($encodedData, ['[]', '{}', '""', 'null', 'NULL'])) {
             return null;
         }
+
         return $encodedData;
     }
 }

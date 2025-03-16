@@ -16,7 +16,7 @@ class AnimeImageDownloadService
     {
         if ($force) {
             DB::table('anime')->update(['image_downloaded' => false]);
-            $logger && $logger("Force downloading: Resetting image_downloaded to false for all anime.");
+            $logger && $logger('Force downloading: Resetting image_downloaded to false for all anime.');
         }
         $anime = DB::table('anime')
             ->whereNot('image_downloaded', '=', true)
@@ -54,7 +54,7 @@ class AnimeImageDownloadService
                         $successful++;
                         $imageDownloaded = true;
                     } else {
-                        //If it failed to download the regular picture after downloading the thumbnail, force a re-download.
+                        // If it failed to download the regular picture after downloading the thumbnail, force a re-download.
                         $imageDownloaded = false;
                         $imageFailed++;
                     }
@@ -115,7 +115,7 @@ class AnimeImageDownloadService
         } else {
             $logger && $logger("Image $type already exists at: ".$fullPath);
 
-            return true; //Technically it's downloaded, if we manually downloaded might as well mark it true.
+            return true; // Technically it's downloaded, if we manually downloaded might as well mark it true.
         }
 
         return false;
@@ -156,11 +156,11 @@ class AnimeImageDownloadService
                 $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
                 $rot19Filename = rot19($fileNameWithoutExtension).'.'.$fileExtension.'.zip';
                 $zipPath = dirname($filePath).DIRECTORY_SEPARATOR.$rot19Filename;
-                $zip = new ZipArchive();
+                $zip = new ZipArchive;
                 if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
-                    //We probably don't want to maintain the subfolder inside the zips
-                    //$zip->addFile($filePath, $iterator->getSubPathName());
-                    //Add the file to the zip without subfolders
+                    // We probably don't want to maintain the subfolder inside the zips
+                    // $zip->addFile($filePath, $iterator->getSubPathName());
+                    // Add the file to the zip without subfolders
                     $zip->addFile($filePath, basename($filePath));
                     $zip->close();
                 } else {
@@ -200,7 +200,7 @@ class AnimeImageDownloadService
 
     private function unzipImage($zipPath)
     {
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         if ($zip->open($zipPath) === true) {
             $extractPath = dirname($zipPath);  // Extract in the same directory where the zip file is located
             $zip->extractTo($extractPath);

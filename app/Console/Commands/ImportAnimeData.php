@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Anime;
 use App\Services\AnimeImportService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
@@ -33,7 +32,7 @@ class ImportAnimeData extends Command
         $this->info('Starting anime data import...');
         Log::channel('anime_import')->info('Starting anime data import...');
 
-        $filePath = $this->argument('filePath') ?? storage_path('app/imports/anime-offline-database.json');
+        $filePath = $this->argument('filePath') ?? storage_path('app/private/imports/anime-offline-database.json');
         $forceDownload = $this->option('forceDownload');
         $skipBackup = $this->option('skipBackup');
         $fullUpdate = $this->option('fullUpdate');
@@ -59,8 +58,8 @@ class ImportAnimeData extends Command
             if (! $skipBackup) {
                 $this->info('Backing up data before anime data import...');
                 Log::channel('anime_import')->info('Backing up data before anime data import...');
-                //This would be fine, but we might as well back up all the images etc too so everything matches.
-                //Artisan::call('app:backup-database', [], new ConsoleOutput);
+                // This would be fine, but we might as well back up all the images etc too so everything matches.
+                // Artisan::call('app:backup-database', [], new ConsoleOutput);
                 Artisan::call('app:backup:run', [], new ConsoleOutput);
             }
 

@@ -42,7 +42,7 @@
                 order: [[7, 'desc'], [8, 'desc']],
                 columns: [
                     { data: 'id', name: 'id' },
-                    { data: 'thumbnail', name: 'picture', render: function(data, type, row) {
+                    { data: 'picture', name: 'picture', render: function(data, type, row) {
                         return '<img src="' + data + '" alt="Thumbnail" style="width:50px; max-height: 70px"  onerror="this.onerror=null; this.src=\'/img/notfound.gif\';" />';
                     }},
                     { data: 'title', name: 'title', render: function(data, type, row) {

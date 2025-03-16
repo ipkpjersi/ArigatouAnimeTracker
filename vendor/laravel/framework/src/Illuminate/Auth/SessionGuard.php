@@ -128,13 +128,14 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  bool  $rehashOnLogin
      * @return void
      */
-    public function __construct($name,
-                                UserProvider $provider,
-                                Session $session,
-                                ?Request $request = null,
-                                ?Timebox $timebox = null,
-                                bool $rehashOnLogin = true)
-    {
+    public function __construct(
+        $name,
+        UserProvider $provider,
+        Session $session,
+        ?Request $request = null,
+        ?Timebox $timebox = null,
+        bool $rehashOnLogin = true,
+    ) {
         $this->name = $name;
         $this->session = $session;
         $this->request = $request;
@@ -238,8 +239,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         }
 
         return $this->user()
-                    ? $this->user()->getAuthIdentifier()
-                    : $this->session->get($this->getName());
+            ? $this->user()->getAuthIdentifier()
+            : $this->session->get($this->getName());
     }
 
     /**
@@ -259,6 +260,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
             return true;
         }
+
+        $this->fireFailedEvent($this->lastAttempted, $credentials);
 
         return false;
     }
@@ -488,7 +491,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  array  $credentials
      * @return void
      */
-    protected function rehashPasswordIfRequired(AuthenticatableContract $user, array $credentials)
+    protected function rehashPasswordIfRequired(AuthenticatableContract $user, #[\SensitiveParameter] array $credentials)
     {
         if ($this->rehashOnLogin) {
             $this->provider->rehashPasswordIfRequired($user, $credentials);
@@ -609,9 +612,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // If we have an event dispatcher instance, we can fire off the logout event
         // so any further processing can be done. This allows the developer to be
         // listening for anytime a user signs out of this application manually.
-        if (isset($this->events)) {
-            $this->events->dispatch(new Logout($this->name, $user));
-        }
+        $this->events?->dispatch(new Logout($this->name, $user));
 
         // Once we have fired the logout event we will clear the users out of memory
         // so they are no longer available as the user is no longer considered as
@@ -637,9 +638,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         // If we have an event dispatcher instance, we can fire off the logout event
         // so any further processing can be done. This allows the developer to be
         // listening for anytime a user signs out of this application manually.
-        if (isset($this->events)) {
-            $this->events->dispatch(new CurrentDeviceLogout($this->name, $user));
-        }
+        $this->events?->dispatch(new CurrentDeviceLogout($this->name, $user));
 
         // Once we have fired the logout event we will clear the users out of memory
         // so they are no longer available as the user is no longer considered as

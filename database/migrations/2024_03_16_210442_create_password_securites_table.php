@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('password_securities', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id')->nullable();
-            //If our user gets deleted we want get rid of their security stuff
+            // If our user gets deleted we want get rid of their security stuff
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->boolean('google2fa_enable')->default(false);
             $table->string('google2fa_secret')->nullable();

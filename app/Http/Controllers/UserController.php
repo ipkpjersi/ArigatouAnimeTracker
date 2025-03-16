@@ -44,7 +44,7 @@ class UserController extends Controller
         }
 
         $view = request('view');
-        $flexCol = ($view === "reviews" || $view === "friends" || $view === "favourites") ? 'flex-col' : '';
+        $flexCol = ($view === 'reviews' || $view === 'friends' || $view === 'favourites') ? 'flex-col' : '';
         $stats = $user->animeStatistics();
         $showFriendsPubliclyOnly = true;
         $showFavouritesPubliclyOnly = true;
@@ -62,19 +62,19 @@ class UserController extends Controller
 
         $currentUser = auth()->user();
 
-        //Check if the user is viewing their own profile
+        // Check if the user is viewing their own profile
         $isOwnProfile = strtolower($currentUser->username ?? '') === strtolower($user->username);
 
         if ($isOwnProfile) {
-            //User is viewing their own profile
+            // User is viewing their own profile
             $canViewFriends = $user->show_friends_on_profile_when_logged_in === 1;
             $canViewReviews = $user->show_reviews_when_logged_in === 1;
             $showChart = $user->enable_score_charts_own_profile_when_logged_in === 1;
             $canViewFavourites = $user->show_own_favourites_when_logged_in === 1;
         } else {
-            //Viewing someone else's profile, check if we are logged in first
+            // Viewing someone else's profile, check if we are logged in first
             if ($currentUser) {
-                //Current user needs to have enabled viewing on other profiles
+                // Current user needs to have enabled viewing on other profiles
                 $canViewFriends = $currentUser->show_friends_on_others_profiles === 1 && $user->show_friends_on_profile_publicly === 1;
                 $canViewReviews = $currentUser->show_others_reviews === 1 && $user->show_reviews_publicly === 1;
                 $showChart = $currentUser->enable_score_charts_other_profiles === 1 && $user->enable_score_charts_own_profile_publicly === 1;
@@ -92,7 +92,7 @@ class UserController extends Controller
         $enableScoreCharts = auth()->user()?->enable_score_charts_system === 1;
         $enableFavouritesSystem = auth()->user()?->enable_favourites_system === 1;
 
-        //Check favourites of viewed user.
+        // Check favourites of viewed user.
         $favouritesQuery = $user->favourites()
             ->join('users', 'anime_favourites.user_id', '=', 'users.id')
             ->when($showFavouritesPubliclyOnly, function ($query) {
@@ -102,7 +102,7 @@ class UserController extends Controller
             });
 
         if (auth()->user() !== null) {
-            //Check sorting preferences of authenticated user, not viewed user.
+            // Check sorting preferences of authenticated user, not viewed user.
             if ($isOwnProfile) {
                 if (auth()->user()->favourites_sort_own === 'random') {
                     $favouritesQuery->inRandomOrder();
@@ -110,7 +110,7 @@ class UserController extends Controller
                     $favouritesQuery->orderBy('anime_favourites.sort_order');
                 } else {
                     $favouritesQuery->orderBy(
-                        auth()->user()->favourites_sort_own === 'date_added' ? 'anime_favourites.created_at' : "anime.{auth()->user()->favourites_sort_own}",
+                        auth()->user()->favourites_sort_own === 'date_added' ? 'anime_favourites.created_at' : 'anime.{auth()->user()->favourites_sort_own}',
                         auth()->user()->favourites_sort_own_order
                     );
                 }
@@ -121,7 +121,7 @@ class UserController extends Controller
                     $favouritesQuery->orderBy('anime_favourites.sort_order');
                 } else {
                     $favouritesQuery->orderBy(
-                        auth()->user()->favourites_sort_others === 'date_added' ? 'anime_favourites.created_at' : "anime.{auth()->user()->favourites_sort_others}",
+                        auth()->user()->favourites_sort_others === 'date_added' ? 'anime_favourites.created_at' : 'anime.{auth()->user()->favourites_sort_others}',
                         auth()->user()->favourites_sort_others_order
                     );
                 }
@@ -133,14 +133,14 @@ class UserController extends Controller
         if (request('view') == 'favourites') {
             $favourites = $favouritesQuery->paginate(10, ['*'], 'favouritepage')->withQueryString();
         } else {
-            //We could add pagination here, in which case we'd paginate 9, instead of take 9.
+            // We could add pagination here, in which case we'd paginate 9, instead of take 9.
             $favourites = $favouritesQuery->take(9)->get();
         }
 
         $reviews = AnimeReview::where('user_id', $user->id)
             ->join('users', 'anime_reviews.user_id', '=', 'users.id')
             ->where('anime_reviews.show_review_publicly', true)
-            ->when(!request('spoilers'), function ($query) {
+            ->when(! request('spoilers'), function ($query) {
                 return $query->where('anime_reviews.contains_spoilers', false);
             })
             ->where('users.show_reviews_publicly', true)
@@ -157,14 +157,14 @@ class UserController extends Controller
             ->where('users.is_banned', false)->count();
 
         $totalFavouritesCount = $user->favourites()
-        ->join('users', 'anime_favourites.user_id', '=', 'users.id')
-        ->where('anime_favourites.show_publicly', true)
-        ->where('users.show_favourites_publicly', true)
-        ->where('users.is_banned', false)
-        ->count();
+            ->join('users', 'anime_favourites.user_id', '=', 'users.id')
+            ->where('anime_favourites.show_publicly', true)
+            ->where('users.show_favourites_publicly', true)
+            ->where('users.is_banned', false)
+            ->count();
 
         $friendUser = null;
-        if (!$isOwnProfile && $currentUser) {
+        if (! $isOwnProfile && $currentUser) {
             $friendUser = $currentUser->friends()
                 ->where('users.id', $user->id)
                 ->first();
@@ -246,7 +246,7 @@ class UserController extends Controller
     public function removeReview(Request $request, $reviewId)
     {
         // Ensure only admins can remove reviews
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -261,7 +261,7 @@ class UserController extends Controller
             'user_id' => auth()->id(),
             'target_id' => $review->user_id,
             'action' => 'remove_review',
-            'message' => 'Removed review of anime ' . $anime->title . ' (anime ID: ' . $anime->id . ') from user: ' . $user->username . ' (user ID: ' . $review->user_id . ')'
+            'message' => 'Removed review of anime '.$anime->title.' (anime ID: '.$anime->id.') from user: '.$user->username.' (user ID: '.$review->user_id.')',
         ]);
 
         return response()->json(['message' => 'Review removed successfully']);
@@ -340,7 +340,7 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
-        if (!$user->favourites->contains($animeId)) {
+        if (! $user->favourites->contains($animeId)) {
             $user->favourites()->attach($animeId, [
                 'show_publicly' => true,
                 'sort_order' => 0,
