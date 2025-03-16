@@ -103,8 +103,8 @@ class Anime extends Model
         // Get the base URL dynamically from Laravel
         $baseUrl = config('app.url'); // Fetch from .env (APP_URL)
 
-        if (!empty($baseUrl)) {
-            $baseUrl = get_base_url(); // Fetch from request if the base URL is still empty
+        if (empty($baseUrl)) {
+            $baseUrl = get_base_url(); // Fetch from helper if the base URL is still empty
         }
 
         // If the image is already local, return as is
