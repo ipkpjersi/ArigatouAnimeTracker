@@ -38,7 +38,7 @@
                         </thead>
                         <tbody>
                             @foreach ($topAnime as $index => $anime)
-                                <tr>
+                                <tr class="border-b-4 border-transparent">
                                     <td>{{ (($topAnime->currentPage() - 1 ) * $topAnime->perPage() ) + $loop->iteration }}</td>
                                     <td>
                                         <a href="{{ route('anime.detail', $anime->id) }}">
@@ -57,7 +57,7 @@
                                                 @php
                                                     $watchStatusId = $userAnimeStatuses[$anime->id] ?? null;
                                                 @endphp
-                                                <div class="no_dropdown_arrow_blank_select-wrapper bg-blue-500">
+                                                <div class="no_dropdown_arrow_blank_select-wrapper @if ($watchStatusId === null) bg-blue-500 @else bg-gray-500 @endif">
                                                     <select
                                                         class="text-sm text-white rounded p-1 flex-1 focus:outline-none z-50 update-anime-status no_dropdown_arrow_blank"
                                                         data-anime-id="{{ $anime->id }}"
