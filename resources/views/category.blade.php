@@ -45,9 +45,9 @@
                             </thead>
                             <tbody>
                                 @foreach ($categoryAnime as $anime)
-                                    <tr>
+                                    <tr class="border-b-4 border-transparent">
                                         <td>
-                                            <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }}" class="inline-block" width="50" height="70" onerror="this.onerror=null; this.src='/img/notfound.gif';">
+                                            <img src="{{ $anime->picture }}" alt="{{ $anime->title }}" class="inline-block" width="50" height="70" onerror="this.onerror=null; this.src='/img/notfound.gif';">
                                             <a href="{{ route('anime.detail', $anime->id) }}" class="ml-4">{{ $anime->title }}</a>
                                         </td>
                                         <td>{{ $anime->anime_type->type }}</td>

@@ -114,7 +114,7 @@
                                         <h4 class="font-bold mb-2">
                                             <a href="{{ route('anime.detail', $review->anime->id) }}">
                                                 {{ $review->anime->title }}
-                                                <img src="{{ $review->anime->thumbnail }}" alt="{{ $review->anime->title }}" style="width:50px; height:70px; margin-right:10px; vertical-align:middle;" onerror="this.onerror=null; this.src='/img/notfound.gif';">
+                                                <img src="{{ $review->anime->picture }}" alt="{{ $review->anime->title }}" style="width:50px; height:70px; margin-right:10px; vertical-align:middle;" onerror="this.onerror=null; this.src='/img/notfound.gif';">
                                             </a>
                                         </h4>
                                         <span id="less-{{ $review->id }}">
@@ -242,7 +242,7 @@
                                         <div class="relative z-20">
                                             <a href="{{ route('anime.detail', $favourite->id) }}">
                                                 <h3 class="text-xl font-semibold mb-2">{{ $favourite->title }}</h3>
-                                                <img src="{{ $favourite->thumbnail }}" alt="{{ $favourite->title }}" class="rounded mb-4 avatar-image"
+                                                <img src="{{ $favourite->picture }}" alt="{{ $favourite->title }}" class="rounded mb-4 avatar-image"
                                                      onerror="this.onerror=null; this.src='/img/notfound.gif';">
                                             </a>
                                             <p class="text-sm">Added on: {{ $favourite->pivot->created_at->format('M d, Y h:i:s A') }}</p>
@@ -318,7 +318,7 @@
                                     <div class="flex flex-wrap items-center gap-2">
                                         @foreach ($favourites as $favourite)
                                             <a href="{{ route('anime.detail', $favourite->id) }}" class="relative group">
-                                                <img src="{{ $favourite->thumbnail }}"
+                                                <img src="{{ $favourite->picture }}"
                                                      alt="{{ $favourite->title }}"
                                                      class="rounded-lg shadow-md w-16 h-24 object-cover"
                                                      onerror="this.onerror=null; this.src='/img/notfound.gif';">

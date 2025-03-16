@@ -42,7 +42,7 @@
                                     <td>{{ (($topAnime->currentPage() - 1 ) * $topAnime->perPage() ) + $loop->iteration }}</td>
                                     <td>
                                         <a href="{{ route('anime.detail', $anime->id) }}">
-                                            <img src="{{ $anime->thumbnail }}" alt="{{ $anime->title }}" class="inline-block" width="50" height="70">
+                                            <img src="{{ $anime->picture }}" alt="{{ $anime->title }}" class="inline-block" width="50" height="70">
                                             <span class="ml-4">{{ $anime->title }}</span>
                                         </a>
                                     </td>
