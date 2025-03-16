@@ -32,7 +32,7 @@ class ImportAnimeData extends Command
         $this->info('Starting anime data import...');
         Log::channel('anime_import')->info('Starting anime data import...');
 
-        $filePath = $this->argument('filePath') ?? storage_path('app/imports/anime-offline-database.json');
+        $filePath = $this->argument('filePath') ?? storage_path('app/private/imports/anime-offline-database.json');
         $forceDownload = $this->option('forceDownload');
         $skipBackup = $this->option('skipBackup');
         $fullUpdate = $this->option('fullUpdate');

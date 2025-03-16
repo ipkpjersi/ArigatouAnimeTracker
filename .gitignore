@@ -20,7 +20,7 @@ yarn-error.log
 /.nova
 /.vscode
 public/img/avatars/**
-!storage/app/imports/anime-offline-database.json
+!storage/app/private/imports/anime-offline-database.json
 database/seeders/anime_additional_data.sql
 /public/picture/**/*.jpg
 /public/picture/**/*.jpeg

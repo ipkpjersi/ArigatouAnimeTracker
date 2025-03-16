@@ -2,4 +2,4 @@
 !private/
 !public/
 !.gitignore
-!imports/anime-offline-database.json
+!private/imports/anime-offline-database.json

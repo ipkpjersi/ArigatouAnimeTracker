@@ -1,2 +1,4 @@
 *
 !.gitignore
+!imports/
+!imports/anime-offline-database.json
