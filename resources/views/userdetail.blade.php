@@ -395,7 +395,17 @@
                     },
                     datalabels: {
                         display: false
-                    }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                let total = tooltipItem.dataset.data.reduce((acc, val) => acc + val, 0);
+                                let value = tooltipItem.raw;
+                                let percentage = ((value / total) * 100).toFixed(2);
+                                return `${value} (${percentage}%)`;
+                            }
+                        }
+                    },
                 }
                 // other options...
             };
@@ -453,7 +463,17 @@
                             size: 12 // Size of the label font
                         },
                         formatter: (value) => value // Display the value itself
-                    }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                let total = tooltipItem.dataset.data.reduce((acc, val) => acc + val, 0);
+                                let value = tooltipItem.raw;
+                                let percentage = ((value / total) * 100).toFixed(2);
+                                return `${value} (${percentage}%)`;
+                            }
+                        }
+                    },
                 }
             };
 
