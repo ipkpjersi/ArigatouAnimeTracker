@@ -18,6 +18,7 @@ class DownloadAdditionalAnimeData extends Command
     /**
      * The console command description.
      * To force a re-download of only known existing API data, technically we could set description = null and genres = api_descriptions_empty where api_descriptions_empty is 0.
+     *
      * @var string
      */
     protected $description = 'Fetches and inserts additional data for anime from the MyAnimeList (or notify.moe or kitsu.io) API. Optionally generates an importable SQL file. Optionally runs for API empty descriptions only (to force a retry of fetching descriptions).';

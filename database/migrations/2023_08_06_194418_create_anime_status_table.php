@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('anime_status', function (Blueprint $table) {
             $table->id();
-            $table->string('status'); //Enum of [FINISHED, ONGOING, UPCOMING, UNKNOWN]
+            $table->string('status'); // Enum of [FINISHED, ONGOING, UPCOMING, UNKNOWN]
             $table->timestamps();
         });
     }

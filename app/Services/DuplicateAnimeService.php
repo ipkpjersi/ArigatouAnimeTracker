@@ -37,7 +37,7 @@ class DuplicateAnimeService
             ->groupBy('title')
             ->havingRaw('COUNT(*) > 1')
             ->get();
-        //Technically, duplicate pictures can generate false positives, like 139 entries with default spring picture would mean they aren't duplicates, but if there's two or three or four of the same picture, that's very likely a duplicate entry.
+        // Technically, duplicate pictures can generate false positives, like 139 entries with default spring picture would mean they aren't duplicates, but if there's two or three or four of the same picture, that's very likely a duplicate entry.
         $pictureDuplicates = DB::table('anime')
             ->select('picture', DB::raw('COUNT(*) as occurrences'))
             ->whereNotNull('picture')
@@ -70,7 +70,7 @@ class DuplicateAnimeService
             })
             ->count();
 
-        $totalDuplicatesData = new \stdClass();
+        $totalDuplicatesData = new \stdClass;
         $totalDuplicatesData->total_duplicate_titles = $count;
 
         return $this->saveToCsv([$totalDuplicatesData], "total_duplicates_{$date}.csv", $logger);
@@ -78,7 +78,7 @@ class DuplicateAnimeService
 
     private function exportAllDuplicateDetails($date, $logger)
     {
-        //Technically, duplicate pictures can generate false positives, like 139 entries with default spring picture would mean they aren't duplicates, but if there's two or three or four of the same picture, that's very likely a duplicate entry.
+        // Technically, duplicate pictures can generate false positives, like 139 entries with default spring picture would mean they aren't duplicates, but if there's two or three or four of the same picture, that's very likely a duplicate entry.
         $duplicates = DB::table('anime')
             ->whereIn('title', function ($query) {
                 $query->select('title')
@@ -104,13 +104,13 @@ class DuplicateAnimeService
     {
         $csv = Writer::createFromString('');
 
-        //Check if $data is a Collection or an array
+        // Check if $data is a Collection or an array
         $firstRecord = is_array($data) ? reset($data) : $data->first();
 
-        //Convert the first record to an array and insert the keys as the first row in the CSV
+        // Convert the first record to an array and insert the keys as the first row in the CSV
         $csv->insertOne(array_keys((array) $firstRecord));
 
-        //Iterate over each record and insert into CSV
+        // Iterate over each record and insert into CSV
         foreach ($data as $record) {
             $csv->insertOne((array) $record);
         }
@@ -130,31 +130,31 @@ class DuplicateAnimeService
         DB::beginTransaction();
 
         try {
-            //Log start of process
+            // Log start of process
             $logger && $logger("Starting merge of anime ID $oldAnimeId into $newAnimeId");
 
-            //Update references in anime_user table
+            // Update references in anime_user table
             DB::table('anime_user')
                 ->where('anime_id', $oldAnimeId)
                 ->update(['anime_id' => $newAnimeId]);
 
             $logger && $logger("Updated anime_user references from $oldAnimeId to $newAnimeId");
 
-            //Update references in anime_reviews table
+            // Update references in anime_reviews table
             DB::table('anime_reviews')
                 ->where('anime_id', $oldAnimeId)
                 ->update(['anime_id' => $newAnimeId]);
 
             $logger && $logger("Updated anime_reviews references from $oldAnimeId to $newAnimeId");
 
-            //Update references in anime_favourites table
+            // Update references in anime_favourites table
             DB::table('anime_favourites')
                 ->where('anime_id', $oldAnimeId)
                 ->update(['anime_id' => $newAnimeId]);
 
             $logger && $logger("Updated anime_favourites references from $oldAnimeId to $newAnimeId");
 
-            //Delete the old anime entry
+            // Delete the old anime entry
             DB::table('anime')
                 ->where('id', $oldAnimeId)
                 ->delete();
@@ -166,10 +166,10 @@ class DuplicateAnimeService
             return ['status' => 'success', 'message' => "Anime with ID $oldAnimeId merged into $newAnimeId successfully"];
         } catch (\Exception $e) {
             DB::rollBack();
-            $logger && $logger("Error during merge: " . $e->getMessage());
-            Log::error("Error merging anime IDs $oldAnimeId into $newAnimeId: " . $e->getMessage());
+            $logger && $logger('Error during merge: '.$e->getMessage());
+            Log::error("Error merging anime IDs $oldAnimeId into $newAnimeId: ".$e->getMessage());
 
-            return ['status' => 'error', 'message' => 'Merge failed: ' . $e->getMessage()];
+            return ['status' => 'error', 'message' => 'Merge failed: '.$e->getMessage()];
         }
     }
 }

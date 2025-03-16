@@ -32,7 +32,7 @@ class Anime extends Model
         'anime_status_id',
     ];
 
-    //Set an ID used to hide all anime from public view.
+    // Set an ID used to hide all anime from public view.
     public static $HIDE_ALL_ANIME_PUBLICLY_ID = 5555;
 
     public function anime_type(): BelongsTo

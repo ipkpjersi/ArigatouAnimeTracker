@@ -19,7 +19,7 @@ class AnimeListImportService
         } elseif ($fileType === 'arigatou') {
             return $this->importFromArigatou($fileContent, $userId, $logger);
         } else {
-            //Unknown file type
+            // Unknown file type
             return '';
         }
     }
@@ -170,6 +170,7 @@ class AnimeListImportService
 
                 if ($existingFavourite) {
                     $logger && $logger("Skipping existing favourite for anime {$anime->title} id {$anime->id}");
+
                     continue;
                 }
 
@@ -198,6 +199,7 @@ class AnimeListImportService
 
                 if ($existingReview) {
                     $logger && $logger("Skipping existing review for anime {$anime->title} id {$anime->id}");
+
                     continue;
                 }
 

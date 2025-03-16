@@ -38,10 +38,10 @@ class AnimeController extends Controller
         ];
 
         $orderData = $request->has('order') ? $request->input('order') : [];
-        //Check if order count matches.
+        // Check if order count matches.
         $sortingMatchesDefault = count($defaultOrder) === count($orderData);
 
-        //Check if all provided order conditions match the default
+        // Check if all provided order conditions match the default
         foreach ($defaultOrder as $index => $default) {
             if (! isset($orderData[$index]) ||
                 $orderData[$index]['column'] != $default['column'] ||
@@ -56,7 +56,7 @@ class AnimeController extends Controller
         }
 
         if (auth()->user() == null || auth()->user()->show_adult_content == false) {
-            //No need for this to be plain-text, so we'll use rot13.
+            // No need for this to be plain-text, so we'll use rot13.
             $query = $query->where('tags', 'NOT LIKE', '%'.str_rot13('uragnv').'%');
         }
 
@@ -69,7 +69,7 @@ class AnimeController extends Controller
                 }
             })
             ->filterColumn('tags', function ($query, $keyword) {
-                //We could add a junction table for anime and tags, but this is probably fine.
+                // We could add a junction table for anime and tags, but this is probably fine.
                 $searchTags = collect(explode(',', $keyword))
                     ->map(fn ($tag) => trim(strtolower($tag)));
                 foreach ($searchTags as $tag) {
@@ -77,7 +77,7 @@ class AnimeController extends Controller
                 }
             })
             ->filterColumn('synonyms', function ($query, $keyword) {
-                //We could add a junction table for anime and synonyms, but this is probably fine.
+                // We could add a junction table for anime and synonyms, but this is probably fine.
                 $searchTags = collect(explode(',', $keyword))
                     ->map(fn ($synonym) => trim(strtolower($synonym)));
                 foreach ($searchTags as $synonym) {
@@ -147,7 +147,7 @@ class AnimeController extends Controller
             ->where('anime_reviews.is_deleted', 0)
             ->latest('anime_reviews.created_at')
             ->paginate(2, ['anime_reviews.*', 'users.username', 'users.avatar', 'users.id as user_id'], 'reviewpage')
-            ->withQueryString(); //We could manually appends() instead of using withQueryString() but withQueryString() is simpler.
+            ->withQueryString(); // We could manually appends() instead of using withQueryString() but withQueryString() is simpler.
 
         $totalReviewsCount = AnimeReview::where('anime_id', $id)
             ->join('users', 'anime_reviews.user_id', '=', 'users.id')
@@ -177,26 +177,26 @@ class AnimeController extends Controller
             'Slice of Life', 'Supernatural', 'Thriller', 'Romantic Comedy', 'Coming of Age', 'School', 'Sports',
             'Magic', 'Military', 'Mecha', 'Music', 'Historical', 'Psychological', 'Battle Royale',
             'Isekai', 'Post-Apocalyptic', 'Space', 'Time Travel', 'Virtual Reality', 'Superpower', 'Cyberpunk',
-            'Mystery', 'Harem', 'Reverse Harem', 'Tsundere', 'Yandere', 'Parody', "Ojou-Sama", "Maids"
+            'Mystery', 'Harem', 'Reverse Harem', 'Tsundere', 'Yandere', 'Parody', 'Ojou-Sama', 'Maids',
         ];
 
         $currentAnimeTags = array_map('strtolower', explode(', ', $anime->tags));
         $otherAnimeTags = array_map('strtolower', $otherAnimeTags);
         $filteredTags = array_intersect($currentAnimeTags, $otherAnimeTags);
         $otherAnime = [];
-        if (!empty($filteredTags)) {
-            $tagConditions = array_map(function($tag) {
-                return "tags LIKE '%" . $tag . "%'";
+        if (! empty($filteredTags)) {
+            $tagConditions = array_map(function ($tag) {
+                return "tags LIKE '%".$tag."%'";
             }, $filteredTags);
 
             $tagConditions = implode(' OR ', $tagConditions);
 
             $otherAnime = DB::table('anime')
-                ->select('anime.*', DB::raw("(
-                    " . implode(' + ', array_map(function($tag) {
-                        return "IF(tags LIKE '%" . $tag . "%', 1, 0)";
-                    }, $filteredTags)) . "
-                ) as match_count"))
+                ->select('anime.*', DB::raw('(
+                    '.implode(' + ', array_map(function ($tag) {
+                    return "IF(tags LIKE '%".$tag."%', 1, 0)";
+                }, $filteredTags)).'
+                ) as match_count'))
                 ->where('id', '!=', $id)
                 ->whereRaw("($tagConditions)")
                 ->orderBy('match_count', 'desc')
@@ -212,6 +212,7 @@ class AnimeController extends Controller
                 'pageName' => 'otheranimepage',
             ]);
         }
+
         return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aatScore', 'aatMembers', 'aatUsers', 'otherAnime', 'favouriteSystemEnabled', 'favourite'));
     }
 
@@ -273,7 +274,7 @@ class AnimeController extends Controller
                 ELSE 0
             END as season_sort');
         if (auth()->user() == null || auth()->user()->show_adult_content == false) {
-            //No need for this to be plain-text, so we'll use rot13.
+            // No need for this to be plain-text, so we'll use rot13.
             $query = $query->where('tags', 'NOT LIKE', '%'.str_rot13('uragnv').'%');
         }
         $sort = $request->get('sort', 'highest_rated');
@@ -418,7 +419,7 @@ class AnimeController extends Controller
         }
 
         if (auth()->user() == null || auth()->user()->show_adult_content == false) {
-            //No need for this to be plain-text, so we'll use rot13.
+            // No need for this to be plain-text, so we'll use rot13.
             $query = $query->where('tags', 'NOT LIKE', '%'.str_rot13('uragnv').'%');
         }
 
@@ -452,7 +453,7 @@ class AnimeController extends Controller
         $pagination = Auth::user()?->anime_list_pagination_size ?? $user->anime_list_pagination_size ?? 15;
         if ($request->has('size') || $request->has('pageSize') || $request->has('pagesize')) {
             $pagination = $request->get('size') ?? $request->get('pageSize') ?? $request->get('pagesize');
-            $pagination = max(1, min((int) $pagination, 1000)); //Clamp between 1 and 1000
+            $pagination = max(1, min((int) $pagination, 1000)); // Clamp between 1 and 1000
         }
         $show_anime_list_number = Auth::user() != null && Auth::user()->show_anime_list_number == 1;
         $watchStatuses = DB::table('watch_status')->get();
@@ -542,7 +543,7 @@ class AnimeController extends Controller
         if ($user->show_anime_list_publicly === 0 && (Auth::user() === null || strtolower(Auth::user()->username) !== strtolower($user->username))) {
             $query = $query->where('anime_user.display_in_list', '=', Anime::$HIDE_ALL_ANIME_PUBLICLY_ID);
         }
-        //We need to match the order we have in DataTables frontend.
+        // We need to match the order we have in DataTables frontend.
         if (Auth::user() != null && Auth::user()->show_anime_list_number == 1) {
             $defaultOrder = [
                 ['column' => 8, 'dir' => 'asc'],
@@ -558,10 +559,10 @@ class AnimeController extends Controller
         }
 
         $orderData = $request->has('order') ? $request->input('order') : [];
-        //Check if order count matches.
+        // Check if order count matches.
         $sortingMatchesDefault = count($defaultOrder) === count($orderData);
 
-        //Check if all provided order conditions match the default
+        // Check if all provided order conditions match the default
         foreach ($defaultOrder as $index => $default) {
             if (! isset($orderData[$index]) ||
                 $orderData[$index]['column'] != $default['column'] ||
@@ -570,7 +571,7 @@ class AnimeController extends Controller
                 break;
             }
         }
-        //TODO: fix non-default sorting, for example sorting by episodes doesn't work. Maybe add in sorting manually?
+        // TODO: fix non-default sorting, for example sorting by episodes doesn't work. Maybe add in sorting manually?
         if ($sortingMatchesDefault) {
             $query->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC');
         }
@@ -591,9 +592,7 @@ class AnimeController extends Controller
 
     /**
      * Used for updating both the v1 of the Anime User List page and also the individual Anime Detail page.
-     * @param Request $request
-     * @param $username
-     * @param $redirectBack
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function updateUserAnimeList(Request $request, $username, $redirectBack = false)
@@ -601,27 +600,27 @@ class AnimeController extends Controller
         $user = User::where('username', $username)->firstOrFail();
 
         if ($request->has('anime_ids') && is_array($request->anime_ids)) {
-            //Is the user updating from the anime detail page (or possibly from the list page if their list has only one entry)?
+            // Is the user updating from the anime detail page (or possibly from the list page if their list has only one entry)?
             $updatingFromAnimeDetailPage = count($request->anime_ids) === 1;
             if ($updatingFromAnimeDetailPage) {
                 $animeId = $request->anime_ids[0];
                 $sortOrder = $request->sort_order[0] ?? null;
-                //Check if the user has the setting enabled and a sort_order is provided
+                // Check if the user has the setting enabled and a sort_order is provided
                 if ($user->modifying_sort_order_on_detail_page_sorts_entire_list && $sortOrder !== null) {
                     $currentEntry = $user->anime()->where('anime_id', $animeId)->first();
                     $currentSortOrder = $currentEntry ? $currentEntry->pivot->sort_order : null;
                     if ($currentSortOrder === null) {
-                        //New entry, insert and shift existing entries
+                        // New entry, insert and shift existing entries
                         $user->anime()->where('sort_order', '>=', $sortOrder)->increment('sort_order');
                     } else {
                         if ($currentSortOrder < $sortOrder) {
-                            //Moving downwards
+                            // Moving downwards
                             $user->anime()->whereBetween('sort_order', [$currentSortOrder + 1, $sortOrder])
-                                          ->decrement('sort_order');
+                                ->decrement('sort_order');
                         } elseif ($currentSortOrder > $sortOrder) {
-                            //Moving upwards
+                            // Moving upwards
                             $user->anime()->whereBetween('sort_order', [$sortOrder, $currentSortOrder - 1])
-                                          ->increment('sort_order');
+                                ->increment('sort_order');
                         }
                     }
                 }
@@ -654,12 +653,12 @@ class AnimeController extends Controller
                     ],
                 ];
 
-                //Add notes to the sync array only if it's provided in the request
+                // Add notes to the sync array only if it's provided in the request
                 if (array_key_exists('notes', $request->all())) {
                     $syncData[$anime_id]['notes'] = $request->notes[$index] ?? '';
                 }
-                //Use syncWithoutDetaching to update the pivot data/junction table
-                //without removing the user's other rows in the junction table.
+                // Use syncWithoutDetaching to update the pivot data/junction table
+                // without removing the user's other rows in the junction table.
                 $user->anime()->syncWithoutDetaching($syncData);
             }
         }
@@ -672,8 +671,7 @@ class AnimeController extends Controller
 
     /**
      * Used only for updating the Anime User List v2 page.
-     * @param Request $request
-     * @param $username
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function updateUserAnimeListV2(Request $request, $username)
@@ -777,7 +775,7 @@ class AnimeController extends Controller
     {
         $user = User::where('username', $username)->firstOrFail();
 
-        //Check if the logged-in user matches the username or is an admin
+        // Check if the logged-in user matches the username or is an admin
         if (auth()->user()->id === $user->id || auth()->user()->is_admin) {
             $user->anime()->detach();
 
@@ -865,7 +863,7 @@ class AnimeController extends Controller
             return redirect()->back()->with('message', 'Export failed due to unknown file type.');
         }
 
-        return response()->download(storage_path("app/exports/{$fileName}"));
+        return response()->download(storage_path("app/private/exports/{$fileName}"));
     }
 
     public function exportAnimeListView()
