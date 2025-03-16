@@ -159,8 +159,18 @@ class AnimeAdditionalDataImportService
                     Log::channel('anime_import')->error('Error fetching data from kitsu.io for anime: '.$row->title.'. Error: '.$e->getMessage());
                 }
             }
-
+            //We only check the description since we don't really need genres to exist in order to update a description, also we can check genres separately and prevent overwriting existing genres with empty ones separately.
             if ($description) {
+                //Prevent overwriting existing genres with empty ones, since we only check for a description before updating anime data, we should fetch existing genres if the new genres are empty.
+                if (empty($genres)) {
+                    $existingGenres = DB::table('anime')
+                        ->where('id', $row->id)
+                        ->value('genres'); //Fetch only the genres column
+
+                    if (!empty($existingGenres)) {
+                        $genres = $existingGenres; //Retain existing genres if they exist
+                    }
+                }
                 $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $averageDuration, $rating, $source, $background, $recommendations, $studios, $broadcast, $relatedAnime, $relatedManga, $sqlFile, $logger);
                 $logger && $logger('Successfully updated description and genres for anime: '.$row->title);
                 Log::channel('anime_import')->info('Successfully updated description and genres for anime: '.$row->title);
