@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use function App\Helpers\getBaseUrl;
+use function App\Helpers\get_base_url;
 
 class Anime extends Model
 {
@@ -104,7 +104,7 @@ class Anime extends Model
         $baseUrl = config('app.url'); // Fetch from .env (APP_URL)
 
         if (!empty($baseUrl)) {
-            $baseUrl = getBaseUrl(); // Fetch from request if the base URL is still empty
+            $baseUrl = get_base_url(); // Fetch from request if the base URL is still empty
         }
 
         // If the image is already local, return as is

@@ -58,8 +58,8 @@ if (! function_exists('safe_json_encode')) {
     }
 }
 
-if (! function_exists('getBaseUrl')) {
-    function getBaseUrl() {
+if (! function_exists('get_base_url')) {
+    function get_base_url() {
         $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $port = $_SERVER['SERVER_PORT'] ?? null;
