@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use function App\Helpers\get_base_url;
 
 class Anime extends Model
 {
@@ -67,5 +68,57 @@ class Anime extends Model
         return Anime::select('id', 'title', 'year', 'season', 'anime_type_id', 'anime_status_id', 'episodes', 'synonyms')
             ->with('anime_type', 'anime_status')
             ->find($animeId);
+    }
+
+    public static function getLocalPictureUrlFromAnimeId(int $animeId): string
+    {
+        $anime = static::find($animeId);
+        if (!$anime) {
+            return '';
+        }
+        return static::convertToLocalImageUrl($anime->picture, 'picture');
+    }
+
+    public static function getLocalThumbnailUrlFromAnimeId(int $animeId): string
+    {
+        $anime = static::find($animeId);
+        if (!$anime) {
+            return '';
+        }
+        return static::convertToLocalImageUrl($anime->thumbnail, 'thumbnail');
+    }
+
+    public function getLocalPictureUrl(): string
+    {
+        return static::convertToLocalImageUrl($this->picture, 'picture');
+    }
+
+    public function getLocalThumbnailUrl(): string
+    {
+        return static::convertToLocalImageUrl($this->thumbnail, 'thumbnail');
+    }
+
+    private static function convertToLocalImageUrl($url, $folder): string
+    {
+        // Get the base URL dynamically from Laravel
+        $baseUrl = config('app.url'); // Fetch from .env (APP_URL)
+
+        if (empty($baseUrl)) {
+            $baseUrl = get_base_url(); // Fetch from helper if the base URL is still empty
+        }
+
+        // If the image is already local, return as is
+        if (str_starts_with($url, $baseUrl)) {
+            return $url;
+        }
+
+        // Parse the URL to get only the path after the domain
+        $parsedUrl = parse_url($url, PHP_URL_PATH);
+
+        // Remove leading slashes to prevent double slashes in final URL
+        $relativePath = ltrim($parsedUrl, '/');
+
+        // Construct the new local URL
+        return url("$folder/$relativePath");
     }
 }

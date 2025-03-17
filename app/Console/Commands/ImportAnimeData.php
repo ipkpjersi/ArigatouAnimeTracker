@@ -41,6 +41,15 @@ class ImportAnimeData extends Command
                 $this->info($message);
             };
 
+            // Perform a backup before doing anything, in case anything goes wrong.
+            if (! $skipBackup) {
+                $this->info('Backing up data before anime data import...');
+                Log::channel('anime_import')->info('Backing up data before anime data import...');
+                // This would be fine, but we might as well back up all the images etc too so everything matches.
+                // Artisan::call('app:backup-database', [], new ConsoleOutput);
+                Artisan::call('app:backup:run', [], new ConsoleOutput);
+            }
+
             if ($forceDownload || ! file_exists($filePath)) {
                 $this->info('Anime database file not found or force download is enabled. Downloading from source...');
                 Log::channel('anime_import')->info('Anime database file not found or force download is enabled. Downloading from source...');
@@ -53,14 +62,6 @@ class ImportAnimeData extends Command
                     }
                 }
                 file_put_contents($filePath, $fileData);
-            }
-
-            if (! $skipBackup) {
-                $this->info('Backing up data before anime data import...');
-                Log::channel('anime_import')->info('Backing up data before anime data import...');
-                // This would be fine, but we might as well back up all the images etc too so everything matches.
-                // Artisan::call('app:backup-database', [], new ConsoleOutput);
-                Artisan::call('app:backup:run', [], new ConsoleOutput);
             }
 
             $result = $animeImportService->importFromJsonFile($filePath, $fullUpdate, $logger);
