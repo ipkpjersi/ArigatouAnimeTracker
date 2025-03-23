@@ -20,13 +20,13 @@
                 <div class="flex space-x-4">
                     @foreach ($paginationSeasons as $key => $seasonData)
                         <a href="{{ route('anime.category', ['category' => 'seasonal', 'season' => $seasonData['season'], 'year' => $seasonData['year'], 'view' => request('view')] + request()->except(['season', 'year'])) }}"
-                           class="px-3 py-1 rounded {{ $key === 'current' ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600' }}">
+                           class="px-3 py-1 rounded {{ $key === 'current' ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 hover:text-white' }}">
                             {{ ucfirst(strtolower($seasonData['season'])) }} {{ $seasonData['year'] }}
                         </a>
                     @endforeach
                     @if (!($currentSeason === $calendarSeason && $currentYear == $calendarYear))
                         <a href="{{ route('anime.category', ['category' => 'seasonal', 'view' => request('view')] + request()->except(['season', 'year'])) }}"
-                           class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 bg-gray-300 dark:bg-gray-600 text-white hover:bg-blue-500 hover:text-white transition">
+                           class="px-3 py-1 rounded border border-gray-300 dark:border-gray-600 bg-gray-300 dark:bg-gray-600 text-black dark:text-white hover:bg-blue-500 hover:text-white transition">
                             Current Season
                         </a>
                     @endif
@@ -34,12 +34,12 @@
 
                 <div class="flex space-x-2 mt-2 md:mt-0">
                     <a href="{{ route('anime.category', ['category' => 'seasonal', 'view' => request('view')] + request()->except('type')) }}"
-                       class="px-2 py-1 rounded {{ !$animeTypeId ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600' }}">
+                       class="px-2 py-1 rounded {{ !$animeTypeId ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 hover:text-white' }}">
                         All
                     </a>
                     @foreach ($animeTypes as $type)
                         <a href="{{ route('anime.category', ['category' => 'seasonal', 'view' => request('view'), 'type' => $type->id] + request()->except('type')) }}"
-                           class="px-2 py-1 rounded {{ $animeTypeId == $type->id ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600' }}">
+                           class="px-2 py-1 rounded {{ $animeTypeId == $type->id ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 hover:text-white' }}">
                             {{ $type->type }}
                         </a>
                     @endforeach
@@ -49,12 +49,12 @@
             <div class="flex justify-between items-center mt-4 mb-4 flex-wrap">
                 <div class="flex space-x-2 mt-2 md:mt-0">
                     <a href="{{ route('anime.category', ['category' => request('category'), 'view' => request('view')] + request()->except('type')) }}"
-                       class="px-2 py-1 rounded {{ !$animeTypeId ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600' }}">
+                       class="px-2 py-1 rounded {{ !$animeTypeId ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 hover:text-white' }}">
                         All
                     </a>
                     @foreach ($animeTypes as $type)
                         <a href="{{ route('anime.category', ['category' => request('category'), 'view' => request('view'), 'type' => $type->id] + request()->except('type')) }}"
-                           class="px-2 py-1 rounded {{ $animeTypeId == $type->id ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600' }}">
+                           class="px-2 py-1 rounded {{ $animeTypeId == $type->id ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 hover:text-white' }}">
                             {{ $type->type }}
                         </a>
                     @endforeach
@@ -64,7 +64,7 @@
         @if ($category === 'seasonal' || $category === 'all')
             <div x-data="{ showFilters: false }" class="mb-4">
                 <button @click="showFilters = !showFilters"
-                    class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                    class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-black dark:text-white rounded hover:bg-blue-500 hover:text-white">
                     Filters
                 </button>
 
@@ -255,7 +255,7 @@
         }
     </script>
     <style>
-        /* Hide any x-cloak elements by default on page load */
+        /* Hide any x-cloak elements by default (on page load) */
         [x-cloak] { display: none !important; }
     </style>
 </x-app-layout>
