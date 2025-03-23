@@ -61,6 +61,39 @@
                 </div>
             </div>
         @endif
+        @if ($category === 'seasonal' || $category === 'all')
+            <div x-data="{ showFilters: false }" class="mb-4">
+                <button @click="showFilters = !showFilters"
+                    class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                    Filters
+                </button>
+
+                <form method="GET" id="category-filter-form" action="{{ route('anime.category', ['category' => $category]) }}"
+                      x-show="showFilters"
+                      x-transition
+                      class="mt-4 flex flex-wrap gap-2">
+
+                    @foreach ($allCategories as $cat)
+                        <label class="inline-flex items-center space-x-1">
+                            <input type="checkbox" class="category-checkbox text-blue-600 mr-1 ml-2" value="{{ $cat }}"
+                                   {{ in_array($cat, explode(',', request()->get('categories', ''))) ? 'checked' : '' }}>
+                            <span>{{ $cat }}</span>
+                        </label>
+                    @endforeach
+
+                    @foreach (request()->except('categories') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+
+                    <input type="hidden" name="categories" id="category-string">
+
+                    <button type="submit"
+                            class="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Filter
+                    </button>
+                </form>
+            </div>
+        @endif
     </x-slot>
 
     <div class="py-12">
@@ -209,5 +242,15 @@
             url.searchParams.set('sort', selectedSort);
             window.location.href = url.toString();
         });
+        const filterForm = document.getElementById('category-filter-form');
+        const filterCategoryString = document.getElementById('category-string');
+
+        if (filterForm && filterCategoryString) {
+            filterForm.addEventListener('submit', () => {
+                const selected = Array.from(document.querySelectorAll('.category-checkbox:checked'))
+                    .map(el => el.value);
+                filterCategoryString.value = selected.join(',');
+            });
+        }
     </script>
 </x-app-layout>

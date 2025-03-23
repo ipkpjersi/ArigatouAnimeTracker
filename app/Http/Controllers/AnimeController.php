@@ -305,76 +305,7 @@ class AnimeController extends Controller
 
     public function categories()
     {
-        $categories = [
-            'Action',
-            'Adventure',
-            'Avant Garde',
-            'Award Winning',
-            'Boys Love',
-            'Comedy',
-            'Drama',
-            'Fantasy',
-            'Girls Love',
-            'Gourmet',
-            'Horror',
-            'Mystery',
-            'Romance',
-            'Sci-Fi',
-            'Slice of Life',
-            'Sports',
-            'Supernatural',
-            'Suspense',
-            'Adult Cast',
-            'Anthropomorphic',
-            'CGDCT',
-            'Childcare',
-            'Combat Sports',
-            'Crossdressing',
-            'Delinquents',
-            'Detective',
-            'Educational',
-            'Gag Humor',
-            'Gore',
-            'Harem',
-            'High Stakes Game',
-            'Historical',
-            'Idols (Female)',
-            'Idols (Male)',
-            'Isekai',
-            'Iyashikei',
-            'Love Polygon',
-            'Magical Sex Shift',
-            'Mahou Shoujo',
-            'Martial Arts',
-            'Mecha',
-            'Medical',
-            'Military',
-            'Music',
-            'Mythology',
-            'Organized Crime',
-            'Otaku Culture',
-            'Parody',
-            'Performing Arts',
-            'Pets',
-            'Psychological',
-            'Racing',
-            'Reincarnation',
-            'Reverse Harem',
-            'Romantic Subtext',
-            'Samurai',
-            'School',
-            'Showbiz',
-            'Space',
-            'Strategy Game',
-            'Super Power',
-            'Survival',
-            'Team Sports',
-            'Time Travel',
-            'Vampire',
-            'Video Game',
-            'Visual Arts',
-            'Workplace',
-        ];
+        $categories = Anime::categoriesList();
 
         return view('categories', compact('categories'));
     }
@@ -384,6 +315,7 @@ class AnimeController extends Controller
         $category = strtolower($category);
         $isSeasonal = $category === 'seasonal';
         $selectedCategories = $request->get('categories', []);
+        $allCategories = Anime::categoriesList();
 
         if (!$request->route('view') && auth()->user()) {
             $view = auth()->user()->display_anime_cards ? 'card' : 'list';
@@ -476,6 +408,7 @@ class AnimeController extends Controller
             'paginationSeasons',
             'calendarSeason',
             'calendarYear',
+            'allCategories'
         ));
     }
 
