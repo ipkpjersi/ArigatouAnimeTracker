@@ -170,8 +170,8 @@
                                         </a>
                                     </div>
                                     <div class="flex items-center relative z-20">
-                                        <span class="text-sm dark:text-gray-300 flex-1">MAL Score: {{ $anime->mal_mean ?? "N/A" }}</span>
-                                        <span class="text-sm dark:text-gray-300 flex-1">MAL Members: {{ $anime->mal_list_members ?? "N/A" }}</span>
+                                        <span class="text-sm dark:text-gray-300">MAL Score: <span class="whitespace-nowrap">{{ $anime->mal_mean ?? "N/A" }}</span></span>
+                                        <span class="text-sm dark:text-gray-300">MAL Members: <span class="whitespace-nowrap">{{ $anime->mal_list_members ?? "N/A" }}</span></span>
                                         @if (Auth::user())
                                             @php
                                                 $userAnime = $anime->user->firstWhere('id', Auth::id());
