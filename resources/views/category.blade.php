@@ -139,7 +139,9 @@
                                         @if (Auth::user())
                                             <td>
                                                 @php
-                                                    $watchStatusId = $userAnimeStatuses[$anime->id] ?? null;
+                                                    $userAnime = $anime->user->firstWhere('id', Auth::id());
+                                                    $watchStatusId = $userAnime?->pivot->watch_status_id ?? null;
+                                                    $selectedStatus = $watchStatusId ? $watchStatuses[$watchStatusId] : null;
                                                 @endphp
                                                 <div class="no_dropdown_arrow_blank_select-wrapper @if ($watchStatusId === null) bg-blue-500 @else bg-gray-500 @endif">
                                                     <select
@@ -180,7 +182,7 @@
                                             @endphp
                                         <div class="no_dropdown_arrow_blank_select-wrapper @if ($watchStatusId === null) bg-blue-500 @else bg-gray-500 @endif">
                                             <select
-                                                class="text-sm text-white rounded p-1 flex-1 focus:outline-none z-50 update-anime-status no_dropdown_arrow_blank"
+                                                class="text-sm text-white rounded p-1 flex-1 focus:outline-none z-50 update-anime-status no_dropdown_arrow_blank_nowidth"
                                                 data-anime-id="{{ $anime->id }}"
                                             >
                                                 <option value="0">{{ 'Add to List' }}</option>
