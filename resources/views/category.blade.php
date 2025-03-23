@@ -68,7 +68,7 @@
                     Filters
                 </button>
 
-                <form method="GET" id="category-filter-form" action="{{ route('anime.category', ['category' => $category]) }}"
+                <form method="GET" id="category-filter-form" action="{{ route('anime.category', ['category' => $category, 'view' => request('view')]) }}"
                       x-show="showFilters"
                       x-transition
                       class="mt-4 flex flex-wrap gap-2">
