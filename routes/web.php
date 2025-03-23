@@ -55,6 +55,16 @@ Route::get('/animelist-v2/data/{username}', [AnimeController::class, 'getUserAni
 
 Route::get('/top-anime', [AnimeController::class, 'topAnime'])->name('anime.top')->middleware('2fa');
 
+//We could just redirect to the seasonal category, but a masked route is probably better.
+/*Route::get('/seasonal', function () {
+    return redirect()->route('anime.category', ['category' => 'seasonal']);
+})->name('anime.seasonal')->middleware('2fa');*/
+
+Route::get('/seasonal/{view?}', [AnimeController::class, 'category'])
+    ->name('anime.seasonal')
+    ->defaults('category', 'seasonal')
+    ->middleware('2fa');
+
 Route::get('/categories', [AnimeController::class, 'categories'])->name('anime.categories')->middleware('2fa');
 
 Route::get('/category/{category}/{view?}', [AnimeController::class, 'category'])->name('anime.category')->middleware('2fa');

@@ -35,6 +35,9 @@
                                 <x-dropdown-link href="{{ route('anime.top') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-600">
                                     {{ __('Top Anime') }}
                                 </x-dropdown-link>
+                                <x-dropdown-link href="{{ route('anime.seasonal') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-600">
+                                    {{ __('Seasonal Anime') }}
+                                </x-dropdown-link>
                             </x-slot>
                         </x-dropdown>
                     </div>

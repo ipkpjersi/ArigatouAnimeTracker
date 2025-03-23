@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Anime;
 use App\Models\AnimeReview;
+use App\Models\AnimeType;
 use App\Models\User;
 use App\Models\WatchStatus;
 use App\Services\AnimeListExportService;
@@ -381,25 +382,41 @@ class AnimeController extends Controller
     public function category(Request $request, $category, $view = 'card')
     {
         $category = strtolower($category);
+        $isSeasonal = $category === 'seasonal';
 
-        if (! $request->route('view') && auth()->user()) {
+        if (!$request->route('view') && auth()->user()) {
             $view = auth()->user()->display_anime_cards ? 'card' : 'list';
         }
 
-        $query = Anime::where(function ($query) use ($category) {
-            $query->whereRaw('LOWER(tags) LIKE ?', ["%$category%"]);
-        });
+        // Determine current season & year
+        $currentDate = Carbon::now();
+        $currentYear = $request->get('year') ?? $currentDate->year;
+        $currentSeason = strtoupper($request->get('season') ?? $this->getCurrentSeason($currentDate));
+        $calendarYear = $currentDate->year;
+        $calendarSeason = $this->getCurrentSeason($currentDate);
 
-        $query = $query->selectRaw('*,
-            CASE WHEN season = "UNDEFINED" THEN "UNKNOWN" ELSE season END as season_display,
-            CASE season
-                WHEN "SPRING" THEN 1
-                WHEN "SUMMER" THEN 2
-                WHEN "FALL" THEN 3
-                WHEN "WINTER" THEN 4
-                ELSE 0
-            END as season_sort'
-        );
+        $animeTypeId = $request->get('type');
+
+        $query = Anime::query();
+
+        if ($isSeasonal) {
+            $query->where('season', $currentSeason)->where('year', $currentYear);
+        } else {
+            $query->whereRaw('LOWER(tags) LIKE ?', ["%$category%"]);
+        }
+
+        if ($animeTypeId) {
+            $query->where('anime_type_id', $animeTypeId);
+        }
+
+        $query->selectRaw('*, CASE WHEN season = "UNDEFINED" THEN "UNKNOWN" ELSE season END as season_display')
+              ->addSelect(DB::raw("CASE season
+                  WHEN 'SPRING' THEN 1
+                  WHEN 'SUMMER' THEN 2
+                  WHEN 'FALL' THEN 3
+                  WHEN 'WINTER' THEN 4
+                  ELSE 0
+              END as season_sort"));
 
         $sort = $request->get('sort', 'mal_mean');
 
@@ -418,9 +435,8 @@ class AnimeController extends Controller
                 break;
         }
 
-        if (auth()->user() == null || auth()->user()->show_adult_content == false) {
-            // No need for this to be plain-text, so we'll use rot13.
-            $query = $query->where('tags', 'NOT LIKE', '%'.str_rot13('uragnv').'%');
+        if (auth()->guest() || auth()->user()->show_adult_content == false) {
+            $query->where('tags', 'NOT LIKE', '%'.str_rot13('uragnv').'%');
         }
 
         $query->with(['user' => function ($query) {
@@ -429,15 +445,59 @@ class AnimeController extends Controller
             }
         }]);
 
-        $categoryAnime = $query->paginate(50)->appends(['sort' => $sort]);
+        $categoryAnime = $query->paginate(50)->appends($request->query());
         $watchStatuses = WatchStatus::all()->keyBy('id');
+        $animeTypes = AnimeType::all();
 
-        return view('category', [
-            'categoryAnime' => $categoryAnime,
-            'category' => ucfirst($category),
-            'viewType' => $view,
-            'watchStatuses' => $watchStatuses,
-        ]);
+        // For seasonal view: compute previous and next season/year
+        $paginationSeasons = $isSeasonal ? $this->getSeasonPagination($currentSeason, $currentYear) : null;
+
+        return view('category', compact(
+            'categoryAnime',
+            'category',
+            'view',
+            'watchStatuses',
+            'animeTypes',
+            'isSeasonal',
+            'currentSeason',
+            'currentYear',
+            'animeTypeId',
+            'paginationSeasons',
+            'calendarSeason',
+            'calendarYear',
+        ));
+    }
+
+    private function getCurrentSeason($date): string
+    {
+        $month = $date->month;
+        return match (true) {
+            $month >= 3 && $month <= 5 => 'SPRING',
+            $month >= 6 && $month <= 8 => 'SUMMER',
+            $month >= 9 && $month <= 11 => 'FALL',
+            default => 'WINTER',
+        };
+    }
+
+    private function getSeasonPagination($season, $year)
+    {
+        $seasons = ['WINTER', 'SPRING', 'SUMMER', 'FALL'];
+        $currentIndex = array_search($season, $seasons);
+
+        $prevIndex = ($currentIndex - 1 + 4) % 4;
+        $nextIndex = ($currentIndex + 1) % 4;
+
+        $prevSeason = $seasons[$prevIndex];
+        $nextSeason = $seasons[$nextIndex];
+
+        $prevYear = ($prevSeason === 'FALL' && $season === 'WINTER') ? $year - 1 : $year;
+        $nextYear = ($nextSeason === 'WINTER' && $season === 'FALL') ? $year + 1 : $year;
+
+        return [
+            'prev' => ['season' => $prevSeason, 'year' => $prevYear],
+            'current' => ['season' => $season, 'year' => $year],
+            'next' => ['season' => $nextSeason, 'year' => $nextYear],
+        ];
     }
 
     public function userAnimeList(Request $request, $username)
