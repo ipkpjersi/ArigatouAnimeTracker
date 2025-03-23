@@ -71,6 +71,7 @@
                 <form method="GET" id="category-filter-form" action="{{ route('anime.category', ['category' => $category, 'view' => request('view')]) }}"
                       x-show="showFilters"
                       x-transition
+                      x-cloak
                       class="mt-4 flex flex-wrap gap-2">
 
                     @foreach ($allCategories as $cat)
@@ -253,4 +254,8 @@
             });
         }
     </script>
+    <style>
+        /* Hide any x-cloak elements by default on page load */
+        [x-cloak] { display: none !important; }
+    </style>
 </x-app-layout>
