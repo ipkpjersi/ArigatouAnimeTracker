@@ -383,6 +383,7 @@ class AnimeController extends Controller
     {
         $category = strtolower($category);
         $isSeasonal = $category === 'seasonal';
+        $selectedCategories = $request->get('categories', []);
 
         if (!$request->route('view') && auth()->user()) {
             $view = auth()->user()->display_anime_cards ? 'card' : 'list';
@@ -399,14 +400,24 @@ class AnimeController extends Controller
 
         $query = Anime::query();
 
-        if ($isSeasonal) {
-            $query->where('season', $currentSeason)->where('year', $currentYear);
-        } else {
-            $query->whereRaw('LOWER(tags) LIKE ?', ["%$category%"]);
-        }
-
         if ($animeTypeId) {
             $query->where('anime_type_id', $animeTypeId);
+        }
+
+        if ($isSeasonal || $category === 'all') {
+            if ($isSeasonal) {
+                $query->where('season', $currentSeason)->where('year', $currentYear);
+            }
+            if ($selectedCategories) {
+                if (is_string($selectedCategories)) {
+                    $selectedCategories = explode(',', $selectedCategories);
+                }
+                foreach ($selectedCategories as $cat) {
+                    $query->whereRaw('LOWER(tags) LIKE ?', ['%' . strtolower($cat) . '%']);
+                }
+            }
+        } else {
+            $query->whereRaw('LOWER(tags) LIKE ?', ["%$category%"]);
         }
 
         $query->selectRaw('*, CASE WHEN season = "UNDEFINED" THEN "UNKNOWN" ELSE season END as season_display')
