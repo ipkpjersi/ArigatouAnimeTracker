@@ -163,6 +163,12 @@
                 <x-responsive-nav-link :href="route('anime.top')">
                     {{ __('Top Anime') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('anime.seasonal')">
+                    {{ __('Seasonal Anime') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('anime.category', ['category' => 'all'])">
+                    {{ __('All Anime') }}
+                </x-responsive-nav-link>
             </div>
             <x-responsive-nav-link href="{{ route('users.list') }}" :active="request()->routeIs('users.list')">
                 {{ __('Users') }}
