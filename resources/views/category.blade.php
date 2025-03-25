@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="title">
-        {{ config('app.name', 'Laravel') }} - {{ $category }} Anime
+        {{ config('app.name', 'Laravel') }} - {{ ucwords($category) }} Anime
     </x-slot>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ $category }} Anime
+            {{ ucwords($category) }} Anime
         </h2>
         <a href="{{ route('anime.category', ['category' => $category, 'view' => 'list'] + request()->query()) }}">List View</a> |
         <a href="{{ route('anime.category', ['category' => $category, 'view' => 'card'] + request()->query()) }}">Card View</a>
@@ -15,6 +15,86 @@
             <option value="newest" {{ request()->get('sort') == 'newest' ? 'selected' : '' }}>Newest</option>
             <option value="title" {{ request()->get('sort') == 'title' ? 'selected' : '' }}>Title</option>
         </select>
+        @if ($isSeasonal)
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-4 mb-4 gap-4">
+                <div class="flex flex-col space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0">
+                    @foreach ($paginationSeasons as $key => $seasonData)
+                        <a href="{{ route('anime.category', ['category' => 'seasonal', 'season' => $seasonData['season'], 'year' => $seasonData['year'], 'view' => request('view')] + request()->except(['season', 'year'])) }}"
+                           class="inline-flex w-fit px-3 py-1 rounded {{ $key === 'current' ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 hover:text-white' }}">
+                            {{ ucfirst(strtolower($seasonData['season'])) }} {{ $seasonData['year'] }}
+                        </a>
+                    @endforeach
+                    @if (!($currentSeason === $calendarSeason && $currentYear == $calendarYear))
+                        <a href="{{ route('anime.category', ['category' => 'seasonal', 'view' => request('view')] + request()->except(['season', 'year'])) }}"
+                           class="inline-flex w-fit px-3 py-1 rounded border border-gray-300 dark:border-gray-600 bg-gray-300 dark:bg-gray-600 text-black dark:text-white hover:bg-blue-500 hover:text-white transition">
+                            Current Season
+                        </a>
+                    @endif
+                </div>
+
+                <div class="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0 mt-2 md:mt-0">
+                    <a href="{{ route('anime.category', ['category' => 'seasonal', 'view' => request('view')] + request()->except('type')) }}"
+                       class="inline-flex w-fit px-2 py-1 rounded {{ !$animeTypeId ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 hover:text-white' }}">
+                        All
+                    </a>
+                    @foreach ($animeTypes as $type)
+                        <a href="{{ route('anime.category', ['category' => 'seasonal', 'view' => request('view'), 'type' => $type->id] + request()->except('type')) }}"
+                           class="inline-flex w-fit px-2 py-1 rounded {{ $animeTypeId == $type->id ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 hover:text-white' }}">
+                            {{ $type->type }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @else
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-4 mb-4 gap-4">
+                <div class="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0 mt-2 md:mt-0">
+                    <a href="{{ route('anime.category', ['category' => request('category'), 'view' => request('view')] + request()->except('type')) }}"
+                       class="inline-flex w-fit px-2 py-1 rounded {{ !$animeTypeId ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 hover:text-white' }}">
+                        All
+                    </a>
+                    @foreach ($animeTypes as $type)
+                        <a href="{{ route('anime.category', ['category' => request('category'), 'view' => request('view'), 'type' => $type->id] + request()->except('type')) }}"
+                           class="inline-flex w-fit px-2 py-1 rounded {{ $animeTypeId == $type->id ? 'bg-blue-600 text-white' : 'bg-gray-300 dark:bg-gray-600 hover:bg-blue-500 hover:text-white' }}">
+                            {{ $type->type }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+        @if ($category === 'seasonal' || $category === 'all')
+            <div x-data="{ showFilters: false }" class="mb-4">
+                <button @click="showFilters = !showFilters"
+                    class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-black dark:text-white rounded hover:bg-blue-500 hover:text-white">
+                    Filters
+                </button>
+
+                <form method="GET" id="category-filter-form" action="{{ route('anime.category', ['category' => $category, 'view' => request('view')]) }}"
+                      x-show="showFilters"
+                      x-transition
+                      x-cloak
+                      class="mt-4 flex flex-wrap gap-2">
+
+                    @foreach ($allCategories as $cat)
+                        <label class="inline-flex items-center space-x-1">
+                            <input type="checkbox" class="category-checkbox text-blue-600 mr-1 ml-2" value="{{ $cat }}"
+                                   {{ in_array($cat, explode(',', request()->get('categories', ''))) ? 'checked' : '' }}>
+                            <span>{{ $cat }}</span>
+                        </label>
+                    @endforeach
+
+                    @foreach (request()->except('categories') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+
+                    <input type="hidden" name="categories" id="category-string">
+
+                    <button type="submit"
+                            class="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Filter
+                    </button>
+                </form>
+            </div>
+        @endif
     </x-slot>
 
     <div class="py-12">
@@ -27,7 +107,7 @@
                       </div>
                     </div>
 
-                    @if ($viewType === 'list')
+                    @if ($view === 'list')
                         <table class="w-full">
                             <thead>
                                 <tr class="text-left">
@@ -59,7 +139,9 @@
                                         @if (Auth::user())
                                             <td>
                                                 @php
-                                                    $watchStatusId = $userAnimeStatuses[$anime->id] ?? null;
+                                                    $userAnime = $anime->user->firstWhere('id', Auth::id());
+                                                    $watchStatusId = $userAnime?->pivot->watch_status_id ?? null;
+                                                    $selectedStatus = $watchStatusId ? $watchStatuses[$watchStatusId] : null;
                                                 @endphp
                                                 <div class="no_dropdown_arrow_blank_select-wrapper @if ($watchStatusId === null) bg-blue-500 @else bg-gray-500 @endif">
                                                     <select
@@ -90,8 +172,8 @@
                                         </a>
                                     </div>
                                     <div class="flex items-center relative z-20">
-                                        <span class="text-sm dark:text-gray-300 flex-1">MAL Score: {{ $anime->mal_mean ?? "N/A" }}</span>
-                                        <span class="text-sm dark:text-gray-300 flex-1">MAL Members: {{ $anime->mal_list_members ?? "N/A" }}</span>
+                                        <span class="text-sm dark:text-gray-300">MAL Score: <span class="whitespace-nowrap">{{ $anime->mal_mean ?? "N/A" }}</span></span>
+                                        <span class="text-sm dark:text-gray-300">MAL Members: <span class="whitespace-nowrap">{{ $anime->mal_list_members ?? "N/A" }}</span></span>
                                         @if (Auth::user())
                                             @php
                                                 $userAnime = $anime->user->firstWhere('id', Auth::id());
@@ -100,7 +182,7 @@
                                             @endphp
                                         <div class="no_dropdown_arrow_blank_select-wrapper @if ($watchStatusId === null) bg-blue-500 @else bg-gray-500 @endif">
                                             <select
-                                                class="text-sm text-white rounded p-1 flex-1 focus:outline-none z-50 update-anime-status no_dropdown_arrow_blank"
+                                                class="text-sm text-white rounded p-1 flex-1 focus:outline-none z-50 update-anime-status no_dropdown_arrow_blank_nowidth"
                                                 data-anime-id="{{ $anime->id }}"
                                             >
                                                 <option value="0">{{ 'Add to List' }}</option>
@@ -163,5 +245,19 @@
             url.searchParams.set('sort', selectedSort);
             window.location.href = url.toString();
         });
+        const filterForm = document.getElementById('category-filter-form');
+        const filterCategoryString = document.getElementById('category-string');
+
+        if (filterForm && filterCategoryString) {
+            filterForm.addEventListener('submit', () => {
+                const selected = Array.from(document.querySelectorAll('.category-checkbox:checked'))
+                    .map(el => el.value);
+                filterCategoryString.value = selected.join(',');
+            });
+        }
     </script>
+    <style>
+        /* Hide any x-cloak elements by default (on page load) */
+        [x-cloak] { display: none !important; }
+    </style>
 </x-app-layout>

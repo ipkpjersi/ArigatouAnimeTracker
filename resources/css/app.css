@@ -51,6 +51,16 @@
   color: white;
 }
 
+.no_dropdown_arrow_blank_nowidth {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0.5em;
+  color: white;
+}
+
 
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button,
 .dark .dataTables_paginate.paging_simple_numbers a.paginate_button.previous.disabled,
