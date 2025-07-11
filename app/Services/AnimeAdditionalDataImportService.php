@@ -145,7 +145,7 @@ class AnimeAdditionalDataImportService
                     $response = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId);
                     if ($response && $response->successful()) {
                         $data = $response->json();
-                        $description = $data['data']['attributes']['synopsis'] ?? null;
+                        $description = $data['data']['attributes']['synopsis'] ?? null; //There seems to be a synopsis variable and a description variable, but their API docs only mention synopsis so let's use synopsis for now.
                         $genresResponse = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId.'/genres');
                         $genresData = $genresResponse->json();
                         $genres = array_map(function ($genre) {
