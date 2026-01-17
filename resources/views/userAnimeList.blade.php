@@ -38,6 +38,9 @@
                                         @if ($show_anime_list_number)
                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">#</th>
                                         @endif
+                                        @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
+                                            <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 w-8"></th>
+                                        @endif
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Picture</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Name</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Type</th>
@@ -61,6 +64,9 @@
                                         @if ($show_anime_list_number)
                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">#</th>
                                         @endif
+                                        @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
+                                            <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 w-8"></th>
+                                        @endif
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Picture</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200">Name</th>
                                         <th class="py-2 px-4 border-b border-gray-200 text-left text-sm uppercase font-semibold text-gray-200 min-w-[70px]">Score</th>
@@ -80,13 +86,22 @@
                                         @endif
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="desktop-tbody">
                                     <!-- desktop design -->
                                     @foreach ($userAnime as $anime)
-                                        <tr id="desktop-row-{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}" class="hidden md:table-row">
+                                        <tr id="desktop-row-{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}" class="hidden md:table-row" data-anime-id="{{ $anime->id }}" data-watch-status="{{ $anime->pivot->watch_status_id }}">
                                             <input type="hidden" class="desktop-anime-ids desktop-only" name="anime_ids[]" value="{{ $anime->id }}">
                                             @if ($show_anime_list_number)
                                                 <td class="py-2 px-4 border-b border-gray-200">{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}</td>
+                                            @endif
+                                            @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
+                                                @php
+                                                    $completedStatusId = $watchStatuses->where('status', 'COMPLETED')->first()?->id;
+                                                    $isCompleted = $anime->pivot->watch_status_id == $completedStatusId;
+                                                @endphp
+                                                <td class="py-2 px-4 border-b border-gray-200 {{ $isCompleted ? 'drag-handle cursor-move hover:text-gray-400 text-gray-600 dark:text-gray-400 dark:hover:text-gray-300' : 'cursor-not-allowed text-gray-400 dark:text-gray-600' }}">
+                                                    <span class="text-xl">{{ $isCompleted ? '⋮⋮' : '•' }}</span>
+                                                </td>
                                             @endif
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 <img src="{{ $anime->picture }}" alt="{{ $anime->title }} thumbnail" width="50" height="50" onerror="this.onerror=null; this.src='{{ asset('img/notfound.gif') }}'">
@@ -167,12 +182,23 @@
                                             </td>
                                         </tr>
                                     @endforeach
+                                </tbody>
+                                <tbody id="mobile-tbody">
                                     <!-- mobile design -->
                                     @foreach ($userAnime as $anime)
-                                        <tr id="mobile-row-{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}" class="md:hidden mobile-only">
+                                        <tr id="mobile-row-{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}" class="md:hidden mobile-only" data-anime-id="{{ $anime->id }}" data-watch-status="{{ $anime->pivot->watch_status_id }}">
                                             <input type="hidden" class="mobile-anime-ids mobile-only" name="anime_ids[]" value="{{ $anime->id }}">
                                             @if ($show_anime_list_number)
                                                 <td class="py-2 px-4 border-b border-gray-200">{{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}</td>
+                                            @endif
+                                            @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
+                                                @php
+                                                    $completedStatusId = $watchStatuses->where('status', 'COMPLETED')->first()?->id;
+                                                    $isCompleted = $anime->pivot->watch_status_id == $completedStatusId;
+                                                @endphp
+                                                <td class="py-2 px-4 border-b border-gray-200 {{ $isCompleted ? 'drag-handle cursor-move hover:text-gray-400 text-gray-600 dark:text-gray-400 dark:hover:text-gray-300' : 'cursor-not-allowed text-gray-400 dark:text-gray-600' }}">
+                                                    <span class="text-xl">{{ $isCompleted ? '⋮⋮' : '•' }}</span>
+                                                </td>
                                             @endif
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 <img src="{{ $anime->picture }}" alt="{{ $anime->title }} thumbnail" width="50" height="50" onerror="this.onerror=null; this.src='{{ asset('img/notfound.gif') }}'">
@@ -310,8 +336,21 @@
             </div>
         </div>
     </div>
+    <style>
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #f3f4f6;
+        }
+        .sortable-drag {
+            cursor: grabbing !important;
+        }
+        .drag-handle {
+            touch-action: none;
+        }
+    </style>
     <script type="module">
         import '/js/jquery.doubleScroll.js';
+
         $(document).ready(function() {
             $('.double-scroll').doubleScroll();
 
@@ -345,7 +384,192 @@
             $(window).resize(function() {
                 toggleHiddenInputs();
             });
+
+            // Initialize drag-drop functionality
+            @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
+                initializeDragDrop();
+            @endif
         });
+
+        // Drag and drop functionality
+        let isDragging = false;
+        let isUpdating = false;
+
+        function initializeDragDrop() {
+            const desktopTbody = document.getElementById('desktop-tbody');
+            const mobileTbody = document.getElementById('mobile-tbody');
+
+            if (!desktopTbody || !mobileTbody) return;
+
+            const sortableOptions = {
+                animation: 150,
+                handle: '.drag-handle',
+                ghostClass: 'sortable-ghost',
+                dragClass: 'sortable-drag',
+                onStart: function() {
+                    isDragging = true;
+                },
+                onEnd: function(evt) {
+                    isDragging = false;
+                    const draggedTbody = evt.from;
+                    const isDraggingDesktop = draggedTbody.id === 'desktop-tbody';
+                    handleDragEnd(isDraggingDesktop);
+                }
+            };
+
+            // Create Sortable instances for both desktop and mobile
+            // Only completed anime have the .drag-handle class, so only they will be draggable
+            new window.Sortable(desktopTbody, sortableOptions);
+            new window.Sortable(mobileTbody, sortableOptions);
+        }
+
+        function getCompletedStatusId() {
+            // Try to find a row with the drag-handle class (which only completed anime have)
+            const firstCompletedRow = document.querySelector('tr[data-watch-status]');
+            if (!firstCompletedRow) return null;
+
+            // Get all watch status options from the select dropdown
+            const selectElement = document.querySelector('select[name="watch_status_id[]"]');
+            if (!selectElement) return null;
+
+            // Find the COMPLETED option
+            const completedOption = Array.from(selectElement.options).find(
+                option => option.text.trim().toUpperCase() === 'COMPLETED'
+            );
+
+            return completedOption ? completedOption.value : null;
+        }
+
+        function handleDragEnd(isDraggingDesktop) {
+            if (isUpdating) return;
+            isUpdating = true;
+
+            try {
+                // Get the tbody that was dragged
+                const sourceTbody = isDraggingDesktop
+                    ? document.getElementById('desktop-tbody')
+                    : document.getElementById('mobile-tbody');
+
+                // Get the other tbody
+                const targetTbody = isDraggingDesktop
+                    ? document.getElementById('mobile-tbody')
+                    : document.getElementById('desktop-tbody');
+
+                // Get new order of anime IDs from the dragged tbody (all anime, not just completed)
+                const rows = Array.from(sourceTbody.querySelectorAll('tr'));
+                const animeIds = rows.map(row => parseInt(row.dataset.animeId));
+
+                // Get completed status ID for filtering
+                const completedStatusId = getCompletedStatusId();
+
+                // Filter to only include completed anime IDs for saving
+                const completedAnimeIds = rows
+                    .filter(row => row.dataset.watchStatus == completedStatusId)
+                    .map(row => parseInt(row.dataset.animeId));
+
+                // Synchronize the other tbody
+                synchronizeTbody(targetTbody, animeIds);
+
+                // Update sort_order inputs in both tbodies (only for completed anime)
+                updateSortOrderInputs(sourceTbody, completedAnimeIds);
+                updateSortOrderInputs(targetTbody, completedAnimeIds);
+
+                // Send AJAX request to backend (only completed anime)
+                saveNewOrder(completedAnimeIds);
+            } finally {
+                isUpdating = false;
+            }
+        }
+
+        function synchronizeTbody(tbody, animeIds) {
+            // Create a map of anime ID to row element
+            const rowMap = new Map();
+            Array.from(tbody.querySelectorAll('tr')).forEach(row => {
+                rowMap.set(parseInt(row.dataset.animeId), row);
+            });
+
+            // Reorder rows to match the animeIds order
+            animeIds.forEach(animeId => {
+                const row = rowMap.get(animeId);
+                if (row) {
+                    tbody.appendChild(row); // Moves the row to the end
+                }
+            });
+        }
+
+        function updateSortOrderInputs(tbody, completedAnimeIds) {
+            const currentPage = {{ $userAnime->currentPage() }};
+            const perPage = {{ $userAnime->perPage() }};
+            const pageOffset = (currentPage - 1) * perPage;
+
+            // Get all rows in their current order
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const completedStatusId = getCompletedStatusId();
+
+            // Counter for completed anime position
+            let completedPosition = 0;
+
+            rows.forEach((row) => {
+                const animeId = parseInt(row.dataset.animeId);
+                const watchStatus = row.dataset.watchStatus;
+                const sortOrderInput = row.querySelector('[name="sort_order[]"]');
+
+                if (sortOrderInput && watchStatus == completedStatusId) {
+                    // Only update sort_order for completed anime
+                    sortOrderInput.value = pageOffset + completedPosition + 1;
+                    completedPosition++;
+                }
+            });
+        }
+
+        function saveNewOrder(animeIds) {
+            const currentPage = {{ $userAnime->currentPage() }};
+            const perPage = {{ $userAnime->perPage() }};
+            const pageOffset = (currentPage - 1) * perPage;
+            const username = '{{ $username }}';
+
+            // Show loading indicator (optional)
+            const saveBtn = document.querySelector('button[type="submit"]');
+            const originalBtnText = saveBtn ? saveBtn.textContent : '';
+            if (saveBtn) {
+                saveBtn.textContent = 'Saving...';
+                saveBtn.disabled = true;
+            }
+
+            axios.post(`/animelist/${username}/reorder`, {
+                anime_ids: animeIds,
+                page_offset: pageOffset,
+                _token: '{{ csrf_token() }}'
+            })
+            .then(function(response) {
+                // Success - show brief success message
+                if (saveBtn) {
+                    saveBtn.textContent = 'Saved!';
+                    setTimeout(() => {
+                        saveBtn.textContent = originalBtnText;
+                        saveBtn.disabled = false;
+                    }, 2000);
+                }
+            })
+            .catch(function(error) {
+                console.error('Error updating order:', error);
+                alert('Failed to save new order. Please try again or refresh the page.');
+
+                // Restore button
+                if (saveBtn) {
+                    saveBtn.textContent = originalBtnText;
+                    saveBtn.disabled = false;
+                }
+
+                // Optionally reload the page to revert to server state
+                // location.reload();
+            });
+        }
+
+        // Make functions available globally for inline onclick handlers
+        window.getCompletedStatusId = getCompletedStatusId;
+        window.updateSortOrderInputs = updateSortOrderInputs;
+        window.saveNewOrder = saveNewOrder;
     </script>
     <script>
         function deleteAnime(animeId, event) {
@@ -500,28 +724,74 @@
         });
         function swapAndSubmitSortOrder(animeId, direction) {
             event.preventDefault(); // Prevent default form submission
-            const currentRow = document.getElementById(`desktop-row-${animeId}`);
+
+            const desktopRow = document.getElementById(`desktop-row-${animeId}`);
+            const mobileRow = document.getElementById(`mobile-row-${animeId}`);
+
+            if (!desktopRow) return;
+
+            const completedStatusId = window.getCompletedStatusId();
+            const currentWatchStatus = desktopRow.dataset.watchStatus;
+
+            // Only allow swapping for completed anime
+            if (currentWatchStatus != completedStatusId) {
+                return;
+            }
+
+            // Determine which tbody to work with
+            const tbody = desktopRow.parentElement;
+            const currentRow = desktopRow;
             const adjacentRow = direction === 'up' ? currentRow.previousElementSibling : currentRow.nextElementSibling;
-            const currentSortOrderInput = currentRow.querySelector('[name="sort_order[]"]');
-            // If there's an adjacent row with a sort_order input, swap values
-            if (adjacentRow && adjacentRow.querySelector('[name="sort_order[]"]') && adjacentRow.querySelector('[name="sort_order[]"]').value > 0) {
-                const adjacentSortOrderInput = adjacentRow.querySelector('[name="sort_order[]"]');
-                // Parse the sort_order values as integers for proper comparison
-                const currentSortOrderValue = parseInt(currentSortOrderInput.value, 10);
-                const adjacentSortOrderValue = parseInt(adjacentSortOrderInput.value, 10);
-                    // Perform the swap
-                    currentSortOrderInput.value = adjacentSortOrderValue;
-                    adjacentSortOrderInput.value = currentSortOrderValue;
-            } /*else { //Comment this out since we only want to swap if there is an adjacent row, otherwise we end up with a list of two with a sort_order 4 followed by 5, clicking up on sort_order 4 results in both getting 5.
-                // Adjust the sort_order for the current row if there's no adjacent row
+
+            // If there's no adjacent row, do nothing
+            if (!adjacentRow) return;
+
+            // Only swap with completed anime
+            const adjacentWatchStatus = adjacentRow.dataset.watchStatus;
+            if (adjacentWatchStatus != completedStatusId) {
+                return;
+            }
+
+            // Swap the rows in the DOM
+            if (direction === 'up') {
+                tbody.insertBefore(currentRow, adjacentRow);
+            } else {
+                tbody.insertBefore(adjacentRow, currentRow);
+            }
+
+            // Get the corresponding mobile tbody and perform the same swap
+            const mobileTbody = document.getElementById('mobile-tbody');
+            const currentMobileAnimeId = currentRow.dataset.animeId;
+            const adjacentMobileAnimeId = adjacentRow.dataset.animeId;
+
+            const currentMobileRow = Array.from(mobileTbody.querySelectorAll('tr')).find(
+                row => row.dataset.animeId === currentMobileAnimeId
+            );
+            const adjacentMobileRow = Array.from(mobileTbody.querySelectorAll('tr')).find(
+                row => row.dataset.animeId === adjacentMobileAnimeId
+            );
+
+            if (currentMobileRow && adjacentMobileRow) {
                 if (direction === 'up') {
-                    currentSortOrderInput.value = Math.max(1, (parseInt(currentSortOrderInput.value) || 0) + 1);
-                } else { // Assuming 'down' direction should also not decrease below 1
-                    currentSortOrderInput.value = Math.max(1, (parseInt(currentSortOrderInput.value) || 0) - 1);
+                    mobileTbody.insertBefore(currentMobileRow, adjacentMobileRow);
+                } else {
+                    mobileTbody.insertBefore(adjacentMobileRow, currentMobileRow);
                 }
-            }*/
-            // Submit the form to update the server
-            currentRow.closest('form').submit();
+            }
+
+            // Get new order and update (only completed anime)
+            const desktopTbody = document.getElementById('desktop-tbody');
+            const rows = Array.from(desktopTbody.querySelectorAll('tr'));
+            const completedAnimeIds = rows
+                .filter(row => row.dataset.watchStatus == completedStatusId)
+                .map(row => parseInt(row.dataset.animeId));
+
+            // Update sort_order inputs (only for completed anime)
+            window.updateSortOrderInputs(desktopTbody, completedAnimeIds);
+            window.updateSortOrderInputs(mobileTbody, completedAnimeIds);
+
+            // Save to server via AJAX (only completed anime)
+            window.saveNewOrder(completedAnimeIds);
         }
     </script>
 </x-app-layout>

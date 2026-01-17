@@ -888,4 +888,55 @@ class AnimeController extends Controller
             'local_thumbnail_url' => $anime->getLocalThumbnailUrl(),
         ]);
     }
+
+    /**
+     * Reorder anime list via AJAX drag-and-drop
+     * Only allows reordering for COMPLETED anime
+     */
+    public function reorderUserAnimeList(Request $request, $username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+
+        // Validate user authorization
+        if (Auth::user() === null || strtolower(Auth::user()->username) !== strtolower($user->username)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $validatedData = $request->validate([
+            'anime_ids' => 'required|array',
+            'anime_ids.*' => 'required|integer|exists:anime,id',
+            'page_offset' => 'required|integer|min:0',
+        ]);
+
+        $animeIds = $validatedData['anime_ids'];
+        $pageOffset = $validatedData['page_offset'];
+
+        // Get the COMPLETED watch status ID
+        $completedStatusId = WatchStatus::where('status', 'COMPLETED')->first()->id;
+
+        // Update sort_order for each anime based on position in the array
+        // Only update if the anime is in the COMPLETED status
+        foreach ($animeIds as $position => $animeId) {
+            // Verify the anime belongs to the user and is COMPLETED
+            $animeUser = $user->anime()->where('anime_id', $animeId)->first();
+
+            if (!$animeUser || $animeUser->pivot->watch_status_id != $completedStatusId) {
+                // Skip non-completed anime
+                continue;
+            }
+
+            // Calculate sort_order: offset + position (1-indexed)
+            $newSortOrder = $pageOffset + $position + 1;
+
+            // Update the pivot table
+            $user->anime()->updateExistingPivot($animeId, [
+                'sort_order' => $newSortOrder,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order updated successfully',
+        ]);
+    }
 }

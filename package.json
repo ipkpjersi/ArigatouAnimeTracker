@@ -23,6 +23,7 @@
         "datatables.net-dt": "^1.13.6",
         "datatables.net-responsive": "^2.5.0",
         "datatables.net-responsive-dt": "^2.5.0",
-        "jquery": "^3.7.0"
+        "jquery": "^3.7.0",
+        "sortablejs": "^1.15.6"
     }
 }
