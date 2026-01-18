@@ -111,7 +111,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->anime_status?->status }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
-                                                    <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800  min-w-[100px] desktop-only" style="padding-right: 36px">
+                                                    <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800  min-w-[145px] desktop-only" style="padding-right: 36px">
                                                         <option value="">Pick a status...</option>
                                                         @foreach ($watchStatuses as $status)
                                                             <option value="{{ $status->id }}" @if ($anime->pivot->watch_status_id == $status->id) selected @endif>
