@@ -409,6 +409,19 @@
                 onStart: function() {
                     isDragging = true;
                 },
+                onMove: function(evt) {
+                    // Prevent dragging COMPLETED anime into non-completed sections
+                    const completedStatusId = getCompletedStatusId();
+                    const draggedStatus = evt.dragged.dataset.watchStatus;
+                    const relatedStatus = evt.related.dataset.watchStatus;
+
+                    // If dragging a completed anime, only allow dropping it next to other completed anime
+                    if (draggedStatus == completedStatusId && relatedStatus != completedStatusId) {
+                        return false;
+                    }
+
+                    return true;
+                },
                 onEnd: function(evt) {
                     isDragging = false;
                     const draggedTbody = evt.from;
