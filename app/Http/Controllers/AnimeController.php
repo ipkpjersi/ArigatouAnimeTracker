@@ -478,7 +478,7 @@ class AnimeController extends Controller
                                 ELSE NULL
                               END as notes
                          ', [Auth::user()->id ?? -1])
-            ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC');
+            ->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.watch_status_id DESC, anime_user.created_at ASC');
         if (! $showAllAnime) {
             $query = $query->where('anime_user.display_in_list', '=', 1);
         }
@@ -602,7 +602,7 @@ class AnimeController extends Controller
         }
         // TODO: fix non-default sorting, for example sorting by episodes doesn't work. Maybe add in sorting manually?
         if ($sortingMatchesDefault) {
-            $query->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.created_at ASC');
+            $query->orderByRaw('ISNULL(sort_order) ASC, sort_order ASC, score DESC, anime_user.watch_status_id DESC, anime_user.created_at ASC');
         }
         if ($request->has('status')) {
             $status = $request->input('status');
