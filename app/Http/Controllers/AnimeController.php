@@ -548,18 +548,43 @@ class AnimeController extends Controller
             $query = $query->where('anime_user.display_in_list', '=', Anime::$HIDE_ALL_ANIME_PUBLICLY_ID);
         }
         // We need to match the order we have in DataTables frontend.
+        // Note: Column indices account for drag handle column (added for owners viewing their own list)
+        $isOwner = Auth::user() != null && strtolower(Auth::user()->username) === strtolower($user->username);
+
         if (Auth::user() != null && Auth::user()->show_anime_list_number == 1) {
-            $defaultOrder = [
-                ['column' => 8, 'dir' => 'asc'],
-                ['column' => 7, 'dir' => 'asc'],
-                ['column' => 1, 'dir' => 'asc'],
-            ];
+            if ($isOwner) {
+                // Owner with number column: #, Drag, Picture, Name, Type, Status, Watch Status, Progress, Score, Sort Order, Episodes, Season, Year, Notes, Delete
+                // sort_order=9, score=8, picture=2
+                $defaultOrder = [
+                    ['column' => 9, 'dir' => 'asc'],
+                    ['column' => 8, 'dir' => 'asc'],
+                    ['column' => 2, 'dir' => 'asc'],
+                ];
+            } else {
+                // Non-owner with number column: #, Picture, Name, Type, Status, Watch Status, Progress, Score, Episodes, Season, Year, Notes
+                // score=7, picture=1 (no sort_order or drag handle for non-owners)
+                $defaultOrder = [
+                    ['column' => 7, 'dir' => 'asc'],
+                    ['column' => 1, 'dir' => 'asc'],
+                ];
+            }
         } else {
-            $defaultOrder = [
-                ['column' => 7, 'dir' => 'asc'],
-                ['column' => 6, 'dir' => 'asc'],
-                ['column' => 0, 'dir' => 'asc'],
-            ];
+            if ($isOwner) {
+                // Owner without number column: Drag, Picture, Name, Type, Status, Watch Status, Progress, Score, Sort Order, Episodes, Season, Year, Notes, Delete
+                // sort_order=8, score=7, picture=1
+                $defaultOrder = [
+                    ['column' => 8, 'dir' => 'asc'],
+                    ['column' => 7, 'dir' => 'asc'],
+                    ['column' => 1, 'dir' => 'asc'],
+                ];
+            } else {
+                // Non-owner without number column: Picture, Name, Type, Status, Watch Status, Progress, Score, Episodes, Season, Year, Notes
+                // score=6, picture=0
+                $defaultOrder = [
+                    ['column' => 6, 'dir' => 'asc'],
+                    ['column' => 0, 'dir' => 'asc'],
+                ];
+            }
         }
 
         $orderData = $request->has('order') ? $request->input('order') : [];
@@ -914,6 +939,8 @@ class AnimeController extends Controller
         // Get the COMPLETED watch status ID
         $completedStatusId = WatchStatus::where('status', 'COMPLETED')->first()->id;
 
+        $updated = [];
+
         // Update sort_order for each anime based on position in the array
         // Only update if the anime is in the COMPLETED status
         foreach ($animeIds as $position => $animeId) {
@@ -932,11 +959,19 @@ class AnimeController extends Controller
             $user->anime()->updateExistingPivot($animeId, [
                 'sort_order' => $newSortOrder,
             ]);
+
+            $updated[] = [
+                'anime_id' => $animeId,
+                'position' => $position,
+                'new_sort_order' => $newSortOrder,
+            ];
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Order updated successfully',
+            'updated_count' => count($updated),
+            'updated' => $updated,
         ]);
     }
 }
