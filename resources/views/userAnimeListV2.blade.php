@@ -36,6 +36,9 @@
                                     @if ($show_anime_list_number)
                                         <th>#</th>
                                     @endif
+                                    @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
+                                        <th class="w-8"></th>
+                                    @endif
                                     <th>Picture</th>
                                     <th>Name</th>
                                     <th>Type</th>
@@ -150,6 +153,18 @@
             currentRow.closest('form').submit();
         }
     </script>
+    <style>
+        .drag-handle {
+            cursor: move;
+            touch-action: none;
+        }
+        .drag-handle:hover {
+            color: #9ca3af;
+        }
+        .reorder-processing {
+            opacity: 0.4;
+        }
+    </style>
     <script type="module">
         import '/js/jquery.doubleScroll.js';
         import '/js/jquery.dataTables.yadcf.js';
@@ -157,10 +172,36 @@
         $(document).ready(function() {
             $('.double-scroll').doubleScroll();
             var watchStatusMap = @json($watchStatusMap);
+            var completedStatusId = null;
+            @foreach ($watchStatuses as $status)
+                @if ($status->status === 'COMPLETED')
+                    completedStatusId = {{ $status->id }};
+                @endif
+            @endforeach
+
             let columns = [];
             if ("{{ $show_anime_list_number }}" == "1") {
                 columns.push({ data: null, searchable: false, orderable: false, defaultContent: '', targets: 0 });
             }
+
+            // Add drag handle column for owner
+            if ('{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}') {
+                columns.push({
+                    data: 'watch_status_id',
+                    name: 'drag_handle',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        const isCompleted = data == completedStatusId;
+                        if (isCompleted) {
+                            return '<span class="drag-handle text-xl text-gray-600 dark:text-gray-400 hover:text-gray-400 dark:hover:text-gray-300" style="cursor: move;">⋮⋮</span>';
+                        } else {
+                            return '<span class="text-xl text-gray-400 dark:text-gray-600" style="cursor: not-allowed;">•</span>';
+                        }
+                    }
+                });
+            }
+
             columns.push(
                 { data: 'thumbnail', name: 'thumbnail', searchable: false, render: function(data, type, row) {
                     return '<span style="display:none">' + row.id  + '</span>' + '<img src="'+data+'" alt="'+row.title+' thumbnail" width="50" height="50" onerror="this.onerror=null; this.src=\'{{ asset('img/notfound.gif') }}\'">' + '<input type="hidden" name="anime_id[]" value="'+row.anime_id+'">';
@@ -297,19 +338,48 @@
             function initDataTable(scrollWidth) {
                 let colReorder = [];
                 let order = [];
-                if ("{{ $show_anime_list_number }}" == "1") {
-                    order = [[8, 'asc'], [7, 'asc'], [1, 'asc']];
-                 } else {
-                    order = [[7, 'asc'], [6, 'asc'], [0, 'asc']];
-                 }
-                if ($(window).width() <= 640) {
-                    if ("{{ $show_anime_list_number }}" == "1") {
-                        colReorder = [0, 1, 2, 7, 11, 10, 3, 4, 5, 6, 9, 8, 12, 13];
+                let isOwner = '{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}';
+                let hasNumberColumn = "{{ $show_anime_list_number }}" == "1";
+
+                // Adjust column indices based on whether owner is viewing (drag handle adds a column)
+                if (hasNumberColumn) {
+                    if (isOwner) {
+                        order = [[9, 'asc'], [8, 'asc'], [2, 'asc']];
                     } else {
-                        colReorder = [0, 1, 6, 10, 9, 2, 3, 4, 5, 8, 7, 11, 12];
+                        order = [[8, 'asc'], [7, 'asc'], [1, 'asc']];
+                    }
+                } else {
+                    if (isOwner) {
+                        order = [[8, 'asc'], [7, 'asc'], [1, 'asc']];
+                    } else {
+                        order = [[7, 'asc'], [6, 'asc'], [0, 'asc']];
                     }
                 }
-                let dataTable = $('#userAnimeTable').DataTable({
+
+                if ($(window).width() <= 640) {
+                    if (hasNumberColumn) {
+                        if (isOwner) {
+                            // 15 Columns: #, Drag, Picture, Name, Type, Status, Watch Status, Progress, Score, Sort Order, Episodes, Season, Year, Notes, Delete
+                            // Mobile order: #, Drag, Picture, Name, Score, Season, Year, Type, Status, Watch Status, Progress, Episodes, Sort Order, Notes, Delete
+                            colReorder = [0, 1, 2, 3, 8, 11, 12, 4, 5, 6, 7, 10, 9, 13, 14];
+                        } else {
+                            // 12 Columns: #, Picture, Name, Type, Status, Watch Status, Progress, Score, Episodes, Season, Year, Notes
+                            // Mobile order: #, Picture, Name, Score, Year, Season, Type, Status, Watch Status, Progress, Episodes, Notes
+                            colReorder = [0, 1, 2, 7, 10, 9, 3, 4, 5, 6, 8, 11];
+                        }
+                    } else {
+                        if (isOwner) {
+                            // 14 Columns: Drag, Picture, Name, Type, Status, Watch Status, Progress, Score, Sort Order, Episodes, Season, Year, Notes, Delete
+                            // Mobile order: Drag, Picture, Name, Score, Season, Year, Type, Status, Watch Status, Progress, Episodes, Sort Order, Notes, Delete
+                            colReorder = [0, 1, 2, 7, 10, 11, 3, 4, 5, 6, 9, 8, 12, 13];
+                        } else {
+                            // 11 Columns: Picture, Name, Type, Status, Watch Status, Progress, Score, Episodes, Season, Year, Notes
+                            // Mobile order: Picture, Name, Score, Year, Season, Type, Status, Watch Status, Progress, Episodes, Notes
+                            colReorder = [0, 1, 6, 9, 8, 2, 3, 4, 5, 7, 10];
+                        }
+                    }
+                }
+                let dtConfig = {
                     processing: true,
                     serverSide: true,
                     order: order,
@@ -321,19 +391,92 @@
                     },
                     scrollX: scrollWidth,
                     bScrollCollapse: true,
-                    colReorder: {
-                        order: colReorder
-                    },
                     createdRow: function(row, data, dataIndex) {
                         // Calculate the overall index based on the current page and data index
                         let pageIndex = $('#userAnimeTable').DataTable().page.info().page;
                         let pageSize = $('#userAnimeTable').DataTable().page.info().length;
                         let overallIndex = pageIndex * pageSize + dataIndex + 1;
 
-                        // Assign the ID to the row
+                        // Assign the ID to the row and watch status data
                         $(row).attr('id', 'row-' + overallIndex);
-                    },
-                });
+                        $(row).attr('data-watch-status', data.watch_status_id);
+                        $(row).attr('data-anime-id', data.anime_id);
+                        $(row).attr('data-sort-order', data.sort_order);
+                    }
+                };
+
+                // Only add colReorder if we have an order array
+                if (colReorder.length > 0) {
+                    dtConfig.colReorder = {
+                        order: colReorder
+                    };
+                }
+
+                // Add rowReorder for owner only
+                if ('{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}') {
+                    dtConfig.rowReorder = {
+                        selector: '.drag-handle',
+                        dataSrc: 'sort_order',
+                        snapX: true
+                    };
+                }
+
+                let dataTable = $('#userAnimeTable').DataTable(dtConfig);
+
+                // Add row-reorder event handler for owner
+                if ('{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}') {
+                    dataTable.on('row-reorder', function(e, diff, edit) {
+                        // Only process if there were actual changes
+                        if (diff.length === 0) return;
+
+                        // Get all current rows with their data
+                        let currentRows = [];
+                        dataTable.rows({ page: 'current' }).every(function() {
+                            let data = this.data();
+                            let node = this.node();
+                            currentRows.push({
+                                data: data,
+                                watchStatus: $(node).attr('data-watch-status'),
+                                animeId: data.anime_id,
+                                sortOrder: data.sort_order
+                            });
+                        });
+
+                        // Create new array to hold reordered items
+                        let reorderedRows = [...currentRows];
+
+                        // Apply the diff - move items from oldPosition (array index) to newPosition
+                        diff.forEach(function(change) {
+                            reorderedRows[change.newPosition] = currentRows[change.oldPosition];
+                        });
+
+                        // Extract completed anime in new order
+                        let newOrder = [];
+                        let minSortOrder = null;
+
+                        reorderedRows.forEach(function(row) {
+                            if (row.watchStatus == completedStatusId && row.animeId) {
+                                newOrder.push(parseInt(row.animeId));
+
+                                // Track the minimum sort_order
+                                if (row.sortOrder && row.sortOrder !== null) {
+                                    if (minSortOrder === null || row.sortOrder < minSortOrder) {
+                                        minSortOrder = row.sortOrder;
+                                    }
+                                }
+                            }
+                        });
+
+                        // Use the minimum sort_order - 1 as the offset
+                        let pageOffset = minSortOrder ? minSortOrder - 1 : 0;
+
+                        // Send AJAX request to update order
+                        if (newOrder.length > 0) {
+                            saveRowOrder(newOrder, pageOffset, dataTable);
+                        }
+                    });
+                }
+
                 // Update index on draw callback so the number in list is always shown when enabled
                 dataTable.on('draw', function() {
                     if ("{{ $show_anime_list_number }}" == "1") {
@@ -343,6 +486,26 @@
                     }
                 });
                 return dataTable;
+            }
+
+            // Function to save row order via AJAX
+            function saveRowOrder(animeIds, pageOffset, dataTable) {
+                const username = '{{ $username }}';
+
+                axios.post(`/animelist/${username}/reorder`, {
+                    anime_ids: animeIds,
+                    page_offset: pageOffset,
+                    _token: '{{ csrf_token() }}'
+                })
+                .then(function(response) {
+                    // Reload the DataTable to fetch updated data from server
+                    dataTable.ajax.reload(null, false); // false = stay on current page
+                })
+                .catch(function(error) {
+                    console.error('Error updating order:', error);
+                    alert('Failed to save new order. Please refresh the page.');
+                    location.reload();
+                });
             }
 
             // Initial DataTable initialization

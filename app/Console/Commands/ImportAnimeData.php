@@ -32,7 +32,7 @@ class ImportAnimeData extends Command
         $this->info('Starting anime data import...');
         Log::channel('anime_import')->info('Starting anime data import...');
 
-        $filePath = $this->argument('filePath') ?? storage_path('app/private/imports/anime-offline-database.json');
+        $filePath = $this->argument('filePath') ?? storage_path('app/private/imports/anime-offline-database-minified.json');
         $forceDownload = $this->option('forceDownload');
         $skipBackup = $this->option('skipBackup');
         $fullUpdate = $this->option('fullUpdate');
@@ -53,9 +53,9 @@ class ImportAnimeData extends Command
             if ($forceDownload || ! file_exists($filePath)) {
                 $this->info('Anime database file not found or force download is enabled. Downloading from source...');
                 Log::channel('anime_import')->info('Anime database file not found or force download is enabled. Downloading from source...');
-                //$fileData = file_get_contents('https://raw.githubusercontent.com/manami-project/anime-offline-database/master/anime-offline-database.json');
-                //The anime-offline-database project no longer uses the master branch for the latest anime database, it now uses a "latest" release instead. 
-                $fileData = file_get_contents('https://github.com/manami-project/anime-offline-database/releases/download/latest/anime-offline-database.json');
+                //$fileData = file_get_contents('https://raw.githubusercontent.com/manami-project/anime-offline-database/master/anime-offline-database-minified.json');
+                //The anime-offline-database project no longer uses the master branch for the latest anime database, it now uses a "latest" release instead.
+                $fileData = file_get_contents('https://github.com/manami-project/anime-offline-database/releases/download/latest/anime-offline-database-minified.json');
                 $directory = dirname($filePath);
                 $this->info("Downloading anime import JSON file to $directory");
                 if (! file_exists($directory)) {

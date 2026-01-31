@@ -1,8 +1,12 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
+import Sortable from 'sortablejs';
+import './custom/dataTables.rowReorder.custom.js';
+import 'datatables.net-rowreorder-dt/css/rowReorder.dataTables.min.css';
 
 window.Alpine = Alpine;
+window.Sortable = Sortable;
 
 Alpine.start();
 

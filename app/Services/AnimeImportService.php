@@ -20,6 +20,9 @@ class AnimeImportService
         $dbIdCounter = 1;
         foreach ($data['data'] as $animeData) {
             $title = str_replace('"', '', $animeData['title']);
+            $season = $animeData['animeSeason']['season'] ?? null;
+            $year = $animeData['animeSeason']['year'] ?? null;
+            $episodes = $animeData['episodes'] ?? null;
             // It's unlikely that full updates will ever be as good as clean database setup since anime can be deleted which we don't really handle and possibly also updated in ways we might not expect, but it's better than not having it, especially with all of our logging for full updates. Full updates are important since re-creating the entire database isn't feasible because the anime data is very relational and used in reviews, user anime lists, etc.
             if ($fullUpdate) {
                 // We can use dbIdCounter for testing purposes.
@@ -109,12 +112,14 @@ class AnimeImportService
             // since anime could have an unknown season in the current year, then get updated with a season,
             // then it won't match. That's one example. There's so many other examples.
             $existingAnime = Anime::where('title', $title)
-                ->where('year', $animeData['animeSeason']['year'])
+                ->when($year !== null, fn ($q) => $q->where('year', $year))
+                ->when($year === null, fn ($q) => $q->whereNull('year'))
                 ->whereHas('anime_type', function ($query) use ($animeData) {
                     $query->where('type', $animeData['type']);
                 })
-                ->where('episodes', $animeData['episodes'])
-                ->where('season', $animeData['animeSeason']['season'])
+                ->where('episodes', $episodes)
+                ->when($season !== null, fn ($q) => $q->where('season', $season))
+                ->when($season === null, fn ($q) => $q->whereNull('season'))
                 // ->where('thumbnail', $animeData['thumbnail'])
                 // ->where('sources', implode(', ', $animeData['sources']))
                 ->first();
@@ -137,10 +142,10 @@ class AnimeImportService
             Anime::create([
                 'title' => $title,
                 'anime_type_id' => $type->id,
-                'episodes' => $animeData['episodes'],
+                'episodes' => $episodes,
                 'anime_status_id' => $status->id,
-                'season' => $animeData['animeSeason']['season'],
-                'year' => $animeData['animeSeason']['year'],
+                'season' => $season,
+                'year' => $year,
                 'picture' => $animeData['picture'],
                 'thumbnail' => $animeData['thumbnail'],
                 'synonyms' => isset($animeData['synonyms']) ? implode(', ', $animeData['synonyms']) : '',
@@ -148,11 +153,8 @@ class AnimeImportService
                 'sources' => isset($animeData['sources']) ? implode(', ', $animeData['sources']) : '',
                 'tags' => isset($animeData['tags']) ? implode(', ', $animeData['tags']) : '',
             ]);
-            $episodes = $animeData['episodes'];
             $type = $type->type;
             $status = $status->status;
-            $season = $animeData['animeSeason']['season'];
-            $year = $animeData['animeSeason']['year'];
             // Technically, we could check if there's any anime with a title match, although there would likely be many false positive matches if we're not careful.
             $logger && $logger("New anime created: $title, Episodes: $episodes, Type: $type, Status ID: $status, Season: $season, Year: $year");
             // Let's also log this to a file since it's important.
