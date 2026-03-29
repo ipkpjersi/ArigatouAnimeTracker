@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+
 use function App\Helpers\get_base_url;
 
 class Anime extends Model
@@ -73,18 +74,20 @@ class Anime extends Model
     public static function getLocalPictureUrlFromAnimeId(int $animeId): string
     {
         $anime = static::find($animeId);
-        if (!$anime) {
+        if (! $anime) {
             return '';
         }
+
         return static::convertToLocalImageUrl($anime->picture, 'picture');
     }
 
     public static function getLocalThumbnailUrlFromAnimeId(int $animeId): string
     {
         $anime = static::find($animeId);
-        if (!$anime) {
+        if (! $anime) {
             return '';
         }
+
         return static::convertToLocalImageUrl($anime->thumbnail, 'thumbnail');
     }
 
@@ -122,7 +125,8 @@ class Anime extends Model
         return url("$folder/$relativePath");
     }
 
-    public static function categoriesList() {
+    public static function categoriesList()
+    {
         return [
             'Action',
             'Adventure',

@@ -317,7 +317,7 @@ class AnimeController extends Controller
         $selectedCategories = $request->get('categories', []);
         $allCategories = Anime::categoriesList();
 
-        if (!$request->route('view') && auth()->user()) {
+        if (! $request->route('view') && auth()->user()) {
             $view = auth()->user()->display_anime_cards ? 'card' : 'list';
         }
 
@@ -345,7 +345,7 @@ class AnimeController extends Controller
                     $selectedCategories = explode(',', $selectedCategories);
                 }
                 foreach ($selectedCategories as $cat) {
-                    $query->whereRaw('LOWER(tags) LIKE ?', ['%' . strtolower($cat) . '%']);
+                    $query->whereRaw('LOWER(tags) LIKE ?', ['%'.strtolower($cat).'%']);
                 }
             }
         } else {
@@ -353,7 +353,7 @@ class AnimeController extends Controller
         }
 
         $query->selectRaw('*, CASE WHEN season = "UNDEFINED" THEN "UNKNOWN" ELSE season END as season_display')
-              ->addSelect(DB::raw("CASE season
+            ->addSelect(DB::raw("CASE season
                   WHEN 'SPRING' THEN 1
                   WHEN 'SUMMER' THEN 2
                   WHEN 'FALL' THEN 3
@@ -415,6 +415,7 @@ class AnimeController extends Controller
     private function getCurrentSeason($date): string
     {
         $month = $date->month;
+
         return match (true) {
             $month >= 3 && $month <= 5 => 'SPRING',
             $month >= 6 && $month <= 8 => 'SUMMER',
@@ -904,7 +905,7 @@ class AnimeController extends Controller
     {
         $anime = Anime::find($id);
 
-        if (!$anime) {
+        if (! $anime) {
             return response()->json(['error' => 'Anime not found'], 404);
         }
 
@@ -947,7 +948,7 @@ class AnimeController extends Controller
             // Verify the anime belongs to the user and is COMPLETED
             $animeUser = $user->anime()->where('anime_id', $animeId)->first();
 
-            if (!$animeUser || $animeUser->pivot->watch_status_id != $completedStatusId) {
+            if (! $animeUser || $animeUser->pivot->watch_status_id != $completedStatusId) {
                 // Skip non-completed anime
                 continue;
             }
