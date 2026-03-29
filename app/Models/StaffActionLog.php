@@ -12,5 +12,4 @@ use Illuminate\Database\Eloquent\Model;
 class StaffActionLog extends Model
 {
     use HasFactory;
-
 }

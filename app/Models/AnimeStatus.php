@@ -12,5 +12,4 @@ use Illuminate\Database\Eloquent\Model;
 class AnimeStatus extends Model
 {
     use HasFactory;
-
 }

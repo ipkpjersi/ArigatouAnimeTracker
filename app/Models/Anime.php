@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use function App\Helpers\get_base_url;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-
 use Illuminate\Database\Eloquent\Relations\HasMany;
+
+use function App\Helpers\get_base_url;
 
 #[Table('anime')]
 #[Fillable(['title', 'type', 'episodes', 'status', 'season', 'year', 'picture', 'thumbnail', 'synonyms', 'relations', 'sources', 'tags', 'image_downloaded', 'anime_type_id', 'anime_status_id'])]

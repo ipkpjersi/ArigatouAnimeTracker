@@ -12,5 +12,4 @@ use Illuminate\Database\Eloquent\Model;
 class WatchStatus extends Model
 {
     use HasFactory;
-
 }

@@ -12,5 +12,4 @@ use Illuminate\Database\Eloquent\Model;
 class AnimeType extends Model
 {
     use HasFactory;
-
 }
