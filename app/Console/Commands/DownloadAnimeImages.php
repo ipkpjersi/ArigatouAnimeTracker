@@ -3,25 +3,15 @@
 namespace App\Console\Commands;
 
 use App\Services\AnimeImageDownloadService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
+#[Signature('app:download-anime-images {--force}')]
+#[Description('Downloads anime images for each anime.')]
 class DownloadAnimeImages extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:download-anime-images {--force}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Downloads anime images for each anime.';
-
     /**
      * Execute the console command.
      */

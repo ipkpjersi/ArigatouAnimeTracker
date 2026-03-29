@@ -2,26 +2,16 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
+#[Signature('app:clear-anime-image-zip-files')]
+#[Description('Deletes the zip files inside picture and thumbnail folders while retaining the folder structure.')]
 class ClearAnimeImageZipFiles extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:clear-anime-image-zip-files';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Deletes the zip files inside picture and thumbnail folders while retaining the folder structure.';
-
     /**
      * Execute the console command.
      */

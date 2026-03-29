@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+#[Table('anime_status')]
+#[Unguarded]
 class AnimeStatus extends Model
 {
-    protected $table = 'anime_status';
-
     use HasFactory;
 
-    protected $guarded = [];
 }

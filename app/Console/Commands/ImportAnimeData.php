@@ -3,27 +3,17 @@
 namespace App\Console\Commands;
 
 use App\Services\AnimeImportService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+#[Signature('app:import-anime-data {filePath?} {--forceDownload} {--skipBackup} {--fullUpdate}')]
+#[Description('Imports anime from the anime database JSON file.')]
 class ImportAnimeData extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:import-anime-data {filePath?} {--forceDownload} {--skipBackup} {--fullUpdate}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Imports anime from the anime database JSON file.';
-
     /**
      * Execute the console command.
      */

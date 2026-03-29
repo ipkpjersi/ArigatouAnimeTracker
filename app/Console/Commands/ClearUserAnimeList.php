@@ -4,24 +4,14 @@ namespace App\Console\Commands;
 
 use App\Models\AnimeUser;
 use App\Models\User;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Signature('app:clear-user-animelist {username : The username of the user}')]
+#[Description('Clears all anime list entries for a given user.')]
 class ClearUserAnimeList extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:clear-user-animelist {username : The username of the user}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Clears all anime list entries for a given user.';
-
     /**
      * Execute the console command.
      */

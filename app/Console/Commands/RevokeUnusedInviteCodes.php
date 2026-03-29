@@ -3,24 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Models\InviteCode;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Signature('app:revoke-unused-invite-codes')]
+#[Description('Revokes any unused invite codes.')]
 class RevokeUnusedInviteCodes extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:revoke-unused-invite-codes';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Revokes any unused invite codes.';
-
     /**
      * Execute the console command.
      */

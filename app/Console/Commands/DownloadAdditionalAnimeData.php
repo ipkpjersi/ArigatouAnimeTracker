@@ -3,26 +3,15 @@
 namespace App\Console\Commands;
 
 use App\Services\AnimeAdditionalDataImportService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
+#[Signature('app:download-anime-additional-data {generateSqlFile?} {apiDescriptionsEmptyOnly?}')]
+#[Description('Fetches and inserts additional data for anime from the MyAnimeList (or notify.moe or kitsu.io) API. Optionally generates an importable SQL file. Optionally runs for API empty descriptions only (to force a retry of fetching descriptions).')]
 class DownloadAdditionalAnimeData extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:download-anime-additional-data {generateSqlFile?} {apiDescriptionsEmptyOnly?}';
-
-    /**
-     * The console command description.
-     * To force a re-download of only known existing API data, technically we could set description = null and genres = api_descriptions_empty where api_descriptions_empty is 0.
-     *
-     * @var string
-     */
-    protected $description = 'Fetches and inserts additional data for anime from the MyAnimeList (or notify.moe or kitsu.io) API. Optionally generates an importable SQL file. Optionally runs for API empty descriptions only (to force a retry of fetching descriptions).';
-
     /**
      * Execute the console command.
      */

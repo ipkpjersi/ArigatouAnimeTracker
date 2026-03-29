@@ -3,24 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Services\AnimeImageDownloadService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Signature('app:zip-anime-images')]
+#[Description('Creates zip archives for each anime image.')]
 class ZipAnimeImages extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:zip-anime-images';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Creates zip archives for each anime image.';
-
     /**
      * Execute the console command.
      */

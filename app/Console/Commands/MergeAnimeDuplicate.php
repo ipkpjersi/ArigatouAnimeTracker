@@ -4,24 +4,14 @@ namespace App\Console\Commands;
 
 use App\Models\Anime;
 use App\Services\DuplicateAnimeService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Signature('app:merge-anime-duplicate {oldAnimeId} {newAnimeId}')]
+#[Description('Merge duplicate anime by replacing old anime ID with a new one and deleting the old entry.')]
 class MergeAnimeDuplicate extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:merge-anime-duplicate {oldAnimeId} {newAnimeId}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Merge duplicate anime by replacing old anime ID with a new one and deleting the old entry.';
-
     /**
      * Execute the console command.
      */
