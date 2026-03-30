@@ -4,6 +4,8 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Database\ClassMorphViolationException;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -40,6 +42,20 @@ trait HasRelationships
     protected $touches = [];
 
     /**
+     * The relationship autoloader callback.
+     *
+     * @var \Closure|null
+     */
+    protected $relationAutoloadCallback = null;
+
+    /**
+     * The relationship autoloader callback context.
+     *
+     * @var mixed
+     */
+    protected $relationAutoloadContext = null;
+
+    /**
      * The many to many relationship methods.
      *
      * @var string[]
@@ -54,6 +70,19 @@ trait HasRelationships
      * @var array
      */
     protected static $relationResolvers = [];
+
+    /**
+     * Initialize the HasRelationships trait.
+     *
+     * @return void
+     */
+    #[Initialize]
+    public function initializeHasRelationships()
+    {
+        if (empty($this->touches)) {
+            $this->touches = static::resolveClassAttribute(Touches::class, 'relations') ?? [];
+        }
+    }
 
     /**
      * Get the dynamic relation resolver if defined or inherited, or return null.
@@ -90,6 +119,99 @@ trait HasRelationships
             static::$relationResolvers,
             [static::class => [$name => $callback]]
         );
+    }
+
+    /**
+     * Determine if a relationship autoloader callback has been defined.
+     *
+     * @return bool
+     */
+    public function hasRelationAutoloadCallback()
+    {
+        return ! is_null($this->relationAutoloadCallback);
+    }
+
+    /**
+     * Define an automatic relationship autoloader callback for this model and its relations.
+     *
+     * @param  \Closure  $callback
+     * @param  mixed  $context
+     * @return $this
+     */
+    public function autoloadRelationsUsing(Closure $callback, $context = null)
+    {
+        // Prevent circular relation autoloading...
+        if ($context && $this->relationAutoloadContext === $context) {
+            return $this;
+        }
+
+        $this->relationAutoloadCallback = $callback;
+        $this->relationAutoloadContext = $context;
+
+        foreach ($this->relations as $key => $value) {
+            $this->propagateRelationAutoloadCallbackToRelation($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Attempt to autoload the given relationship using the autoload callback.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function attemptToAutoloadRelation($key)
+    {
+        if (! $this->hasRelationAutoloadCallback()) {
+            return false;
+        }
+
+        $this->invokeRelationAutoloadCallbackFor($key, []);
+
+        return $this->relationLoaded($key);
+    }
+
+    /**
+     * Invoke the relationship autoloader callback for the given relationships.
+     *
+     * @param  string  $key
+     * @param  array  $tuples
+     * @return void
+     */
+    protected function invokeRelationAutoloadCallbackFor($key, $tuples)
+    {
+        $tuples = array_merge([[$key, get_class($this)]], $tuples);
+
+        call_user_func($this->relationAutoloadCallback, $tuples);
+    }
+
+    /**
+     * Propagate the relationship autoloader callback to the given related models.
+     *
+     * @param  string  $key
+     * @param  mixed  $models
+     * @return void
+     */
+    protected function propagateRelationAutoloadCallbackToRelation($key, $models)
+    {
+        if (! $this->hasRelationAutoloadCallback() || ! $models) {
+            return;
+        }
+
+        if ($models instanceof Model) {
+            $models = [$models];
+        }
+
+        if (! is_iterable($models)) {
+            return;
+        }
+
+        $callback = fn (array $tuples) => $this->invokeRelationAutoloadCallbackFor($key, $tuples);
+
+        foreach ($models as $model) {
+            $model->autoloadRelationsUsing($callback, $this->relationAutoloadContext);
+        }
     }
 
     /**
@@ -384,7 +506,7 @@ trait HasRelationships
      */
     protected function guessBelongsToRelation()
     {
-        [$one, $two, $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        [, , $caller] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
 
         return $caller['function'];
     }
@@ -564,7 +686,7 @@ trait HasRelationships
      * @param  string|null  $parentKey
      * @param  string|null  $relatedKey
      * @param  string|null  $relation
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, $this, \Illuminate\Database\Eloquent\Relations\Pivot>
      */
     public function belongsToMany(
         $related,
@@ -624,7 +746,7 @@ trait HasRelationships
      * @param  string  $parentKey
      * @param  string  $relatedKey
      * @param  string|null  $relationName
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, TDeclaringModel>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Relations\Pivot>
      */
     protected function newBelongsToMany(
         Builder $query,
@@ -805,7 +927,7 @@ trait HasRelationships
             );
         });
 
-        return ! is_null($caller) ? $caller['function'] : null;
+        return $caller['function'] ?? null;
     }
 
     /**
@@ -821,8 +943,9 @@ trait HasRelationships
         // sorted alphabetically and concatenated with an underscore, so we can
         // just sort the models and join them together to get the table name.
         $segments = [
-            $instance ? $instance->joiningTableSegment()
-                      : Str::snake(class_basename($related)),
+            $instance
+                ? $instance->joiningTableSegment()
+                : Str::snake(class_basename($related)),
             $this->joiningTableSegment(),
         ];
 
@@ -894,6 +1017,8 @@ trait HasRelationships
      * Get the class name for polymorphic relations.
      *
      * @return string
+     *
+     * @throws \Illuminate\Database\ClassMorphViolationException
      */
     public function getMorphClass()
     {
@@ -926,7 +1051,7 @@ trait HasRelationships
     {
         return tap(new $class, function ($instance) {
             if (! $instance->getConnectionName()) {
-                $instance->setConnection($this->connection);
+                $instance->setConnection($this->getConnectionName());
             }
         });
     }
@@ -987,6 +1112,8 @@ trait HasRelationships
     {
         $this->relations[$relation] = $value;
 
+        $this->propagateRelationAutoloadCallbackToRelation($relation, $value);
+
         return $this;
     }
 
@@ -1017,6 +1144,18 @@ trait HasRelationships
     }
 
     /**
+     * Enable relationship autoloading for this model.
+     *
+     * @return $this
+     */
+    public function withRelationshipAutoloading()
+    {
+        $this->newCollection([$this])->withRelationshipAutoloading();
+
+        return $this;
+    }
+
+    /**
      * Duplicate the instance and unset all the loaded relations.
      *
      * @return $this
@@ -1026,6 +1165,23 @@ trait HasRelationships
         $model = clone $this;
 
         return $model->unsetRelations();
+    }
+
+    /**
+     * Duplicate the instance and unset the given loaded relations.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function withoutRelation($relations)
+    {
+        $model = clone $this;
+
+        foreach ((array) $relations as $relation) {
+            $model->unsetRelation($relation);
+        }
+
+        return $model;
     }
 
     /**

@@ -2,25 +2,15 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
+#[Signature('app:clear-anime-api-descriptions-empty')]
+#[Description('Clears all API descriptions empty flags.')]
 class ClearApiDescriptionsEmpty extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:clear-anime-api-descriptions-empty';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Clears all API descriptions empty flags.';
-
     /**
      * Execute the console command.
      */

@@ -68,7 +68,7 @@ class PasswordSecurityController extends Controller
 
     public function disable2fa(Request $request): RedirectResponse
     {
-        if (! (Hash::check($request->get('current-password'), Auth::user()->password))) {
+        if (! (Hash::check($request->input('current-password'), Auth::user()->password))) {
             return redirect()->back()->with('error', 'The password you entered is not correct. Please try again or contact a member of staff for further support.');
         }
 

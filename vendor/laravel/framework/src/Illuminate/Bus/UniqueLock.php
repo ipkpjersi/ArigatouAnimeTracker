@@ -3,9 +3,13 @@
 namespace Illuminate\Bus;
 
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\UniqueFor;
 
 class UniqueLock
 {
+    use ReadsQueueAttributes;
+
     /**
      * The cache repository implementation.
      *
@@ -17,7 +21,6 @@ class UniqueLock
      * Create a new unique lock manager instance.
      *
      * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @return void
      */
     public function __construct(Cache $cache)
     {
@@ -34,10 +37,10 @@ class UniqueLock
     {
         $uniqueFor = method_exists($job, 'uniqueFor')
             ? $job->uniqueFor()
-            : ($job->uniqueFor ?? 0);
+            : ($this->getAttributeValue($job, UniqueFor::class, 'uniqueFor') ?? 0);
 
         $cache = method_exists($job, 'uniqueVia')
-            ? $job->uniqueVia()
+            ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
 
         return (bool) $cache->lock($this->getKey($job), $uniqueFor)->get();
@@ -52,7 +55,7 @@ class UniqueLock
     public function release($job)
     {
         $cache = method_exists($job, 'uniqueVia')
-            ? $job->uniqueVia()
+            ? ($job->uniqueVia() ?? $this->cache)
             : $this->cache;
 
         $cache->lock($this->getKey($job))->forceRelease();
@@ -70,6 +73,10 @@ class UniqueLock
             ? $job->uniqueId()
             : ($job->uniqueId ?? '');
 
-        return 'laravel_unique_job:'.get_class($job).':'.$uniqueId;
+        $jobName = method_exists($job, 'displayName')
+            ? hash('xxh128', $job->displayName())
+            : get_class($job);
+
+        return 'laravel_unique_job:'.$jobName.':'.$uniqueId;
     }
 }

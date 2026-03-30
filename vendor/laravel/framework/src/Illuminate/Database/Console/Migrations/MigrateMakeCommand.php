@@ -51,7 +51,6 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      *
      * @param  \Illuminate\Database\Migrations\MigrationCreator  $creator
      * @param  \Illuminate\Support\Composer  $composer
-     * @return void
      */
     public function __construct(MigrationCreator $creator, Composer $composer)
     {
@@ -112,6 +111,10 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         $file = $this->creator->create(
             $name, $this->getMigrationPath(), $table, $create
         );
+
+        if (windows_os()) {
+            $file = str_replace('/', '\\', $file);
+        }
 
         $this->components->info(sprintf('Migration [%s] created successfully.', $file));
     }

@@ -20,7 +20,6 @@ class InvokedProcess implements InvokedProcessContract
      * Create a new invoked process instance.
      *
      * @param  \Symfony\Component\Process\Process  $process
-     * @return void
      */
     public function __construct(Process $process)
     {
@@ -35,6 +34,16 @@ class InvokedProcess implements InvokedProcessContract
     public function id()
     {
         return $this->process->getPid();
+    }
+
+    /**
+     * Get the command line for the process.
+     *
+     * @return string
+     */
+    public function command()
+    {
+        return $this->process->getCommandLine();
     }
 
     /**

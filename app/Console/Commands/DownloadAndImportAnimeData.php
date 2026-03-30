@@ -2,26 +2,16 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+#[Signature('app:download-and-import-anime-data')]
+#[Description('Download and import anime data, then download additional data and images. This is the recommended import command.')]
 class DownloadAndImportAnimeData extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:download-and-import-anime-data';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Download and import anime data, then download additional data and images. This is the recommended import command.';
-
     /**
      * Execute the console command.
      */

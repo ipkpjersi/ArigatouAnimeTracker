@@ -26,7 +26,6 @@ class ConnectionFactory
      * Create a new connection factory instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return void
      */
     public function __construct(Container $container)
     {
@@ -88,7 +87,9 @@ class ConnectionFactory
     {
         $connection = $this->createSingleConnection($this->getWriteConfig($config));
 
-        return $connection->setReadPdo($this->createReadPdo($config));
+        return $connection
+            ->setReadPdo($this->createReadPdo($config))
+            ->setReadPdoConfig($this->getReadConfig($config));
     }
 
     /**
