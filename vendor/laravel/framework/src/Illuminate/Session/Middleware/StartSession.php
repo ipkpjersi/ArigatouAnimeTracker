@@ -33,7 +33,6 @@ class StartSession
      *
      * @param  \Illuminate\Session\SessionManager  $manager
      * @param  callable|null  $cacheFactoryResolver
-     * @return void
      */
     public function __construct(SessionManager $manager, ?callable $cacheFactoryResolver = null)
     {
@@ -205,6 +204,10 @@ class StartSession
             ! $request->prefetch() &&
             ! $request->isPrecognitive()) {
             $session->setPreviousUrl($request->fullUrl());
+
+            if (method_exists($session, 'setPreviousRoute')) {
+                $session->setPreviousRoute($request->route()->getName());
+            }
         }
     }
 
@@ -263,10 +266,10 @@ class StartSession
      */
     protected function getCookieExpirationDate()
     {
-        $config = $this->manager->getSessionConfig();
+        $expiresOnClose = $this->manager->getSessionConfig()['expire_on_close'];
 
-        return $config['expire_on_close'] ? 0 : Date::instance(
-            Carbon::now()->addMinutes((int) $config['lifetime'])
+        return $expiresOnClose ? 0 : Date::instance(
+            Carbon::now()->addSeconds($this->getSessionLifetimeInSeconds())
         );
     }
 

@@ -52,8 +52,11 @@ class HasOneThrough extends HasOneOrManyThrough implements SupportsPartialRelati
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $this->getDictionaryKey($model->getAttribute($this->localKey))])) {
+            $key = $this->getDictionaryKey($model->getAttribute($this->localKey));
+
+            if ($key !== null && isset($dictionary[$key])) {
                 $value = $dictionary[$key];
+
                 $model->setRelation(
                     $relation, reset($value)
                 );
@@ -78,7 +81,10 @@ class HasOneThrough extends HasOneOrManyThrough implements SupportsPartialRelati
     {
         $query->addSelect([$this->getQualifiedFirstKeyName()]);
 
-        $this->performJoin($query);
+        // We need to join subqueries that aren't the inner-most subquery which is joined in the CanBeOneOfMany::ofMany method...
+        if ($this->getOneOfManySubQuery() !== null) {
+            $this->performJoin($query);
+        }
     }
 
     /** @inheritDoc */
