@@ -478,8 +478,8 @@ class ComposerStaticInitde5948e767683128a0d26086e6f36f46
         ),
         'Nette\\' => 
         array (
-            0 => __DIR__ . '/..' . '/nette/utils/src',
-            1 => __DIR__ . '/..' . '/nette/schema/src',
+            0 => __DIR__ . '/..' . '/nette/schema/src',
+            1 => __DIR__ . '/..' . '/nette/utils/src',
         ),
         'Monolog\\' => 
         array (
@@ -495,8 +495,8 @@ class ComposerStaticInitde5948e767683128a0d26086e6f36f46
         ),
         'League\\Uri\\' => 
         array (
-            0 => __DIR__ . '/..' . '/league/uri-interfaces',
-            1 => __DIR__ . '/..' . '/league/uri',
+            0 => __DIR__ . '/..' . '/league/uri',
+            1 => __DIR__ . '/..' . '/league/uri-interfaces',
         ),
         'League\\Pipeline\\' => 
         array (
