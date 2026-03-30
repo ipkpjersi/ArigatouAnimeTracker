@@ -2,13 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class UserFriend extends Model
-{
-    protected $table = 'user_friends';
-
-    protected $fillable = [
-
-    ];
-}
+#[Table('user_friends')]
+class UserFriend extends Model {}

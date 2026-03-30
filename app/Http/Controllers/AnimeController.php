@@ -278,7 +278,7 @@ class AnimeController extends Controller
             // No need for this to be plain-text, so we'll use rot13.
             $query = $query->where('tags', 'NOT LIKE', '%'.str_rot13('uragnv').'%');
         }
-        $sort = $request->get('sort', 'highest_rated');
+        $sort = $request->input('sort', 'highest_rated');
         if ($sort === 'highest_rated') {
             $query->orderBy('mal_mean', 'desc');
         } elseif ($sort === 'most_popular') {
@@ -314,21 +314,21 @@ class AnimeController extends Controller
     {
         $category = strtolower($category);
         $isSeasonal = $category === 'seasonal';
-        $selectedCategories = $request->get('categories', []);
+        $selectedCategories = $request->input('categories', []);
         $allCategories = Anime::categoriesList();
 
-        if (!$request->route('view') && auth()->user()) {
+        if (! $request->route('view') && auth()->user()) {
             $view = auth()->user()->display_anime_cards ? 'card' : 'list';
         }
 
         // Determine current season & year
         $currentDate = Carbon::now();
-        $currentYear = $request->get('year') ?? $currentDate->year;
-        $currentSeason = strtoupper($request->get('season') ?? $this->getCurrentSeason($currentDate));
+        $currentYear = $request->input('year') ?? $currentDate->year;
+        $currentSeason = strtoupper($request->input('season') ?? $this->getCurrentSeason($currentDate));
         $calendarYear = $currentDate->year;
         $calendarSeason = $this->getCurrentSeason($currentDate);
 
-        $animeTypeId = $request->get('type');
+        $animeTypeId = $request->input('type');
 
         $query = Anime::query();
 
@@ -345,7 +345,7 @@ class AnimeController extends Controller
                     $selectedCategories = explode(',', $selectedCategories);
                 }
                 foreach ($selectedCategories as $cat) {
-                    $query->whereRaw('LOWER(tags) LIKE ?', ['%' . strtolower($cat) . '%']);
+                    $query->whereRaw('LOWER(tags) LIKE ?', ['%'.strtolower($cat).'%']);
                 }
             }
         } else {
@@ -353,7 +353,7 @@ class AnimeController extends Controller
         }
 
         $query->selectRaw('*, CASE WHEN season = "UNDEFINED" THEN "UNKNOWN" ELSE season END as season_display')
-              ->addSelect(DB::raw("CASE season
+            ->addSelect(DB::raw("CASE season
                   WHEN 'SPRING' THEN 1
                   WHEN 'SUMMER' THEN 2
                   WHEN 'FALL' THEN 3
@@ -361,7 +361,7 @@ class AnimeController extends Controller
                   ELSE 0
               END as season_sort"));
 
-        $sort = $request->get('sort', 'mal_mean');
+        $sort = $request->input('sort', 'mal_mean');
 
         switch ($sort) {
             case 'mal_members':
@@ -415,6 +415,7 @@ class AnimeController extends Controller
     private function getCurrentSeason($date): string
     {
         $month = $date->month;
+
         return match (true) {
             $month >= 3 && $month <= 5 => 'SPRING',
             $month >= 6 && $month <= 8 => 'SUMMER',
@@ -456,7 +457,7 @@ class AnimeController extends Controller
         }
         $pagination = Auth::user()?->anime_list_pagination_size ?? $user->anime_list_pagination_size ?? 15;
         if ($request->has('size') || $request->has('pageSize') || $request->has('pagesize')) {
-            $pagination = $request->get('size') ?? $request->get('pageSize') ?? $request->get('pagesize');
+            $pagination = $request->input('size') ?? $request->input('pageSize') ?? $request->input('pagesize');
             $pagination = max(1, min((int) $pagination, 1000)); // Clamp between 1 and 1000
         }
         $show_anime_list_number = Auth::user() != null && Auth::user()->show_anime_list_number == 1;
@@ -904,7 +905,7 @@ class AnimeController extends Controller
     {
         $anime = Anime::find($id);
 
-        if (!$anime) {
+        if (! $anime) {
             return response()->json(['error' => 'Anime not found'], 404);
         }
 
@@ -947,7 +948,7 @@ class AnimeController extends Controller
             // Verify the anime belongs to the user and is COMPLETED
             $animeUser = $user->anime()->where('anime_id', $animeId)->first();
 
-            if (!$animeUser || $animeUser->pivot->watch_status_id != $completedStatusId) {
+            if (! $animeUser || $animeUser->pivot->watch_status_id != $completedStatusId) {
                 // Skip non-completed anime
                 continue;
             }

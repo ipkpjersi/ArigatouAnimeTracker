@@ -3,25 +3,15 @@
 namespace App\Console\Commands;
 
 use App\Services\AnimeAdditionalDataImportService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
+#[Signature('app:import-anime-additional-data')]
+#[Description('Imports additional anime data from the generated SQL file')]
 class ImportAdditionalAnimeData extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:import-anime-additional-data';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Imports additional anime data from the generated SQL file';
-
     /**
      * Execute the console command.
      */

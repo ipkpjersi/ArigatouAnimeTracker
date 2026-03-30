@@ -3,24 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Services\DatabaseBackupService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Signature('app:backup-database')]
+#[Description('Back up the current database')]
 class BackupDatabase extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:backup-database';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Back up the current database';
-
     /**
      * Execute the console command.
      */

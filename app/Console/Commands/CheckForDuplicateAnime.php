@@ -3,24 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Services\DuplicateAnimeService;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Signature('app:check-anime-duplicates')]
+#[Description('Check for duplicate anime entries and export details to CSV.')]
 class CheckForDuplicateAnime extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'app:check-anime-duplicates';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Check for duplicate anime entries and export details to CSV.';
-
     /**
      * Execute the console command.
      */

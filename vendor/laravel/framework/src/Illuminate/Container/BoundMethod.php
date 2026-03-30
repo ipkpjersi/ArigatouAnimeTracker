@@ -166,7 +166,7 @@ class BoundMethod
         $container,
         $parameter,
         array &$parameters,
-        &$dependencies
+        &$dependencies,
     ) {
         $pendingDependencies = [];
 
@@ -187,6 +187,8 @@ class BoundMethod
                 $pendingDependencies = array_merge($pendingDependencies, is_array($variadicDependencies)
                     ? $variadicDependencies
                     : [$variadicDependencies]);
+            } elseif ($parameter->isDefaultValueAvailable() && ! $container->bound($className)) {
+                $pendingDependencies[] = $parameter->getDefaultValue();
             } else {
                 $pendingDependencies[] = $container->make($className);
             }

@@ -2,36 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+
 use function App\Helpers\get_base_url;
 
+#[Table('anime')]
+#[Fillable(['title', 'type', 'episodes', 'status', 'season', 'year', 'picture', 'thumbnail', 'synonyms', 'relations', 'sources', 'tags', 'image_downloaded', 'anime_type_id', 'anime_status_id'])]
 class Anime extends Model
 {
-    protected $table = 'anime';
-
     use HasFactory;
-
-    protected $fillable = [
-        'title',
-        'type',
-        'episodes',
-        'status',
-        'season',
-        'year',
-        'picture',
-        'thumbnail',
-        'synonyms',
-        'relations',
-        'sources',
-        'tags',
-        'image_downloaded',
-        'anime_type_id',
-        'anime_status_id',
-    ];
 
     // Set an ID used to hide all anime from public view.
     public static $HIDE_ALL_ANIME_PUBLICLY_ID = 5555;
@@ -73,18 +58,20 @@ class Anime extends Model
     public static function getLocalPictureUrlFromAnimeId(int $animeId): string
     {
         $anime = static::find($animeId);
-        if (!$anime) {
+        if (! $anime) {
             return '';
         }
+
         return static::convertToLocalImageUrl($anime->picture, 'picture');
     }
 
     public static function getLocalThumbnailUrlFromAnimeId(int $animeId): string
     {
         $anime = static::find($animeId);
-        if (!$anime) {
+        if (! $anime) {
             return '';
         }
+
         return static::convertToLocalImageUrl($anime->thumbnail, 'thumbnail');
     }
 
@@ -122,7 +109,8 @@ class Anime extends Model
         return url("$folder/$relativePath");
     }
 
-    public static function categoriesList() {
+    public static function categoriesList()
+    {
         return [
             'Action',
             'Adventure',

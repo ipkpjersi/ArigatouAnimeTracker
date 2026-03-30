@@ -2,15 +2,15 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
+#[Signature('app:clear-anime-image-downloads {deleteFiles=false : Whether to delete the actual files (true/false)}')]
+#[Description('Clears the anime image download flags, optionally deleting the files.')]
 class ClearAnimeImageDownloads extends Command
 {
-    protected $signature = 'app:clear-anime-image-downloads {deleteFiles=false : Whether to delete the actual files (true/false)}';
-
-    protected $description = 'Clears the anime image download flags, optionally deleting the files.';
-
     public function handle(): void
     {
         $this->info('Starting to clear all anime image download flags...');

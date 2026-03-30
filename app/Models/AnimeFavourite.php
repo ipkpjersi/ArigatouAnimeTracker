@@ -2,21 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable(['user_id', 'anime_id', 'show_publicly', 'sort_order'])]
 class AnimeFavourite extends Model
 {
     use HasFactory;
-
-    // Define fillable attributes if needed
-    protected $fillable = [
-        'user_id',
-        'anime_id',
-        'show_publicly',
-        'sort_order',
-    ];
 
     /**
      * Get the user that added the favourite.

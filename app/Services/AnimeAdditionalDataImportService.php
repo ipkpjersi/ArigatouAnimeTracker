@@ -145,7 +145,7 @@ class AnimeAdditionalDataImportService
                     $response = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId);
                     if ($response && $response->successful()) {
                         $data = $response->json();
-                        $description = $data['data']['attributes']['synopsis'] ?? null; //There seems to be a synopsis variable and a description variable, but their API docs only mention synopsis so let's use synopsis for now.
+                        $description = $data['data']['attributes']['synopsis'] ?? null; // There seems to be a synopsis variable and a description variable, but their API docs only mention synopsis so let's use synopsis for now.
                         $genresResponse = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId.'/genres');
                         $genresData = $genresResponse->json();
                         $genres = array_map(function ($genre) {
@@ -159,16 +159,16 @@ class AnimeAdditionalDataImportService
                     Log::channel('anime_import')->error('Error fetching data from kitsu.io for anime: '.$row->title.'. Error: '.$e->getMessage());
                 }
             }
-            //We only check the description since we don't really need genres to exist in order to update a description, also we can check genres separately and prevent overwriting existing genres with empty ones separately.
+            // We only check the description since we don't really need genres to exist in order to update a description, also we can check genres separately and prevent overwriting existing genres with empty ones separately.
             if ($description) {
-                //Prevent overwriting existing genres with empty ones, since we only check for a description before updating anime data, we should fetch existing genres if the new genres are empty.
+                // Prevent overwriting existing genres with empty ones, since we only check for a description before updating anime data, we should fetch existing genres if the new genres are empty.
                 if (empty($genres)) {
                     $existingGenres = DB::table('anime')
                         ->where('id', $row->id)
-                        ->value('genres'); //Fetch only the genres column
+                        ->value('genres'); // Fetch only the genres column
 
-                    if (!empty($existingGenres)) {
-                        $genres = $existingGenres; //Retain existing genres if they exist
+                    if (! empty($existingGenres)) {
+                        $genres = $existingGenres; // Retain existing genres if they exist
                     }
                 }
                 $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $averageDuration, $rating, $source, $background, $recommendations, $studios, $broadcast, $relatedAnime, $relatedManga, $sqlFile, $logger);
