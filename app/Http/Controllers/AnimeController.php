@@ -793,7 +793,19 @@ class AnimeController extends Controller
     public function removeFromList($animeId, $redirect = true)
     {
         $user = Auth::user();
+
+        $pivot = $user->anime()->where('anime_id', $animeId)->first();
+        $deletedSortOrder = $pivot ? $pivot->pivot->sort_order : null;
+
         $user->anime()->detach($animeId);
+
+        if ($deletedSortOrder !== null) {
+            DB::table('anime_user')
+                ->where('user_id', $user->id)
+                ->where('sort_order', '>', $deletedSortOrder)
+                ->decrement('sort_order');
+        }
+
         if ($redirect == true) {
             return redirect()->back()->with('popup', 'Anime removed from your list.');
         }
