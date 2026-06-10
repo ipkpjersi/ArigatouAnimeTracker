@@ -7,7 +7,11 @@
 
         <title>{{ $title ?? config('app.name', 'Laravel') }}</title>
 
-        <link rel="shortcut icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+        <!-- Favicon -->
+        <link rel="icon" href="{{ asset('img/icons/logo.ico') }}" sizes="any">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/icons/logo-32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/icons/logo-16.png') }}">
+        <link rel="apple-touch-icon" href="{{ asset('img/icons/logo-128.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
