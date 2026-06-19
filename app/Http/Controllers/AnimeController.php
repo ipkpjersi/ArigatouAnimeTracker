@@ -5,16 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Anime;
 use App\Models\AnimeReview;
 use App\Models\AnimeType;
+use App\Models\StaffActionLog;
 use App\Models\User;
 use App\Models\WatchStatus;
 use App\Services\AnimeListExportService;
 use App\Services\AnimeListImportService;
+use App\Services\DuplicateAnimeService;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class AnimeController extends Controller
@@ -214,7 +217,99 @@ class AnimeController extends Controller
             ]);
         }
 
-        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aatScore', 'aatMembers', 'aatUsers', 'otherAnime', 'favouriteSystemEnabled', 'favourite'));
+        // Sort the external links so the preferred sources (MAL, AniList, etc.) appear first.
+        $sortedSources = Anime::sortLinksByPriority($anime->sources);
+        $sortedRelations = Anime::sortLinksByPriority($anime->relations);
+
+        // Only admins can merge anime, so only build the list of merge candidates for them.
+        $similarAnime = collect();
+        if ($user && $user->isAdmin()) {
+            $similarAnime = $this->getSimilarAnimeForMerge($anime);
+        }
+
+        return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aatScore', 'aatMembers', 'aatUsers', 'otherAnime', 'favouriteSystemEnabled', 'favourite', 'sortedSources', 'sortedRelations', 'similarAnime'));
+    }
+
+    /**
+     * Build a list of anime with a similar title that an admin can merge the
+     * given anime into. Matches on the meaningful words of the title so that
+     * likely duplicates surface near the top of the merge dropdown.
+     */
+    private function getSimilarAnimeForMerge(Anime $anime)
+    {
+        $words = array_filter(preg_split('/[^\p{L}\p{N}]+/u', $anime->title), function ($word) {
+            return mb_strlen($word) >= 3;
+        });
+
+        $query = DB::table('anime')
+            ->select('id', 'title', 'year', 'season')
+            ->where('id', '!=', $anime->id);
+
+        if (! empty($words)) {
+            $query->where(function ($q) use ($words) {
+                foreach ($words as $word) {
+                    $q->orWhere('title', 'LIKE', '%'.$word.'%');
+                }
+            });
+        } else {
+            // Fall back to matching the entire title if no long words were found.
+            $query->where('title', 'LIKE', '%'.$anime->title.'%');
+        }
+
+        return $query->orderBy('title')->limit(100)->get();
+    }
+
+    /**
+     * Merge the given anime into another anime entry. This moves all list
+     * entries, reviews, and favourites to the target anime and permanently
+     * deletes the merged anime. Admin only and cannot be undone.
+     */
+    public function mergeAnime(Request $request, $animeId, DuplicateAnimeService $duplicateAnimeService)
+    {
+        if (auth()->user() === null || ! auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'target_anime_id' => 'required|integer|exists:anime,id',
+            'confirmation' => 'required|string',
+        ]);
+
+        $oldAnime = Anime::find($animeId);
+        $targetAnimeId = (int) $request->input('target_anime_id');
+
+        if (! $oldAnime) {
+            return redirect()->back()->with('popup', 'The anime to merge could not be found.');
+        }
+
+        if ((int) $animeId === $targetAnimeId) {
+            return redirect()->back()->with('popup', 'You cannot merge an anime into itself.');
+        }
+
+        if (strtolower(trim($request->input('confirmation'))) !== 'agree') {
+            return redirect()->back()->with('popup', 'You must type "agree" to confirm the merge.');
+        }
+
+        $oldTitle = $oldAnime->title;
+        $result = $duplicateAnimeService->mergeDuplicateAnime($animeId, $targetAnimeId);
+
+        if ($result['status'] !== 'success') {
+            return redirect()->back()->with('popup', $result['message']);
+        }
+
+        StaffActionLog::create([
+            'user_id' => auth()->id(),
+            'target_id' => $targetAnimeId,
+            'action' => 'merge_anime',
+            'message' => 'Merged anime '.$oldTitle.' (anime ID: '.$animeId.') into anime ID: '.$targetAnimeId,
+        ]);
+
+        $targetAnime = Anime::find($targetAnimeId);
+
+        return redirect()->route('anime.detail', [
+            'id' => $targetAnimeId,
+            'title' => $targetAnime ? Str::slug($targetAnime->title) : null,
+        ])->with('popup', 'Anime merged successfully.');
     }
 
     public function addReview(Request $request)

@@ -55,6 +55,43 @@ class Anime extends Model
             ->find($animeId);
     }
 
+    /**
+     * Sort a comma-separated list of external links so the preferred sources
+     * appear first. Priority order is MyAnimeList, AniList, Kitsu, Anime-Planet,
+     * LiveChart, then notify.moe. Links from unrecognized sources keep their
+     * original relative order and are placed last.
+     */
+    public static function sortLinksByPriority($links): array
+    {
+        if (empty($links)) {
+            return [];
+        }
+
+        $items = array_values(array_filter(array_map('trim', explode(',', $links)), function ($item) {
+            return $item !== '';
+        }));
+
+        // Ordered list of domains that determine link priority.
+        $priority = ['myanimelist.net', 'anilist.co', 'kitsu', 'anime-planet.com', 'livechart.me', 'notify.moe'];
+
+        $rank = function ($link) use ($priority) {
+            foreach ($priority as $index => $needle) {
+                if (stripos($link, $needle) !== false) {
+                    return $index;
+                }
+            }
+
+            return count($priority);
+        };
+
+        // usort is stable in PHP 8+, so equal-ranked links keep their original order.
+        usort($items, function ($a, $b) use ($rank) {
+            return $rank($a) <=> $rank($b);
+        });
+
+        return $items;
+    }
+
     public static function getLocalPictureUrlFromAnimeId(int $animeId): string
     {
         $anime = static::find($animeId);

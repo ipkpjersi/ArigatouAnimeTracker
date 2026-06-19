@@ -120,6 +120,8 @@ Route::middleware('auth', '2fa')->group(function () {
     Route::post('/add-friend/{friendId}', [UserController::class, 'addFriend'])->name('add-friend');
     Route::post('/remove-friend/{friendId}', [UserController::class, 'removeFriend'])->name('remove-friend');
 
+    Route::post('/anime/{animeId}/merge', [AnimeController::class, 'mergeAnime'])->name('anime.merge');
+
     Route::post('/anime/{animeId}/add-to-favourites', [UserController::class, 'addToFavourites'])->name('anime.addToFavourites');
     Route::put('/anime/{animeId}/update-favourite', [UserController::class, 'updateFavourite'])->name('anime.updateFavourite');
     Route::delete('/anime/{animeId}/remove-from-favourites', [UserController::class, 'removeFromFavourites'])->name('anime.removeFromFavourites');

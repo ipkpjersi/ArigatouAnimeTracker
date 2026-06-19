@@ -221,6 +221,59 @@
                             @endif
                         @endif
 
+                        @if (auth()->user() && auth()->user()->isAdmin())
+                            <!-- Merge Anime Button (admin only) -->
+                            <button type="button" onclick="openMergeModal()" class="mt-4 bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded w-full">
+                                Merge Anime
+                            </button>
+
+                            <!-- Merge Anime Modal -->
+                            <div id="merge-modal" class="hidden fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50">
+                                <div class="bg-white dark:bg-gray-800 dark:text-gray-200 p-6 rounded shadow-lg w-11/12 max-w-lg max-h-screen overflow-y-auto">
+                                    <h3 class="text-lg font-bold mb-2">Merge Anime</h3>
+                                    <p class="mb-4 text-sm">
+                                        This will merge <strong>{{ $anime->title }}</strong> into the anime you select below.
+                                        All list entries, reviews, and favourites will be moved to the target anime, and
+                                        <strong>{{ $anime->title }}</strong> will be permanently deleted. This cannot be undone.
+                                    </p>
+
+                                    <form action="{{ route('anime.merge', $anime->id) }}" method="POST">
+                                        @csrf
+
+                                        <!-- Filter -->
+                                        <div class="mb-2">
+                                            <label for="merge_filter" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Filter by name:</label>
+                                            <input type="text" id="merge_filter" onkeyup="filterMergeOptions()" placeholder="Type to filter..." class="mt-1 dark:bg-gray-700 dark:text-gray-200 form-input block w-full">
+                                        </div>
+
+                                        <!-- Target anime dropdown -->
+                                        <div class="mb-4">
+                                            <label for="target_anime_id" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Merge into:</label>
+                                            <select name="target_anime_id" id="target_anime_id" onchange="updateMergeConfirmState()" class="mt-1 dark:bg-gray-700 dark:text-gray-200 form-select block w-full" size="8">
+                                                @foreach ($similarAnime as $candidate)
+                                                    <option value="{{ $candidate->id }}">{{ $candidate->title }}@if ($candidate->year) ({{ $candidate->year }})@endif [ID: {{ $candidate->id }}]</option>
+                                                @endforeach
+                                            </select>
+                                            @if ($similarAnime->isEmpty())
+                                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">No anime with a similar name were found.</p>
+                                            @endif
+                                        </div>
+
+                                        <!-- Confirmation -->
+                                        <div class="mb-4">
+                                            <label for="confirmation" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Do you agree? This cannot be undone. Type <strong>agree</strong> to confirm:</label>
+                                            <input type="text" name="confirmation" id="confirmation" autocomplete="off" onkeyup="updateMergeConfirmState()" placeholder="agree" class="mt-1 dark:bg-gray-700 dark:text-gray-200 form-input block w-full">
+                                        </div>
+
+                                        <div class="flex justify-end gap-2">
+                                            <button type="button" onclick="closeMergeModal()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded">Cancel</button>
+                                            <button type="submit" id="merge_confirm_button" disabled class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">Confirm Merge</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        @endif
+
                         <h4 class="font-bold mt-4">Tags:</h4>
                         <ul>
                             @foreach (explode(', ', $anime->tags) as $tag)
@@ -261,15 +314,15 @@
 
                         <h4 class="font-bold @if (!empty(trim($anime->description))) mt-4 @endif mb-2">More Details:</h4>
                         <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            @foreach (explode(', ', $anime->sources) as $source)
+                            @foreach ($sortedSources as $source)
                                 <li><a href="{{ $source }}" target="_blank" rel="noopener" class="underline">{{ $source }}</a></li>
                             @endforeach
                         </ul>
 
-                        @if (!empty($anime->relations))
+                        @if (!empty($sortedRelations))
                             <h4 class="font-bold mt-4 mb-2">Related Anime:</h4>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                @foreach (explode(', ', $anime->relations) as $relation)
+                                @foreach ($sortedRelations as $relation)
                                     <li><a href="{{ $relation }}" target="_blank" rel="noopener" class="underline">{{ $relation }}</a></li>
                                 @endforeach
                             </ul>
@@ -469,6 +522,33 @@
         function toggleReviewForm() {
             let form = document.getElementById('reviewForm');
             form.classList.toggle('hidden');
+        }
+
+        function openMergeModal() {
+            document.getElementById('merge-modal').classList.remove('hidden');
+        }
+
+        function closeMergeModal() {
+            document.getElementById('merge-modal').classList.add('hidden');
+        }
+
+        function filterMergeOptions() {
+            const filter = document.getElementById('merge_filter').value.toLowerCase();
+            const options = document.querySelectorAll('#target_anime_id option');
+            options.forEach((option) => {
+                option.hidden = !option.textContent.toLowerCase().includes(filter);
+            });
+        }
+
+        // The confirm button stays disabled until a target is selected and "agree" is typed.
+        function updateMergeConfirmState() {
+            const select = document.getElementById('target_anime_id');
+            const confirmation = document.getElementById('confirmation').value.trim().toLowerCase();
+            const button = document.getElementById('merge_confirm_button');
+            const ready = select.value !== '' && confirmation === 'agree';
+            button.disabled = !ready;
+            button.classList.toggle('opacity-50', !ready);
+            button.classList.toggle('cursor-not-allowed', !ready);
         }
 
         function toggleReviewContent(reviewId) {
