@@ -46,6 +46,10 @@ Route::get('/anime/', [AnimeController::class, 'list'])->name('anime.list')->mid
 
 Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->name('anime.data')->middleware('2fa');
 
+// Must be registered before the /anime/{id}/{title?} catch-all below, otherwise
+// "merge-candidates" is treated as a title and the detail page is served instead.
+Route::get('/anime/{animeId}/merge-candidates', [AnimeController::class, 'mergeCandidates'])->name('anime.mergeCandidates')->middleware(['auth', '2fa']);
+
 Route::get('/anime/{id}/{title?}', [AnimeController::class, 'detail'])->name('anime.detail')->middleware('2fa');
 
 Route::get('/animelist/{username}', [AnimeController::class, 'userAnimeList'])->name('user.anime.list')->middleware('2fa');

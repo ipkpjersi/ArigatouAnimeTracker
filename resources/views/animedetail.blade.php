@@ -223,9 +223,18 @@
 
                         @if (auth()->user() && auth()->user()->isAdmin())
                             <!-- Merge Anime Button (admin only) -->
-                            <button type="button" onclick="openMergeModal()" class="mt-4 bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded w-full">
+                            <button type="button" onclick="openMergeModal()" class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded w-full">
                                 Merge Anime
                             </button>
+
+                            <style>
+                                /* width: max-content so a long row makes the listbox itself scroll horizontally
+                                   instead of overflowing onto the modal; min-width keeps short rows full width. */
+                                #target_anime_list .merge-option { padding: 0.25rem 0.5rem; cursor: pointer; width: max-content; min-width: 100%; }
+                                #target_anime_list .merge-option:hover { background-color: rgba(0, 0, 0, 0.06); }
+                                .dark #target_anime_list .merge-option:hover { background-color: rgba(255, 255, 255, 0.08); }
+                                #target_anime_list .merge-option[aria-selected="true"] { background-color: #2563eb; color: #fff; }
+                            </style>
 
                             <!-- Merge Anime Modal -->
                             <div id="merge-modal" class="hidden fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50">
@@ -242,18 +251,19 @@
 
                                         <!-- Filter -->
                                         <div class="mb-2">
-                                            <label for="merge_filter" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Filter by name:</label>
-                                            <input type="text" id="merge_filter" onkeyup="filterMergeOptions()" placeholder="Type to filter..." class="mt-1 dark:bg-gray-700 dark:text-gray-200 form-input block w-full">
+                                            <label for="merge_filter" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Search by title or synonym:</label>
+                                            <input type="text" id="merge_filter" onkeyup="searchMergeCandidates()" placeholder="Type to search..." autocomplete="off" class="mt-1 dark:bg-gray-700 dark:text-gray-200 form-input block w-full">
                                         </div>
 
                                         <!-- Target anime dropdown -->
                                         <div class="mb-4">
-                                            <label for="target_anime_id" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Merge into:</label>
-                                            <select name="target_anime_id" id="target_anime_id" onchange="updateMergeConfirmState()" class="mt-1 dark:bg-gray-700 dark:text-gray-200 form-select block w-full" size="8">
+                                            <label for="target_anime_list" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Merge into:</label>
+                                            <div id="target_anime_list" role="listbox" tabindex="0" class="mt-1 dark:bg-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded block w-full" style="height: 12rem; overflow: auto; white-space: nowrap;">
                                                 @foreach ($similarAnime as $candidate)
-                                                    <option value="{{ $candidate->id }}">{{ $candidate->title }}@if ($candidate->year) ({{ $candidate->year }})@endif [ID: {{ $candidate->id }}]</option>
+                                                    <div class="merge-option" role="option" aria-selected="false" data-id="{{ $candidate->id }}" onclick="selectMergeCandidate(this)">{{ $candidate->label }}</div>
                                                 @endforeach
-                                            </select>
+                                            </div>
+                                            <input type="hidden" name="target_anime_id" id="target_anime_id">
                                             @if ($similarAnime->isEmpty())
                                                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">No anime with a similar name were found.</p>
                                             @endif
@@ -532,12 +542,70 @@
             document.getElementById('merge-modal').classList.add('hidden');
         }
 
-        function filterMergeOptions() {
-            const filter = document.getElementById('merge_filter').value.toLowerCase();
-            const options = document.querySelectorAll('#target_anime_id option');
-            options.forEach((option) => {
-                option.hidden = !option.textContent.toLowerCase().includes(filter);
+        // Close the merge modal when clicking the backdrop (but not its content) or pressing Escape.
+        document.addEventListener('DOMContentLoaded', function () {
+            const mergeModal = document.getElementById('merge-modal');
+            if (!mergeModal) {
+                return;
+            }
+            mergeModal.addEventListener('click', function (event) {
+                if (event.target === mergeModal) {
+                    closeMergeModal();
+                }
             });
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && !mergeModal.classList.contains('hidden')) {
+                    closeMergeModal();
+                }
+            });
+        });
+
+        let mergeSearchTimeout = null;
+
+        // Live-search merge targets against title and synonyms server-side, mirroring
+        // the global anime search, so an English title finds its Japanese-titled
+        // duplicate and vice versa rather than only filtering a preloaded list.
+        function searchMergeCandidates() {
+            const keyword = document.getElementById('merge_filter').value.trim();
+            clearTimeout(mergeSearchTimeout);
+            mergeSearchTimeout = setTimeout(() => {
+                const url = "{{ route('anime.mergeCandidates', $anime->id) }}?q=" + encodeURIComponent(keyword);
+                fetch(url, { headers: { 'Accept': 'application/json' } })
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error('Merge candidate search failed: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then((candidates) => {
+                        const list = document.getElementById('target_anime_list');
+                        list.innerHTML = '';
+                        // Rebuilding the list clears any previous selection.
+                        document.getElementById('target_anime_id').value = '';
+                        candidates.forEach((candidate) => {
+                            const option = document.createElement('div');
+                            option.className = 'merge-option';
+                            option.setAttribute('role', 'option');
+                            option.setAttribute('aria-selected', 'false');
+                            option.setAttribute('data-id', candidate.id);
+                            option.onclick = () => selectMergeCandidate(option);
+                            option.textContent = candidate.label;
+                            list.appendChild(option);
+                        });
+                        updateMergeConfirmState();
+                    })
+                    .catch((error) => console.error(error));
+            }, 250);
+        }
+
+        // Highlight the clicked row and store its id in the hidden field the form submits.
+        function selectMergeCandidate(option) {
+            document.querySelectorAll('#target_anime_list .merge-option').forEach((el) => {
+                el.setAttribute('aria-selected', 'false');
+            });
+            option.setAttribute('aria-selected', 'true');
+            document.getElementById('target_anime_id').value = option.getAttribute('data-id');
+            updateMergeConfirmState();
         }
 
         // The confirm button stays disabled until a target is selected and "agree" is typed.

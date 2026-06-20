@@ -241,22 +241,120 @@ class AnimeController extends Controller
             return mb_strlen($word) >= 3;
         });
 
-        $query = DB::table('anime')
-            ->select('id', 'title', 'year', 'season')
-            ->where('id', '!=', $anime->id);
+        // Match against the synonyms too so duplicates whose title differs by
+        // language (an English title vs its Japanese synonym) still surface.
+        $synonyms = array_filter(preg_split('/[^\p{L}\p{N}]+/u', (string) $anime->synonyms), function ($word) {
+            return mb_strlen($word) >= 3;
+        });
+        $words = array_unique(array_merge($words, $synonyms));
+
+        $query = $this->mergeCandidateBaseQuery()
+            ->where('anime.id', '!=', $anime->id);
 
         if (! empty($words)) {
             $query->where(function ($q) use ($words) {
                 foreach ($words as $word) {
-                    $q->orWhere('title', 'LIKE', '%'.$word.'%');
+                    $q->orWhere('anime.title', 'LIKE', '%'.$word.'%')
+                        ->orWhere('anime.synonyms', 'LIKE', '%'.$word.'%');
                 }
             });
         } else {
             // Fall back to matching the entire title if no long words were found.
-            $query->where('title', 'LIKE', '%'.$anime->title.'%');
+            $query->where('anime.title', 'LIKE', '%'.$anime->title.'%');
         }
 
-        return $query->orderBy('title')->limit(100)->get();
+        return $query->orderBy('anime.title')->limit(100)->get()
+            ->each(fn ($row) => $row->label = $this->mergeCandidateLabel($row));
+    }
+
+    /**
+     * Base query for merge candidates, joining the type and status lookup tables
+     * so the dropdown can show episodes, type, status, and season for each entry.
+     */
+    private function mergeCandidateBaseQuery()
+    {
+        return DB::table('anime')
+            ->leftJoin('anime_type', 'anime.anime_type_id', '=', 'anime_type.id')
+            ->leftJoin('anime_status', 'anime.anime_status_id', '=', 'anime_status.id')
+            ->select(
+                'anime.id',
+                'anime.title',
+                'anime.year',
+                'anime.season',
+                'anime.synonyms',
+                'anime.episodes',
+                'anime_type.type',
+                'anime_status.status'
+            );
+    }
+
+    /**
+     * Format a merge candidate into a single descriptive label so the initial
+     * server-rendered list and the live-search JSON stay identical.
+     */
+    private function mergeCandidateLabel($row)
+    {
+        $parts = [];
+        if (! empty($row->type)) {
+            $parts[] = $row->type;
+        }
+        if (! is_null($row->episodes) && $row->episodes !== '') {
+            $parts[] = $row->episodes.' eps';
+        }
+        if (! empty($row->status)) {
+            $parts[] = $row->status;
+        }
+
+        // Combine season and year in the parentheses, e.g. "(SUMMER 2026)".
+        $seasonYear = [];
+        if (! empty($row->season) && $row->season !== 'UNDEFINED') {
+            $seasonYear[] = $row->season;
+        }
+        if (! empty($row->year)) {
+            $seasonYear[] = $row->year;
+        }
+
+        $label = $row->title;
+        if (! empty($seasonYear)) {
+            $label .= ' ('.implode(' ', $seasonYear).')';
+        }
+        if (! empty($parts)) {
+            $label .= ' - '.implode(', ', $parts);
+        }
+        $label .= ' [ID: '.$row->id.']';
+
+        return $label;
+    }
+
+    /**
+     * Live search for merge target candidates. Matches the keyword against both
+     * the title and the synonyms (the same fields the global anime search uses)
+     * so an English title also surfaces its Japanese-titled duplicate and vice
+     * versa. Admin only. Returns JSON for the merge modal dropdown.
+     */
+    public function mergeCandidates(Request $request, $animeId)
+    {
+        if (auth()->user() === null || ! auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $keyword = trim((string) $request->input('q'));
+
+        $query = $this->mergeCandidateBaseQuery()
+            ->where('anime.id', '!=', (int) $animeId);
+
+        if ($keyword !== '') {
+            $like = '%'.strtolower($keyword).'%';
+            $query->where(function ($q) use ($like) {
+                $q->whereRaw('LOWER(anime.title) LIKE ?', [$like])
+                    ->orWhereRaw('LOWER(anime.synonyms) LIKE ?', [$like]);
+            });
+        }
+
+        $candidates = $query->orderBy('anime.title')->limit(100)->get()
+            ->map(fn ($row) => ['id' => $row->id, 'label' => $this->mergeCandidateLabel($row)]);
+
+        return response()->json($candidates);
     }
 
     /**
@@ -297,9 +395,11 @@ class AnimeController extends Controller
             return redirect()->back()->with('popup', $result['message']);
         }
 
+        // target_id is a user FK and a merge has no user target, so leave it null;
+        // the affected anime ids are captured in the message below.
         StaffActionLog::create([
             'user_id' => auth()->id(),
-            'target_id' => $targetAnimeId,
+            'target_id' => null,
             'action' => 'merge_anime',
             'message' => 'Merged anime '.$oldTitle.' (anime ID: '.$animeId.') into anime ID: '.$targetAnimeId,
         ]);
