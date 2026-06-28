@@ -38,18 +38,23 @@ class AnimeAdditionalDataImportService
                         });
                 })
                     // New case: the anime already has a description/genres (so it
-                    // was skipped above) but its MAL stats were never fetched.
-                    // This path is independent of the description-empty retry
-                    // flag and uses its own mal_details_downloaded marker rather
-                    // than a data column, so persistent failures or anime that
-                    // genuinely have no stats are attempted once and then left
-                    // alone instead of being re-fetched on every run. When
-                    // forceMalDetailsRedownload is set we ignore that marker and
-                    // re-fetch every anime with a MAL source.
-                    ->orWhere(function ($subQuery) use ($forceMalDetailsRedownload) {
+                    // was skipped above) but its MAL details are still missing.
+                    // This mirrors the description gap-fill above: we key off the
+                    // data being empty (no studios) so missing details keep being
+                    // retried, and use the mal_details_empty flag the same way
+                    // api_descriptions_empty is used, to demote confirmed-empty
+                    // anime to the empty-only retry pass instead of re-attempting
+                    // them on every normal pass. When forceMalDetailsRedownload is
+                    // set we ignore both and re-fetch every anime with a MAL source.
+                    ->orWhere(function ($subQuery) use ($apiDescriptionsEmptyOnly, $forceMalDetailsRedownload) {
                         $subQuery->where('sources', 'LIKE', '%myanimelist.net/anime/%');
                         if (! $forceMalDetailsRedownload) {
-                            $subQuery->where('mal_details_downloaded', '=', 0);
+                            $subQuery->where('mal_details_empty', '=', $apiDescriptionsEmptyOnly ? 1 : 0)
+                                ->where(function ($malEmptyQuery) {
+                                    $malEmptyQuery->whereNull('studios')
+                                        ->orWhere(DB::raw('TRIM(studios)'), '=', '')
+                                        ->orWhere('studios', '=', '[]');
+                                });
                         }
                     });
             })
@@ -228,15 +233,15 @@ class AnimeAdditionalDataImportService
                     ->where('id', $row->id)
                     ->update(['api_descriptions_empty' => true]);
             }
-            // Mark that we attempted a MAL details fetch for this anime (only
-            // relevant when it has a MAL source). Set this regardless of whether
-            // the fetch succeeded so persistent failures are not re-selected on
-            // every run. To retry them, reset the flag via
-            // app:clear-anime-mal-details-downloads.
-            if ($malId) {
+            // Mirror api_descriptions_empty for MAL details: if this anime has a
+            // MAL source but the fetch returned no studios (our marker for MAL
+            // details being present), flag it as empty so it is retried via the
+            // empty-only pass rather than on every normal pass. Reset the flag
+            // with app:clear-anime-mal-details-empty to retry from the normal pass.
+            if ($malId && (empty($studios) || $studios === '[]')) {
                 DB::table('anime')
                     ->where('id', $row->id)
-                    ->update(['mal_details_downloaded' => true]);
+                    ->update(['mal_details_empty' => true]);
             }
             $sleepTime = config('global.additional_data_service_sleep_time', 15);
             $logger && $logger("Sleeping for $sleepTime seconds");
