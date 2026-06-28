@@ -50,6 +50,8 @@ Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->nam
 // "merge-candidates" is treated as a title and the detail page is served instead.
 Route::get('/anime/{animeId}/merge-candidates', [AnimeController::class, 'mergeCandidates'])->name('anime.mergeCandidates')->middleware(['auth', '2fa']);
 
+Route::get('/anime/{id}/other-anime', [AnimeController::class, 'otherAnime'])->name('anime.otherAnime')->middleware('2fa');
+
 Route::get('/anime/{id}/{title?}', [AnimeController::class, 'detail'])->name('anime.detail')->middleware('2fa');
 
 Route::get('/animelist/{username}', [AnimeController::class, 'userAnimeList'])->name('user.anime.list')->middleware('2fa');

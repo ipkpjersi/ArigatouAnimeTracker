@@ -176,60 +176,7 @@ class AnimeController extends Controller
             ->whereNotNull('score')
             ->count();
 
-        $otherAnimeTags = [
-            'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Sci-Fi',
-            'Slice of Life', 'Supernatural', 'Thriller', 'Romantic Comedy', 'Coming of Age', 'School', 'Sports',
-            'Magic', 'Military', 'Mecha', 'Music', 'Historical', 'Psychological', 'Battle Royale',
-            'Isekai', 'Post-Apocalyptic', 'Space', 'Time Travel', 'Virtual Reality', 'Superpower', 'Cyberpunk',
-            'Mystery', 'Harem', 'Reverse Harem', 'Tsundere', 'Yandere', 'Parody', 'Ojou-Sama', 'Maids',
-        ];
-
-        $currentAnimeTags = array_map('strtolower', explode(', ', $anime->tags));
-        $otherAnimeTags = array_map('strtolower', $otherAnimeTags);
-        $filteredTags = array_intersect($currentAnimeTags, $otherAnimeTags);
-        $otherAnime = [];
-        if (! empty($filteredTags)) {
-            $tagConditions = array_map(function ($tag) {
-                return "tags LIKE '%".$tag."%'";
-            }, $filteredTags);
-
-            $tagConditions = implode(' OR ', $tagConditions);
-
-            $otherAnime = DB::table('anime')
-                ->select('anime.*', DB::raw('(
-                    '.implode(' + ', array_map(function ($tag) {
-                    return "IF(tags LIKE '%".$tag."%', 1, 0)";
-                }, $filteredTags)).'
-                ) as match_count'))
-                ->where('id', '!=', $id)
-                ->whereRaw("($tagConditions)")
-                ->orderBy('match_count', 'desc')
-                ->limit(500)
-                ->get();
-
-            $page = LengthAwarePaginator::resolveCurrentPage('otheranimepage');
-            $perPage = 5;
-            $offset = ($page * $perPage) - $perPage;
-            $paginatedItems = $otherAnime->slice($offset, $perPage)->values();
-
-            // Attach the current user's list status (if any) to each of the
-            // other anime cards shown on this page.
-            if ($user) {
-                $otherAnimeStatuses = DB::table('anime_user')
-                    ->where('user_id', $user->id)
-                    ->whereIn('anime_id', $paginatedItems->pluck('id'))
-                    ->pluck('watch_status_id', 'anime_id');
-                $paginatedItems->each(function ($item) use ($otherAnimeStatuses, $watchStatuses) {
-                    $statusId = $otherAnimeStatuses[$item->id] ?? null;
-                    $item->list_status = $statusId ? ($watchStatuses[$statusId]->status ?? null) : null;
-                });
-            }
-
-            $otherAnime = new LengthAwarePaginator($paginatedItems, $otherAnime->count(), $perPage, $page, [
-                'path' => LengthAwarePaginator::resolveCurrentPath(),
-                'pageName' => 'otheranimepage',
-            ]);
-        }
+        $otherAnime = $this->getOtherAnime($anime, $user, $watchStatuses);
 
         // Sort the external links so the preferred sources (MAL, AniList, etc.) appear first.
         $sortedSources = Anime::sortLinksByPriority($anime->sources);
@@ -242,6 +189,86 @@ class AnimeController extends Controller
         }
 
         return view('animedetail', compact('anime', 'watchStatuses', 'currentUserStatus', 'currentUserProgress', 'currentUserScore', 'currentUserSortOrder', 'currentUserNotes', 'currentUserDisplayInList', 'currentUserShowAnimeNotesPublicly', 'reviews', 'userHasReview', 'userReview', 'totalReviewsCount', 'aatScore', 'aatMembers', 'aatUsers', 'otherAnime', 'favouriteSystemEnabled', 'favourite', 'sortedSources', 'sortedRelations', 'similarAnime'));
+    }
+
+    /**
+     * Slim endpoint that renders only the "Other Anime" section for a given
+     * anime. Used by the AJAX pagination on the detail page so we transfer just
+     * the section markup instead of the entire page.
+     */
+    public function otherAnime($id)
+    {
+        $anime = Anime::findOrFail($id);
+        $watchStatuses = WatchStatus::all()->keyBy('id');
+        $otherAnime = $this->getOtherAnime($anime, auth()->user(), $watchStatuses);
+
+        return view('partials.otheranime', compact('otherAnime'));
+    }
+
+    /**
+     * Build the paginated list of "Other Anime" (anime sharing tags with the
+     * given anime) and attach the current user's list status to each card.
+     */
+    private function getOtherAnime(Anime $anime, $user, $watchStatuses)
+    {
+        $otherAnimeTags = [
+            'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Sci-Fi',
+            'Slice of Life', 'Supernatural', 'Thriller', 'Romantic Comedy', 'Coming of Age', 'School', 'Sports',
+            'Magic', 'Military', 'Mecha', 'Music', 'Historical', 'Psychological', 'Battle Royale',
+            'Isekai', 'Post-Apocalyptic', 'Space', 'Time Travel', 'Virtual Reality', 'Superpower', 'Cyberpunk',
+            'Mystery', 'Harem', 'Reverse Harem', 'Tsundere', 'Yandere', 'Parody', 'Ojou-Sama', 'Maids',
+        ];
+
+        $currentAnimeTags = array_map('strtolower', explode(', ', $anime->tags));
+        $otherAnimeTags = array_map('strtolower', $otherAnimeTags);
+        $filteredTags = array_intersect($currentAnimeTags, $otherAnimeTags);
+        if (empty($filteredTags)) {
+            return [];
+        }
+
+        $tagConditions = array_map(function ($tag) {
+            return "tags LIKE '%".$tag."%'";
+        }, $filteredTags);
+
+        $tagConditions = implode(' OR ', $tagConditions);
+
+        $otherAnime = DB::table('anime')
+            ->select('anime.*', DB::raw('(
+                '.implode(' + ', array_map(function ($tag) {
+                return "IF(tags LIKE '%".$tag."%', 1, 0)";
+            }, $filteredTags)).'
+            ) as match_count'))
+            ->where('id', '!=', $anime->id)
+            ->whereRaw("($tagConditions)")
+            ->orderBy('match_count', 'desc')
+            ->limit(500)
+            ->get();
+
+        $page = LengthAwarePaginator::resolveCurrentPage('otheranimepage');
+        $perPage = 5;
+        $offset = ($page * $perPage) - $perPage;
+        $paginatedItems = $otherAnime->slice($offset, $perPage)->values();
+
+        // Attach the current user's list status (if any) to each of the
+        // other anime cards shown on this page.
+        if ($user) {
+            $otherAnimeStatuses = DB::table('anime_user')
+                ->where('user_id', $user->id)
+                ->whereIn('anime_id', $paginatedItems->pluck('id'))
+                ->pluck('watch_status_id', 'anime_id');
+            $paginatedItems->each(function ($item) use ($otherAnimeStatuses, $watchStatuses) {
+                $statusId = $otherAnimeStatuses[$item->id] ?? null;
+                $item->list_status = $statusId ? ($watchStatuses[$statusId]->status ?? null) : null;
+            });
+        }
+
+        // Always point pagination links at the full detail page (not the slim
+        // partial endpoint) so bookmarks and non-JS navigation load a real page.
+        // The AJAX handler intercepts these links and fetches the slim endpoint.
+        return new LengthAwarePaginator($paginatedItems, $otherAnime->count(), $perPage, $page, [
+            'path' => url('/anime/'.$anime->id),
+            'pageName' => 'otheranimepage',
+        ]);
     }
 
     /**

@@ -339,26 +339,9 @@
                         @endif
 
                         @if (!empty($otherAnime))
-                            <h4 class="font-bold mt-4 mb-2">Other Anime:</h4>
-                            <div id="other-anime-section">
-                                <div class="flex flex-wrap -mx-2" id="other-anime-list">
-                                    @foreach ($otherAnime as $other)
-                                        <div class="w-1/2 md:w-1/5 px-2 mb-4">
-                                            <a href="/anime/{{ $other->id }}/{{ Str::slug($other->title) }}" class="block border p-2 h-full rounded-lg">
-                                                <div class="h-full flex flex-col items-center">
-                                                    <img src="{{ $other->picture }}" onerror="this.onerror=null; this.src='/img/notfound.gif';" alt="{{ $other->title }}" class="h-16 w-12 mb-2 mt-1 rounded">
-                                                    <h5 class="text-center text-blue-600 dark:text-blue-400 hover:underline">{{ Str::limit($other->title, 40) }}</h5>
-                                                    @auth
-                                                        @if (!empty($other->list_status))
-                                                            <span class="inline-block bg-gray-500 text-white text-sm rounded px-2 py-1 mt-auto">{{ $other->list_status }}</span>
-                                                        @endif
-                                                    @endauth
-                                                </div>
-                                            </a>
-                                        </div>
-                                    @endforeach
-                                </div>
-                                {{ $otherAnime->links() }}
+                            <h4 class="font-bold mt-4 mb-2" id="other-anime-heading">Other Anime:</h4>
+                            <div id="other-anime-section" data-other-anime-url="{{ route('anime.otherAnime', $anime->id) }}">
+                                @include('partials.otheranime')
                             </div>
                         @endif
 
@@ -527,14 +510,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.location.search.includes('otheranimepage')) {
-                document.getElementById('other-anime-list').scrollIntoView({ behavior: 'instant' });
+                document.getElementById('other-anime-heading').scrollIntoView({ behavior: 'instant' });
             }
 
             // Other Anime pagination via AJAX for a smoother experience. The
-            // pagination links keep their real href so bookmarks and direct
-            // navigation (and a JS-disabled fallback) still work the old way.
+            // pagination links keep their real (full detail page) href so
+            // bookmarks and a JS-disabled fallback still work the old way, while
+            // the click handler fetches only the slim partial endpoint for speed.
             const otherAnimeSection = document.getElementById('other-anime-section');
             if (otherAnimeSection) {
+                const slimBase = otherAnimeSection.dataset.otherAnimeUrl;
+
                 // Show a spinner overlay while the next page loads. The overlay
                 // is a child of the section, so swapping in the new content
                 // removes it automatically.
@@ -550,28 +536,28 @@
                     otherAnimeSection.appendChild(overlay);
                 };
 
-                const loadOtherAnimePage = async (url, push) => {
+                // displayUrl is the bookmarkable full detail page URL; we derive
+                // the page number from it and fetch only the slim partial.
+                const loadOtherAnimePage = async (displayUrl, push) => {
                     showOtherAnimeLoading();
+                    const page = new URL(displayUrl, window.location.origin).searchParams.get('otheranimepage') || '1';
+                    const fetchUrl = slimBase + '?otheranimepage=' + encodeURIComponent(page);
                     try {
-                        const response = await fetch(url, {
+                        const response = await fetch(fetchUrl, {
                             headers: { 'X-Requested-With': 'XMLHttpRequest' },
                         });
-                        const text = await response.text();
-                        const newSection = new DOMParser()
-                            .parseFromString(text, 'text/html')
-                            .getElementById('other-anime-section');
-                        if (!newSection) {
-                            window.location.href = url;
+                        if (!response.ok) {
+                            window.location.href = displayUrl;
                             return;
                         }
-                        otherAnimeSection.innerHTML = newSection.innerHTML;
+                        otherAnimeSection.innerHTML = await response.text();
                         if (push) {
-                            window.history.pushState({ otherAnimePage: true }, '', url);
+                            window.history.pushState({ otherAnimePage: true }, '', displayUrl);
                         }
-                        document.getElementById('other-anime-list').scrollIntoView({ behavior: 'instant' });
+                        document.getElementById('other-anime-heading').scrollIntoView({ behavior: 'instant' });
                     } catch (error) {
                         // Fall back to a normal navigation if the AJAX load fails.
-                        window.location.href = url;
+                        window.location.href = displayUrl;
                     }
                 };
 
@@ -585,7 +571,7 @@
                         return;
                     }
                     event.preventDefault();
-                    loadOtherAnimePage(url.href, true);
+                    loadOtherAnimePage(link.href, true);
                 });
 
                 // Keep browser back/forward in sync with the AJAX pagination,
