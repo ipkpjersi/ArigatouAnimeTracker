@@ -81,7 +81,7 @@
                                     </span>
                                 </span>
                                 @if (count($synonyms) > 4)
-                                    <button id="toggle-button" onclick="toggleSynonyms()">&#x25BC; Show More</button>
+                                    <button id="toggle-button" onclick="toggleSynonyms()" class="text-blue-600 dark:text-blue-400 hover:underline">&#x25BC; Show More</button>
                                 @endif
                             </div>
                         @endif
@@ -325,7 +325,7 @@
                         <h4 class="font-bold @if (!empty(trim($anime->description))) mt-4 @endif mb-2">More Details:</h4>
                         <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @foreach ($sortedSources as $source)
-                                <li><a href="{{ $source }}" target="_blank" rel="noopener" class="underline">{{ $source }}</a></li>
+                                <li><a href="{{ $source }}" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 underline">{{ $source }}</a></li>
                             @endforeach
                         </ul>
 
@@ -333,7 +333,7 @@
                             <h4 class="font-bold mt-4 mb-2">Related Anime:</h4>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 @foreach ($sortedRelations as $relation)
-                                    <li><a href="{{ $relation }}" target="_blank" rel="noopener" class="underline">{{ $relation }}</a></li>
+                                    <li><a href="{{ $relation }}" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 underline">{{ $relation }}</a></li>
                                 @endforeach
                             </ul>
                         @endif
@@ -346,7 +346,12 @@
                                         <a href="/anime/{{ $other->id }}/{{ Str::slug($other->title) }}" class="block border p-2 h-full rounded-lg">
                                             <div class="h-full flex flex-col items-center">
                                                 <img src="{{ $other->picture }}" onerror="this.onerror=null; this.src='/img/notfound.gif';" alt="{{ $other->title }}" class="h-16 w-12 mb-2 mt-1 rounded">
-                                                <h5 class="text-center">{{ Str::limit($other->title, 40) }}</h5>
+                                                <h5 class="text-center text-blue-600 dark:text-blue-400 hover:underline">{{ Str::limit($other->title, 40) }}</h5>
+                                                @auth
+                                                    @if (!empty($other->list_status))
+                                                        <span class="inline-block bg-gray-500 text-white text-sm rounded px-2 py-1 mt-auto">{{ $other->list_status }}</span>
+                                                    @endif
+                                                @endauth
                                             </div>
                                         </a>
                                     </div>
@@ -507,7 +512,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.location.search.includes('otheranimepage')) {
-                document.getElementById('other-anime-list').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('other-anime-list').scrollIntoView({ behavior: 'instant' });
             }
             // Check if the element exists
             const statusModal = document.getElementById('status-modal');

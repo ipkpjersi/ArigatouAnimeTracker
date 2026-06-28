@@ -211,6 +211,20 @@ class AnimeController extends Controller
             $perPage = 5;
             $offset = ($page * $perPage) - $perPage;
             $paginatedItems = $otherAnime->slice($offset, $perPage)->values();
+
+            // Attach the current user's list status (if any) to each of the
+            // other anime cards shown on this page.
+            if ($user) {
+                $otherAnimeStatuses = DB::table('anime_user')
+                    ->where('user_id', $user->id)
+                    ->whereIn('anime_id', $paginatedItems->pluck('id'))
+                    ->pluck('watch_status_id', 'anime_id');
+                $paginatedItems->each(function ($item) use ($otherAnimeStatuses, $watchStatuses) {
+                    $statusId = $otherAnimeStatuses[$item->id] ?? null;
+                    $item->list_status = $statusId ? ($watchStatuses[$statusId]->status ?? null) : null;
+                });
+            }
+
             $otherAnime = new LengthAwarePaginator($paginatedItems, $otherAnime->count(), $perPage, $page, [
                 'path' => LengthAwarePaginator::resolveCurrentPath(),
                 'pageName' => 'otheranimepage',
