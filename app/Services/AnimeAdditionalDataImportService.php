@@ -257,19 +257,23 @@ class AnimeAdditionalDataImportService
         if ($genres !== null) {
             $updateData['genres'] = $genres;
         }
-        if ($malRank !== null) {
+        // Use !empty() rather than !== null for the MAL fields so an empty or
+        // zero value from the API never overwrites an existing known-good value
+        // (a real MAL rank/score/popularity/user count is never 0). This matches
+        // the SQL-file generation path below.
+        if (! empty($malRank)) {
             $updateData['mal_rank'] = $malRank;
         }
-        if ($malMean !== null) {
+        if (! empty($malMean)) {
             $updateData['mal_mean'] = $malMean;
         }
-        if ($malPopularity !== null) {
+        if (! empty($malPopularity)) {
             $updateData['mal_popularity'] = $malPopularity;
         }
-        if ($malScoringUsers !== null) {
+        if (! empty($malScoringUsers)) {
             $updateData['mal_scoring_users'] = $malScoringUsers;
         }
-        if ($malListMembers !== null) {
+        if (! empty($malListMembers)) {
             $updateData['mal_list_members'] = $malListMembers;
         }
         if ($averageDuration !== null) {
@@ -303,7 +307,7 @@ class AnimeAdditionalDataImportService
             $updateData['related_anime'] = $relatedAnime;
         }
         if ($relatedManga !== null) {
-            $updateData['related_manga'] = $relatedAnime;
+            $updateData['related_manga'] = $relatedManga;
         }
 
         if (! empty($updateData)) {
