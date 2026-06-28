@@ -251,16 +251,16 @@ class AnimeAdditionalDataImportService
     {
         $updateData = [];
 
-        if ($description !== null) {
+        // Use !empty() rather than !== null throughout so an empty or zero value
+        // from a sparse API response never overwrites existing known-good data.
+        // This also keeps this path consistent with the SQL-file path below.
+        if (! empty($description)) {
             $updateData['description'] = $description;
         }
-        if ($genres !== null) {
+        if (! empty($genres)) {
             $updateData['genres'] = $genres;
         }
-        // Use !empty() rather than !== null for the MAL fields so an empty or
-        // zero value from the API never overwrites an existing known-good value
-        // (a real MAL rank/score/popularity/user count is never 0). This matches
-        // the SQL-file generation path below.
+        // A real MAL rank/score/popularity/user count is never 0.
         if (! empty($malRank)) {
             $updateData['mal_rank'] = $malRank;
         }
@@ -276,37 +276,35 @@ class AnimeAdditionalDataImportService
         if (! empty($malListMembers)) {
             $updateData['mal_list_members'] = $malListMembers;
         }
-        if ($averageDuration !== null) {
+        if (! empty($averageDuration)) {
             $updateData['duration'] = $averageDuration;
-        }
-        if ($averageDuration !== null) {
             $updateData['duration_downloaded'] = 1;
         }
-        if ($rating !== null) {
+        if (! empty($rating)) {
             $updateData['rating'] = $rating;
-        }
-        if ($rating !== null) {
             $updateData['rating_downloaded'] = 1;
         }
-        if ($source !== null) {
+        if (! empty($source)) {
             $updateData['source'] = $source;
         }
-        if ($background !== null) {
+        if (! empty($background)) {
             $updateData['background'] = $background;
         }
-        if ($recommendations !== null) {
+        // These are JSON-encoded arrays, so an empty result is the literal "[]"
+        // (not null or ''). Skip it so we never wipe existing data with "[]".
+        if (! empty($recommendations) && $recommendations !== '[]') {
             $updateData['recommendations'] = $recommendations;
         }
-        if ($studios !== null) {
+        if (! empty($studios) && $studios !== '[]') {
             $updateData['studios'] = $studios;
         }
-        if ($broadcast !== null) {
+        if (! empty($broadcast) && $broadcast !== '[]') {
             $updateData['broadcast'] = $broadcast;
         }
-        if ($relatedAnime !== null) {
+        if (! empty($relatedAnime) && $relatedAnime !== '[]') {
             $updateData['related_anime'] = $relatedAnime;
         }
-        if ($relatedManga !== null) {
+        if (! empty($relatedManga) && $relatedManga !== '[]') {
             $updateData['related_manga'] = $relatedManga;
         }
 
@@ -333,11 +331,13 @@ class AnimeAdditionalDataImportService
             $ratingDownloaded = ! empty($rating) && $rating !== 'NULL' ? 1 : 0;
             $source = ! empty($source) ? addslashes($source) : $anime->source ?? 'NULL';
             $background = ! empty($background) ? addslashes($background) : $anime->background ?? 'NULL';
-            $recommendations = ! empty($recommendations) ? addslashes($recommendations) : $anime->recommendations ?? 'NULL';
-            $studios = ! empty($studios) ? addslashes($studios) : $anime->studios ?? 'NULL';
-            $broadcast = ! empty($broadcast) ? addslashes($broadcast) : $anime->broadcast ?? 'NULL';
-            $relatedAnime = ! empty($relatedAnime) ? addslashes($relatedAnime) : $anime->related_anime ?? 'NULL';
-            $relatedManga = ! empty($relatedManga) ? addslashes($relatedManga) : $anime->related_manga ?? 'NULL';
+            // Treat an empty JSON array ("[]") as empty so we fall back to the
+            // existing value instead of overwriting it with "[]".
+            $recommendations = (! empty($recommendations) && $recommendations !== '[]') ? addslashes($recommendations) : $anime->recommendations ?? 'NULL';
+            $studios = (! empty($studios) && $studios !== '[]') ? addslashes($studios) : $anime->studios ?? 'NULL';
+            $broadcast = (! empty($broadcast) && $broadcast !== '[]') ? addslashes($broadcast) : $anime->broadcast ?? 'NULL';
+            $relatedAnime = (! empty($relatedAnime) && $relatedAnime !== '[]') ? addslashes($relatedAnime) : $anime->related_anime ?? 'NULL';
+            $relatedManga = (! empty($relatedManga) && $relatedManga !== '[]') ? addslashes($relatedManga) : $anime->related_manga ?? 'NULL';
 
             $updateQuery = "UPDATE anime SET description = '$description', genres = '$genres', mal_mean = $malMean, mal_rank = $malRank, mal_popularity = $malPopularity, mal_scoring_users = $malScoringUsers, mal_list_members = $malListMembers, duration = $averageDuration, duration_downloaded = $durationDownloaded, rating = '$rating', rating_downloaded = $ratingDownloaded, source = '$source', background = '$background', recommendations = '$recommendations', studios = '$studios', broadcast = '$broadcast', related_anime = '$relatedAnime', related_manga = '$relatedManga' WHERE title = '$title' AND anime_type_id = $anime->anime_type_id AND anime_status_id = $anime->anime_status_id AND season = $season AND year = $year AND episodes = $anime->episodes;\n";
             fwrite($sqlFile, $updateQuery);
