@@ -511,6 +511,19 @@
             </div>
         </div>
     </div>
+    <style>
+        .other-anime-spinner {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 4px solid rgba(59, 130, 246, 0.3);
+            border-top-color: #3b82f6;
+            border-radius: 9999px;
+            animation: other-anime-spin 0.7s linear infinite;
+        }
+        @keyframes other-anime-spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.location.search.includes('otheranimepage')) {
@@ -522,7 +535,23 @@
             // navigation (and a JS-disabled fallback) still work the old way.
             const otherAnimeSection = document.getElementById('other-anime-section');
             if (otherAnimeSection) {
+                // Show a spinner overlay while the next page loads. The overlay
+                // is a child of the section, so swapping in the new content
+                // removes it automatically.
+                const showOtherAnimeLoading = () => {
+                    otherAnimeSection.style.position = 'relative';
+                    if (document.getElementById('other-anime-loading')) {
+                        return;
+                    }
+                    const overlay = document.createElement('div');
+                    overlay.id = 'other-anime-loading';
+                    overlay.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(127,127,127,0.25);z-index:10;';
+                    overlay.innerHTML = '<div class="other-anime-spinner"></div>';
+                    otherAnimeSection.appendChild(overlay);
+                };
+
                 const loadOtherAnimePage = async (url, push) => {
+                    showOtherAnimeLoading();
                     try {
                         const response = await fetch(url, {
                             headers: { 'X-Requested-With': 'XMLHttpRequest' },
