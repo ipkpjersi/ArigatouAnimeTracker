@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 #[Signature('app:download-and-import-anime-data')]
-#[Description('Download and import anime data, then download additional data and images. This is the recommended import command.')]
+#[Description('Download and import anime data, then download additional data and images. This is the recommended import/update command.')]
 class DownloadAndImportAnimeData extends Command
 {
     /**
