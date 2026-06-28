@@ -510,7 +510,20 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.location.search.includes('otheranimepage')) {
-                document.getElementById('other-anime-heading').scrollIntoView({ behavior: 'instant' });
+                // Scroll the Other Anime heading into view on a full page load
+                // (bookmark / hard navigation). Run it now and again on window
+                // load: the main cover image (and other content above) has no
+                // fixed dimensions, so it has ~0 height at DOMContentLoaded and
+                // pushes the heading down once it loads. Re-running on load
+                // corrects the position after that layout shift settles.
+                const snapToOtherAnime = () => {
+                    const heading = document.getElementById('other-anime-heading');
+                    if (heading) {
+                        heading.scrollIntoView({ behavior: 'instant' });
+                    }
+                };
+                snapToOtherAnime();
+                window.addEventListener('load', snapToOtherAnime);
             }
 
             // Other Anime pagination via AJAX for a smoother experience. The
