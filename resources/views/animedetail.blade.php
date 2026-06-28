@@ -554,7 +554,11 @@
                         if (push) {
                             window.history.pushState({ otherAnimePage: true }, '', displayUrl);
                         }
-                        document.getElementById('other-anime-heading').scrollIntoView({ behavior: 'instant' });
+                        // Intentionally do not scrollIntoView here: on an async
+                        // pagination load the section swaps in place, so snapping
+                        // to the heading would yank the viewport. The full page
+                        // load path (DOMContentLoaded above) still snaps, which
+                        // is what we want for bookmarks/hard navigations.
                     } catch (error) {
                         // Fall back to a normal navigation if the AJAX load fails.
                         window.location.href = displayUrl;
