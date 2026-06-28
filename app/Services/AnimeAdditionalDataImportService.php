@@ -12,21 +12,46 @@ use function App\Helpers\safe_json_encode;
 
 class AnimeAdditionalDataImportService
 {
-    public function downloadAdditionalAnimeData($logger = null, $generateSqlFile = false, $apiDescriptionsEmptyOnly = false)
+    public function downloadAdditionalAnimeData($logger = null, $generateSqlFile = false, $apiDescriptionsEmptyOnly = false, $forceMalDetailsRedownload = false)
     {
         $startTime = microtime(true);
         $count = 0;
         $all = DB::table('anime')
             ->get();
         $anime = DB::table('anime')
-            ->where('api_descriptions_empty', '=', $apiDescriptionsEmptyOnly ? 'true' : 'false')
-            ->where(function ($query) {
-                $query->whereNull('description')
-                    ->orWhere(DB::raw('TRIM(description)'), '=', '');
-            })
-            ->where(function ($query) {
-                $query->whereNull('genres')
-                    ->orWhere(DB::raw('TRIM(genres)'), '=', '');
+            ->where(function ($query) use ($apiDescriptionsEmptyOnly, $forceMalDetailsRedownload) {
+                // Original case: the anime is missing both its description and
+                // its genres, so we need to fetch those. This path is gated by
+                // the api_descriptions_empty retry flag. That column is a
+                // tinyint(1), so compare against the integers 1/0 rather than
+                // the strings 'true'/'false' (both of which MySQL casts to 0,
+                // which made the empty-only retry mode target the wrong rows).
+                $query->where(function ($subQuery) use ($apiDescriptionsEmptyOnly) {
+                    $subQuery->where('api_descriptions_empty', '=', $apiDescriptionsEmptyOnly ? 1 : 0)
+                        ->where(function ($descQuery) {
+                            $descQuery->whereNull('description')
+                                ->orWhere(DB::raw('TRIM(description)'), '=', '');
+                        })
+                        ->where(function ($genresQuery) {
+                            $genresQuery->whereNull('genres')
+                                ->orWhere(DB::raw('TRIM(genres)'), '=', '');
+                        });
+                })
+                    // New case: the anime already has a description/genres (so it
+                    // was skipped above) but its MAL stats were never fetched.
+                    // This path is independent of the description-empty retry
+                    // flag and uses its own mal_details_downloaded marker rather
+                    // than a data column, so persistent failures or anime that
+                    // genuinely have no stats are attempted once and then left
+                    // alone instead of being re-fetched on every run. When
+                    // forceMalDetailsRedownload is set we ignore that marker and
+                    // re-fetch every anime with a MAL source.
+                    ->orWhere(function ($subQuery) use ($forceMalDetailsRedownload) {
+                        $subQuery->where('sources', 'LIKE', '%myanimelist.net/anime/%');
+                        if (! $forceMalDetailsRedownload) {
+                            $subQuery->where('mal_details_downloaded', '=', 0);
+                        }
+                    });
             })
             ->get();
         $total = $all->count();
@@ -182,6 +207,16 @@ class AnimeAdditionalDataImportService
                 DB::table('anime')
                     ->where('id', $row->id)
                     ->update(['api_descriptions_empty' => true]);
+            }
+            // Mark that we attempted a MAL details fetch for this anime (only
+            // relevant when it has a MAL source). Set this regardless of whether
+            // the fetch succeeded so persistent failures are not re-selected on
+            // every run. To retry them, reset the flag via
+            // app:clear-anime-mal-details-downloads.
+            if ($malId) {
+                DB::table('anime')
+                    ->where('id', $row->id)
+                    ->update(['mal_details_downloaded' => true]);
             }
             $sleepTime = config('global.additional_data_service_sleep_time', 15);
             $logger && $logger("Sleeping for $sleepTime seconds");
