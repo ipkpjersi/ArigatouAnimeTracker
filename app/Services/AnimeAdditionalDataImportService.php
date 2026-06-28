@@ -135,6 +135,26 @@ class AnimeAdditionalDataImportService
                         $relatedManga = safe_json_encode($data['related_manga'] ?? []); // Any similarly related manga to this.
 
                         $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
+
+                        // Note which MAL stat fields came back empty. MAL does
+                        // not publish a mean score or rank (and sometimes not
+                        // even scoring users) until an anime crosses a minimum
+                        // scoring-member threshold, so these are routinely null
+                        // for low-popularity/new anime even when popularity and
+                        // members are present. Logging this makes it clear the
+                        // gap is MAL withholding the data, not our import.
+                        $missingMalFields = array_keys(array_filter([
+                            'rank' => $malRank,
+                            'mean' => $malMean,
+                            'popularity' => $malPopularity,
+                            'scoring_users' => $malUsers,
+                            'members' => $malMembers,
+                        ], function ($value) {
+                            return empty($value);
+                        }));
+                        if ($missingMalFields) {
+                            $logger && $logger('MAL returned no '.implode(', ', $missingMalFields).' for anime: '.$row->title);
+                        }
                     } elseif ($response) {
                         $data = $response->json();
                         $logger && $logger('Failed update response from MAL for anime: '.$row->title.' '.print_r($data, true));
