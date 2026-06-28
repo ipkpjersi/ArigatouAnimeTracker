@@ -358,8 +358,8 @@
                                         </div>
                                     @endforeach
                                 </div>
+                                {{ $otherAnime->links() }}
                             </div>
-                            {{ $otherAnime->links() }}
                         @endif
 
                         <!-- Anime Reviews Section -->
