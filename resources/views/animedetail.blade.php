@@ -340,22 +340,24 @@
 
                         @if (!empty($otherAnime))
                             <h4 class="font-bold mt-4 mb-2">Other Anime:</h4>
-                            <div class="flex flex-wrap -mx-2" id="other-anime-list">
-                                @foreach ($otherAnime as $other)
-                                    <div class="w-1/2 md:w-1/5 px-2 mb-4">
-                                        <a href="/anime/{{ $other->id }}/{{ Str::slug($other->title) }}" class="block border p-2 h-full rounded-lg">
-                                            <div class="h-full flex flex-col items-center">
-                                                <img src="{{ $other->picture }}" onerror="this.onerror=null; this.src='/img/notfound.gif';" alt="{{ $other->title }}" class="h-16 w-12 mb-2 mt-1 rounded">
-                                                <h5 class="text-center text-blue-600 dark:text-blue-400 hover:underline">{{ Str::limit($other->title, 40) }}</h5>
-                                                @auth
-                                                    @if (!empty($other->list_status))
-                                                        <span class="inline-block bg-gray-500 text-white text-sm rounded px-2 py-1 mt-auto">{{ $other->list_status }}</span>
-                                                    @endif
-                                                @endauth
-                                            </div>
-                                        </a>
-                                    </div>
-                                @endforeach
+                            <div id="other-anime-section">
+                                <div class="flex flex-wrap -mx-2" id="other-anime-list">
+                                    @foreach ($otherAnime as $other)
+                                        <div class="w-1/2 md:w-1/5 px-2 mb-4">
+                                            <a href="/anime/{{ $other->id }}/{{ Str::slug($other->title) }}" class="block border p-2 h-full rounded-lg">
+                                                <div class="h-full flex flex-col items-center">
+                                                    <img src="{{ $other->picture }}" onerror="this.onerror=null; this.src='/img/notfound.gif';" alt="{{ $other->title }}" class="h-16 w-12 mb-2 mt-1 rounded">
+                                                    <h5 class="text-center text-blue-600 dark:text-blue-400 hover:underline">{{ Str::limit($other->title, 40) }}</h5>
+                                                    @auth
+                                                        @if (!empty($other->list_status))
+                                                            <span class="inline-block bg-gray-500 text-white text-sm rounded px-2 py-1 mt-auto">{{ $other->list_status }}</span>
+                                                        @endif
+                                                    @endauth
+                                                </div>
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                             {{ $otherAnime->links() }}
                         @endif
@@ -513,6 +515,55 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (window.location.search.includes('otheranimepage')) {
                 document.getElementById('other-anime-list').scrollIntoView({ behavior: 'instant' });
+            }
+
+            // Other Anime pagination via AJAX for a smoother experience. The
+            // pagination links keep their real href so bookmarks and direct
+            // navigation (and a JS-disabled fallback) still work the old way.
+            const otherAnimeSection = document.getElementById('other-anime-section');
+            if (otherAnimeSection) {
+                const loadOtherAnimePage = async (url, push) => {
+                    try {
+                        const response = await fetch(url, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        });
+                        const text = await response.text();
+                        const newSection = new DOMParser()
+                            .parseFromString(text, 'text/html')
+                            .getElementById('other-anime-section');
+                        if (!newSection) {
+                            window.location.href = url;
+                            return;
+                        }
+                        otherAnimeSection.innerHTML = newSection.innerHTML;
+                        if (push) {
+                            window.history.pushState({ otherAnimePage: true }, '', url);
+                        }
+                        document.getElementById('other-anime-list').scrollIntoView({ behavior: 'instant' });
+                    } catch (error) {
+                        // Fall back to a normal navigation if the AJAX load fails.
+                        window.location.href = url;
+                    }
+                };
+
+                otherAnimeSection.addEventListener('click', (event) => {
+                    const link = event.target.closest('a');
+                    if (!link || !otherAnimeSection.contains(link)) {
+                        return;
+                    }
+                    const url = new URL(link.href, window.location.origin);
+                    if (!url.searchParams.has('otheranimepage')) {
+                        return;
+                    }
+                    event.preventDefault();
+                    loadOtherAnimePage(url.href, true);
+                });
+
+                // Keep browser back/forward in sync with the AJAX pagination,
+                // including returning to the first page (no otheranimepage param).
+                window.addEventListener('popstate', () => {
+                    loadOtherAnimePage(window.location.href, false);
+                });
             }
             // Check if the element exists
             const statusModal = document.getElementById('status-modal');
