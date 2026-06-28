@@ -213,6 +213,10 @@ class UserController extends Controller
             return response()->json([], 404);
         }
         $user = User::findOrFail($userId);
+        // Admins cannot ban themselves or other admins.
+        if ($user->id === auth()->id() || $user->isAdmin()) {
+            return response()->json(['message' => 'You cannot ban this user'], 403);
+        }
         $user->is_banned = true;
         $user->save();
 
