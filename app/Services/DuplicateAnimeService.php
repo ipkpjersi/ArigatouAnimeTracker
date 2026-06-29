@@ -6,6 +6,7 @@ use App\Models\Anime;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use League\Csv\Writer;
 
@@ -133,6 +134,12 @@ class DuplicateAnimeService
             // Log start of process
             $logger && $logger("Starting merge of anime ID $oldAnimeId into $newAnimeId");
 
+            // Reconcile column data before deleting the old row. The target (new)
+            // anime keeps all of its own populated values; any field that is null
+            // or empty on the target is back-filled from the old entry so scraped
+            // data like mal_rank, mal_members, description, etc. is not lost.
+            $this->reconcileAnimeColumns($oldAnimeId, $newAnimeId, $logger);
+
             // Update references in anime_user table
             DB::table('anime_user')
                 ->where('anime_id', $oldAnimeId)
@@ -170,6 +177,56 @@ class DuplicateAnimeService
             Log::error("Error merging anime IDs $oldAnimeId into $newAnimeId: ".$e->getMessage());
 
             return ['status' => 'error', 'message' => 'Merge failed: '.$e->getMessage()];
+        }
+    }
+
+    /**
+     * Back-fill any null or empty columns on the target (new) anime using the
+     * values from the old anime that is about to be deleted. The target's own
+     * populated values always win on conflict, so this only ever fills gaps and
+     * never overwrites existing data. Identity and timestamp columns are skipped.
+     *
+     * Booleans and numeric zeros are treated as real values (not "empty"), so a
+     * legitimate 0 or false on the target is never clobbered.
+     */
+    private function reconcileAnimeColumns($oldAnimeId, $newAnimeId, $logger = null)
+    {
+        $oldAnime = DB::table('anime')->where('id', $oldAnimeId)->first();
+        $newAnime = DB::table('anime')->where('id', $newAnimeId)->first();
+
+        // Nothing to reconcile if either row is missing.
+        if (! $oldAnime || ! $newAnime) {
+            return;
+        }
+
+        // Pull columns dynamically so new migrations are covered automatically.
+        $skip = ['id', 'created_at', 'updated_at'];
+        $columns = array_diff(Schema::getColumnListing('anime'), $skip);
+
+        $updates = [];
+        foreach ($columns as $column) {
+            $newValue = $newAnime->$column ?? null;
+            $oldValue = $oldAnime->$column ?? null;
+
+            // Only fill when the target is empty (null or empty string) and the
+            // old row actually has something to offer. The string '0' and other
+            // numeric/boolean zeros are not considered empty here.
+            $targetEmpty = $newValue === null || $newValue === '';
+            $oldHasValue = $oldValue !== null && $oldValue !== '';
+
+            if ($targetEmpty && $oldHasValue) {
+                $updates[$column] = $oldValue;
+            }
+        }
+
+        if (! empty($updates)) {
+            DB::table('anime')
+                ->where('id', $newAnimeId)
+                ->update($updates);
+
+            $logger && $logger('Back-filled '.count($updates).' empty field(s) on anime ID '.$newAnimeId.' from anime ID '.$oldAnimeId.': '.implode(', ', array_keys($updates)));
+        } else {
+            $logger && $logger("No empty fields on anime ID $newAnimeId to back-fill from anime ID $oldAnimeId");
         }
     }
 }
