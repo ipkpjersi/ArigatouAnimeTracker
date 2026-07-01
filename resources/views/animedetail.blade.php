@@ -241,9 +241,10 @@
                                 <div class="bg-white dark:bg-gray-800 dark:text-gray-200 p-6 rounded shadow-lg w-11/12 max-w-lg max-h-screen overflow-y-auto">
                                     <h3 class="text-lg font-bold mb-2">Merge Anime</h3>
                                     <p class="mb-4 text-sm">
-                                        This will merge <strong>{{ $anime->title }}</strong> into the anime you select below.
-                                        All list entries, reviews, and favourites will be moved to the target anime, and
-                                        <strong>{{ $anime->title }}</strong> will be permanently deleted. This cannot be undone.
+                                        This will merge <strong>{{ $anime->title }}</strong> (ID {{ $anime->id }}, the anime you are currently viewing)
+                                        into the anime you select below. All list entries, reviews, and favourites will be moved to the target anime, and
+                                        <strong>{{ $anime->title }}</strong> (ID {{ $anime->id }}) will be
+                                        <strong>permanently deleted</strong>. This cannot be undone.
                                     </p>
 
                                     <form action="{{ route('anime.merge', $anime->id) }}" method="POST">
