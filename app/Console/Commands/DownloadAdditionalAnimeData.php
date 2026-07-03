@@ -8,8 +8,8 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
-#[Signature('app:download-anime-additional-data {generateSqlFile?} {apiDescriptionsEmptyOnly?} {--forceMalRedownload}')]
-#[Description('Fetches and inserts additional data for anime from the MyAnimeList (or notify.moe or kitsu.io) API. Optionally generates an importable SQL file. Optionally runs for API empty descriptions only (to force a retry of fetching descriptions). Optionally forces a re-download of MAL details for every anime with a MAL source, even ones already marked as downloaded.')]
+#[Signature('app:download-anime-additional-data {generateSqlFile?} {apiEmptyOnly?} {--forceMalRedownload}')]
+#[Description('Fetches and inserts additional data for anime from the MyAnimeList (or notify.moe or kitsu.io) API. Optionally generates an importable SQL file. Optionally runs the empty-only pass, which retries only anime already flagged empty on a previous attempt (api_descriptions_empty for descriptions/genres, mal_details_empty for MAL details) rather than the not-yet-flagged anime the normal pass targets. Optionally forces a re-download of MAL details for every anime with a MAL source, even ones already marked as downloaded.')]
 class DownloadAdditionalAnimeData extends Command
 {
     /**
@@ -18,7 +18,7 @@ class DownloadAdditionalAnimeData extends Command
     public function handle(AnimeAdditionalDataImportService $animeAdditionalDataImportService): void
     {
         $generateSqlFile = $this->argument('generateSqlFile') ?? false;
-        $apiDescriptionsEmptyOnly = $this->argument('apiDescriptionsEmptyOnly') ?? false;
+        $apiEmptyOnly = $this->argument('apiEmptyOnly') ?? false;
         $forceMalDetailsRedownload = $this->option('forceMalRedownload');
 
         $this->info('Starting to fetch additional anime data '.($generateSqlFile ? 'with generating an SQL file' : 'without generating an SQL file').'...');
@@ -28,7 +28,7 @@ class DownloadAdditionalAnimeData extends Command
                 $this->info($message);
             };
 
-            $result = $animeAdditionalDataImportService->downloadAdditionalAnimeData($logger, $generateSqlFile, $apiDescriptionsEmptyOnly, $forceMalDetailsRedownload);
+            $result = $animeAdditionalDataImportService->downloadAdditionalAnimeData($logger, $generateSqlFile, $apiEmptyOnly, $forceMalDetailsRedownload);
             $duration = round($result['duration'], 2);
 
             $this->info("Fetched and updated additional anime data for {$result['count']} out of {$result['total']} anime records successfully in {$duration} seconds.");

@@ -12,22 +12,22 @@ use function App\Helpers\safe_json_encode;
 
 class AnimeAdditionalDataImportService
 {
-    public function downloadAdditionalAnimeData($logger = null, $generateSqlFile = false, $apiDescriptionsEmptyOnly = false, $forceMalDetailsRedownload = false)
+    public function downloadAdditionalAnimeData($logger = null, $generateSqlFile = false, $apiEmptyOnly = false, $forceMalDetailsRedownload = false)
     {
         $startTime = microtime(true);
         $count = 0;
         $all = DB::table('anime')
             ->get();
         $anime = DB::table('anime')
-            ->where(function ($query) use ($apiDescriptionsEmptyOnly, $forceMalDetailsRedownload) {
+            ->where(function ($query) use ($apiEmptyOnly, $forceMalDetailsRedownload) {
                 // Original case: the anime is missing both its description and
                 // its genres, so we need to fetch those. This path is gated by
                 // the api_descriptions_empty retry flag. That column is a
                 // tinyint(1), so compare against the integers 1/0 rather than
                 // the strings 'true'/'false' (both of which MySQL casts to 0,
                 // which made the empty-only retry mode target the wrong rows).
-                $query->where(function ($subQuery) use ($apiDescriptionsEmptyOnly) {
-                    $subQuery->where('api_descriptions_empty', '=', $apiDescriptionsEmptyOnly ? 1 : 0)
+                $query->where(function ($subQuery) use ($apiEmptyOnly) {
+                    $subQuery->where('api_descriptions_empty', '=', $apiEmptyOnly ? 1 : 0)
                         ->where(function ($descQuery) {
                             $descQuery->whereNull('description')
                                 ->orWhere(DB::raw('TRIM(description)'), '=', '');
@@ -38,22 +38,32 @@ class AnimeAdditionalDataImportService
                         });
                 })
                     // New case: the anime already has a description/genres (so it
-                    // was skipped above) but its MAL details are still missing.
-                    // This mirrors the description gap-fill above: we key off the
-                    // data being empty (no studios) so missing details keep being
+                    // was skipped above) but some of its MAL details are still
+                    // missing. This mirrors the description gap-fill above: we key
+                    // off the data being empty so missing details keep being
                     // retried, and use the mal_details_empty flag the same way
                     // api_descriptions_empty is used, to demote confirmed-empty
                     // anime to the empty-only retry pass instead of re-attempting
-                    // them on every normal pass. When forceMalDetailsRedownload is
+                    // them on every normal pass. We treat MAL details as
+                    // incomplete when EITHER studios OR mal_mean is empty, since
+                    // both are MAL-provided: MAL publishes studios as soon as an
+                    // anime is announced but withholds the score/rank until the
+                    // anime crosses a minimum scoring-member threshold, so an
+                    // anime imported while airing gets studios immediately and
+                    // would otherwise be treated as complete and never re-checked
+                    // for the score MAL publishes later. Checking mal_mean too is
+                    // what catches that case. When forceMalDetailsRedownload is
                     // set we ignore both and re-fetch every anime with a MAL source.
-                    ->orWhere(function ($subQuery) use ($apiDescriptionsEmptyOnly, $forceMalDetailsRedownload) {
+                    ->orWhere(function ($subQuery) use ($apiEmptyOnly, $forceMalDetailsRedownload) {
                         $subQuery->where('sources', 'LIKE', '%myanimelist.net/anime/%');
                         if (! $forceMalDetailsRedownload) {
-                            $subQuery->where('mal_details_empty', '=', $apiDescriptionsEmptyOnly ? 1 : 0)
+                            $subQuery->where('mal_details_empty', '=', $apiEmptyOnly ? 1 : 0)
                                 ->where(function ($malEmptyQuery) {
                                     $malEmptyQuery->whereNull('studios')
                                         ->orWhere(DB::raw('TRIM(studios)'), '=', '')
-                                        ->orWhere('studios', '=', '[]');
+                                        ->orWhere('studios', '=', '[]')
+                                        ->orWhereNull('mal_mean')
+                                        ->orWhere(DB::raw('TRIM(mal_mean)'), '=', '');
                                 });
                         }
                     });
@@ -140,6 +150,12 @@ class AnimeAdditionalDataImportService
                         $relatedManga = safe_json_encode($data['related_manga'] ?? []); // Any similarly related manga to this.
 
                         $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
+                        // Also record MAL successes to the anime_import log, not
+                        // just the console. Previously only the error path below
+                        // was written to the file, so a run's log could show MAL
+                        // failures with zero successes and make it look like MAL
+                        // was never reached when it actually worked fine.
+                        Log::channel('anime_import')->info('Updated data for anime: '.$row->title.' from MAL. mean: '.($malMean ?? 'null').', rank: '.($malRank ?? 'null').', scoring_users: '.($malUsers ?? 'null'));
 
                         // Note which MAL stat fields came back empty. MAL does
                         // not publish a mean score or rank (and sometimes not
@@ -159,10 +175,18 @@ class AnimeAdditionalDataImportService
                         }));
                         if ($missingMalFields) {
                             $logger && $logger('MAL returned no '.implode(', ', $missingMalFields).' for anime: '.$row->title);
+                            // Log withheld MAL fields to the file too, so a later
+                            // missing score can be traced to MAL withholding it
+                            // (below its scoring threshold) rather than an import bug.
+                            Log::channel('anime_import')->info('MAL returned no '.implode(', ', $missingMalFields).' for anime: '.$row->title);
                         }
                     } elseif ($response) {
                         $data = $response->json();
                         $logger && $logger('Failed update response from MAL for anime: '.$row->title.' '.print_r($data, true));
+                        // A non-2xx MAL response (bad/removed MAL id, auth issue,
+                        // rate limit) is distinct from a network exception, so
+                        // record it to the file as well rather than console-only.
+                        Log::channel('anime_import')->warning('Failed update response from MAL for anime: '.$row->title.' '.print_r($data, true));
                     }
                 } catch (\Exception $e) {
                     $logger && $logger('Error fetching data from MAL for anime: '.$row->title.'. Error: '.$e->getMessage());
@@ -234,11 +258,15 @@ class AnimeAdditionalDataImportService
                     ->update(['api_descriptions_empty' => true]);
             }
             // Mirror api_descriptions_empty for MAL details: if this anime has a
-            // MAL source but the fetch returned no studios (our marker for MAL
-            // details being present), flag it as empty so it is retried via the
-            // empty-only pass rather than on every normal pass. Reset the flag
-            // with app:clear-anime-mal-details-empty to retry from the normal pass.
-            if ($malId && (empty($studios) || $studios === '[]')) {
+            // MAL source but the fetch left some MAL detail empty (no studios or
+            // no mal_mean score), flag it as empty so it is retried via the
+            // empty-only pass rather than on every normal pass. This uses the same
+            // studios-OR-mal_mean gap as the selection query above: MAL withholds
+            // the score until an anime crosses a minimum scoring-member threshold,
+            // so a still-empty score is the signal that there is more to fetch
+            // later. Reset the flag with app:clear-anime-mal-details-empty to
+            // retry from the normal pass.
+            if ($malId && (empty($studios) || $studios === '[]' || empty($malMean))) {
                 DB::table('anime')
                     ->where('id', $row->id)
                     ->update(['mal_details_empty' => true]);
