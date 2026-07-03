@@ -149,13 +149,17 @@ class AnimeAdditionalDataImportService
                         $relatedAnime = safe_json_encode($data['related_anime'] ?? []); // Any similarly related anime to this.
                         $relatedManga = safe_json_encode($data['related_manga'] ?? []); // Any similarly related manga to this.
 
-                        $logger && $logger('Updated data for anime: '.$row->title.' from MAL');
-                        // Also record MAL successes to the anime_import log, not
-                        // just the console. Previously only the error path below
-                        // was written to the file, so a run's log could show MAL
-                        // failures with zero successes and make it look like MAL
-                        // was never reached when it actually worked fine.
-                        Log::channel('anime_import')->info('Updated data for anime: '.$row->title.' from MAL. mean: '.($malMean ?? 'null').', rank: '.($malRank ?? 'null').', scoring_users: '.($malUsers ?? 'null'));
+                        // Build one detailed success message and send it to both
+                        // the console and the anime_import log file. Previously the
+                        // console showed only the bare title and the file got
+                        // nothing, so a run's log could show MAL failures with zero
+                        // successes and make it look like MAL was never reached when
+                        // it actually worked fine. Including the mean/rank/scoring
+                        // values makes it visible at a glance which anime MAL is
+                        // still withholding a score for.
+                        $malSuccessMessage = 'Updated data for anime: '.$row->title.' from MAL. mean: '.($malMean ?? 'null').', rank: '.($malRank ?? 'null').', scoring_users: '.($malUsers ?? 'null');
+                        $logger && $logger($malSuccessMessage);
+                        Log::channel('anime_import')->info($malSuccessMessage);
 
                         // Note which MAL stat fields came back empty. MAL does
                         // not publish a mean score or rank (and sometimes not
