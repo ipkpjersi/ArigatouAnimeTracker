@@ -8,8 +8,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-#[Signature('app:download-and-import-anime-data')]
-#[Description('Download and import anime data, then download additional data and images. This is the recommended import/update command.')]
+#[Signature('app:download-and-import-anime-data {--forceMalRedownload}')]
+#[Description('Download and import anime data, then download additional data and images. Optionally pass --forceMalRedownload to re-fetch MAL details for every anime with a MAL source (used to refresh scores/ranks that MAL publishes or changes over time), instead of only the anime still missing data. This is the recommended import/update command.')]
 class DownloadAndImportAnimeData extends Command
 {
     /**
@@ -17,6 +17,8 @@ class DownloadAndImportAnimeData extends Command
      */
     public function handle(): void
     {
+        $forceMalDetailsRedownload = $this->option('forceMalRedownload');
+
         $this->info('Starting the process of downloading and importing anime data...');
 
         try {
@@ -24,15 +26,26 @@ class DownloadAndImportAnimeData extends Command
             $this->info('Downloading and importing anime data...');
             Artisan::call('app:import-anime-data', ['--forceDownload' => true, '--fullUpdate' => true], new ConsoleOutput);
 
-            // Download Additional Anime Data for anime already flagged empty on a
-            // previous attempt (api_descriptions_empty / mal_details_empty = 1)
-            $this->info('Downloading additional anime data for existing anime data...');
-            Artisan::call('app:download-anime-additional-data', ['generateSqlFile' => true, 'apiEmptyOnly' => true], new ConsoleOutput);
+            if ($forceMalDetailsRedownload) {
+                // Force mode: --forceMalRedownload ignores the mal_details_empty
+                // flag and re-fetches every anime with a MAL source, so the normal
+                // two-pass (empty-only then normal) split is meaningless here and
+                // would fetch every MAL anime twice. Run a single forced pass
+                // instead. A forced MAL fetch also returns each synopsis, so
+                // descriptions are refreshed along the way.
+                $this->info('Downloading additional anime data with a forced MAL re-download for all anime...');
+                Artisan::call('app:download-anime-additional-data', ['generateSqlFile' => true, 'apiEmptyOnly' => false, '--forceMalRedownload' => true], new ConsoleOutput);
+            } else {
+                // Download Additional Anime Data for anime already flagged empty on a
+                // previous attempt (api_descriptions_empty / mal_details_empty = 1)
+                $this->info('Downloading additional anime data for existing anime data...');
+                Artisan::call('app:download-anime-additional-data', ['generateSqlFile' => true, 'apiEmptyOnly' => true], new ConsoleOutput);
 
-            // Download Additional Anime Data for anime not yet flagged empty
-            // (api_descriptions_empty / mal_details_empty = 0), i.e. the normal pass
-            $this->info('Downloading additional anime data for new anime data...');
-            Artisan::call('app:download-anime-additional-data', ['generateSqlFile' => true, 'apiEmptyOnly' => false], new ConsoleOutput);
+                // Download Additional Anime Data for anime not yet flagged empty
+                // (api_descriptions_empty / mal_details_empty = 0), i.e. the normal pass
+                $this->info('Downloading additional anime data for new anime data...');
+                Artisan::call('app:download-anime-additional-data', ['generateSqlFile' => true, 'apiEmptyOnly' => false], new ConsoleOutput);
+            }
 
             // Download Anime Images
             $this->info('Downloading anime images...');
