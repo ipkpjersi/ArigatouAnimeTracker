@@ -124,9 +124,11 @@ class AnimeAdditionalDataImportService
             if ($malId) {
                 try {
                     // Sometimes the data for certain columns returned by the MAL API is unexpected/unclean even with safe_json_encode, so we could always SELECT DISTINCT columns if necessary and then even hardcode any arrays with said data for any input/display validation. It's better to have the format in an incorrect/weird format than to not have it at all.
-                    $response = Http::withHeaders([
-                        'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
-                    ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users,source,background,recommendations,studios,broadcast,related_anime,related_manga');
+                    $response = $this->getWithRateLimitBackoff(function () use ($malId) {
+                        return Http::withHeaders([
+                            'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
+                        ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users,source,background,recommendations,studios,broadcast,related_anime,related_manga');
+                    }, 'MAL', $row->title, $logger);
                     if ($response && $response->successful()) {
                         $data = $response->json();
                         $description = $data['synopsis'] ?? null;
@@ -204,7 +206,9 @@ class AnimeAdditionalDataImportService
             // Then try notify.moe if MAL fails
             if ((! $description || ! $genres) && $notifyMoeId) {
                 try {
-                    $response = Http::get('https://notify.moe/api/anime/'.$notifyMoeId);
+                    $response = $this->getWithRateLimitBackoff(function () use ($notifyMoeId) {
+                        return Http::get('https://notify.moe/api/anime/'.$notifyMoeId);
+                    }, 'notify.moe', $row->title, $logger);
                     if ($response && $response->successful()) {
                         $data = $response->json();
                         $description = $data['summary'] ?? null;
@@ -220,11 +224,15 @@ class AnimeAdditionalDataImportService
             // Finally, try kitsu.io if both MAL and notify.moe fail
             if ((! $description || ! $genres) && $kitsuId) {
                 try {
-                    $response = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId);
+                    $response = $this->getWithRateLimitBackoff(function () use ($kitsuId) {
+                        return Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId);
+                    }, 'kitsu.io', $row->title, $logger);
                     if ($response && $response->successful()) {
                         $data = $response->json();
                         $description = $data['data']['attributes']['synopsis'] ?? null; // There seems to be a synopsis variable and a description variable, but their API docs only mention synopsis so let's use synopsis for now.
-                        $genresResponse = Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId.'/genres');
+                        $genresResponse = $this->getWithRateLimitBackoff(function () use ($kitsuId) {
+                            return Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId.'/genres');
+                        }, 'kitsu.io', $row->title, $logger);
                         $genresData = $genresResponse->json();
                         $genres = array_map(function ($genre) {
                             return $genre['attributes']['name'];
@@ -337,6 +345,35 @@ class AnimeAdditionalDataImportService
             'total' => $total,
             'duration' => $duration,
         ];
+    }
+
+    /**
+     * Run an HTTP request and, if the API responds with HTTP 429 (rate limited),
+     * log it, back off for the configured amount of time, then retry the request
+     * once. $request is a closure that performs and returns the HTTP response, so
+     * the exact same call (headers, URL, etc.) can be replayed after the backoff.
+     * Returns the final response (which may still be a 429 if the retry also fails,
+     * in which case the normal not-successful handling at the call site applies and
+     * the anime is left to be retried on a later pass).
+     */
+    private function getWithRateLimitBackoff(callable $request, $apiName, $title, $logger = null)
+    {
+        $response = $request();
+        if ($response && $response->status() === 429) {
+            $backoff = config('global.additional_data_service_rate_limit_sleep_time', 120);
+            $message = "Received HTTP 429 (rate limited) from $apiName for anime: $title. Backing off for {$backoff} seconds before retrying.";
+            $logger && $logger($message);
+            Log::channel('anime_import')->warning($message);
+            sleep($backoff);
+            $response = $request();
+            if ($response && $response->status() === 429) {
+                $stillLimited = "Still rate limited (HTTP 429) from $apiName for anime: $title after backing off. Leaving it for a later pass.";
+                $logger && $logger($stillLimited);
+                Log::channel('anime_import')->warning($stillLimited);
+            }
+        }
+
+        return $response;
     }
 
     private function updateAnimeData($anime, $description, $genres, $malRank, $malMean, $malPopularity, $malScoringUsers, $malListMembers, $averageDuration, $rating, $source, $background, $recommendations, $studios, $broadcast, $relatedAnime, $relatedManga, $sqlFile, $logger = null)

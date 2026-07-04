@@ -6,6 +6,9 @@ return [
     'invite_only_registration_enabled' => env('INVITE_ONLY_REGISTRATION_ENABLED', 'false'),
     'mal_client_id' => env('MAL_CLIENT_ID', ''),
     'additional_data_service_sleep_time' => env('ADDITIONAL_DATA_SERVICE_SLEEP_TIME', 5),
+    // How long to back off (in seconds) when an external API returns HTTP 429
+    // (rate limited) during the additional data fetch, before retrying once.
+    'additional_data_service_rate_limit_sleep_time' => env('ADDITIONAL_DATA_SERVICE_RATE_LIMIT_SLEEP_TIME', 120),
     'image_download_service_sleep_time_lower' => env('IMAGE_DOWNLOAD_SERVICE_SLEEP_TIME_LOWER', 5),
     'image_download_service_sleep_time_upper' => env('IMAGE_DOWNLOAD_SERVICE_SLEEP_TIME_UPPER', 22),
 ];
