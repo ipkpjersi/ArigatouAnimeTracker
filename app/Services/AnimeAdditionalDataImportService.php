@@ -72,9 +72,9 @@ class AnimeAdditionalDataImportService
         $total = $all->count();
         $downloading = $anime->count();
         $logger && $logger("Downloading additional anime data for $downloading out of $total anime.");
-        $sqlFile = $generateSqlFile ? fopen(('database/seeders/anime_additional_data.sql'), 'a') : null;
-        $sqlFilePath = 'database/seeders/anime_additional_data.sql';
-        $zipFilePath = 'database/seeders/anime_additional_data.sql.zip';
+        $sqlFilePath = database_path('seeders/anime_additional_data.sql');
+        $zipFilePath = database_path('seeders/anime_additional_data.sql.zip');
+        $sqlFile = $generateSqlFile ? fopen($sqlFilePath, 'a') : null;
 
         if ($generateSqlFile && ! file_exists($sqlFilePath) && file_exists($zipFilePath)) {
             $logger && $logger('File anime_additional_data.sql does not exist, extracting anime_additional_data.sql.zip to append more data...');
@@ -506,7 +506,7 @@ class AnimeAdditionalDataImportService
     private function zipSqlFile()
     {
         $sqlPath = database_path('seeders/anime_additional_data.sql');
-        $zipPath = database_path('seeders/anime_additional_data.zip');
+        $zipPath = database_path('seeders/anime_additional_data.sql.zip');
 
         $zip = new ZipArchive;
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
@@ -519,7 +519,7 @@ class AnimeAdditionalDataImportService
 
     private function unzipSqlFile()
     {
-        $zipPath = database_path('seeders/anime_additional_data.zip');
+        $zipPath = database_path('seeders/anime_additional_data.sql.zip');
         $sqlPath = database_path('seeders/anime_additional_data.sql');
 
         $zip = new ZipArchive;
