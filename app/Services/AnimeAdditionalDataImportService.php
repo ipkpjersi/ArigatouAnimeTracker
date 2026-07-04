@@ -188,11 +188,16 @@ class AnimeAdditionalDataImportService
                         }
                     } elseif ($response) {
                         $data = $response->json();
-                        $logger && $logger('Failed update response from MAL for anime: '.$row->title.' '.print_r($data, true));
+                        // Include the HTTP status code so the failure kind is clear
+                        // at a glance (404 not_found for a dead/removed MAL id, 401/403
+                        // for an auth problem, 429 for rate limiting, etc.) rather than
+                        // only the response body.
+                        $failedResponseMessage = 'Failed update response from MAL for anime: '.$row->title.' HTTP status: '.$response->status().' '.print_r($data, true);
+                        $logger && $logger($failedResponseMessage);
                         // A non-2xx MAL response (bad/removed MAL id, auth issue,
                         // rate limit) is distinct from a network exception, so
                         // record it to the file as well rather than console-only.
-                        Log::channel('anime_import')->warning('Failed update response from MAL for anime: '.$row->title.' '.print_r($data, true));
+                        Log::channel('anime_import')->warning($failedResponseMessage);
                     }
                 } catch (\Exception $e) {
                     $logger && $logger('Error fetching data from MAL for anime: '.$row->title.'. Error: '.$e->getMessage());
@@ -214,6 +219,15 @@ class AnimeAdditionalDataImportService
                         $description = $data['summary'] ?? null;
                         $genres = $data['genres'] ? implode(',', $data['genres']) : null;
                         $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from notify.moe');
+                    } elseif ($response) {
+                        // Mirror the MAL non-2xx logging for this fallback: include
+                        // the HTTP status and the response body so a 404/403/etc. is
+                        // visible rather than silently falling through to the generic
+                        // "Failed to fetch/update" message below.
+                        $data = $response->json();
+                        $failedResponseMessage = 'Failed update response from notify.moe for anime: '.$row->title.' HTTP status: '.$response->status().' '.print_r($data, true);
+                        $logger && $logger($failedResponseMessage);
+                        Log::channel('anime_import')->warning($failedResponseMessage);
                     }
                 } catch (\Exception $e) {
                     $logger && $logger('Error fetching data from notify.moe for anime: '.$row->title.'. Error: '.$e->getMessage());
@@ -239,6 +253,15 @@ class AnimeAdditionalDataImportService
                         }, $genresData['data'] ?? []);
                         $genres = $genres ? implode(',', $genres) : null;
                         $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from kitsu.io');
+                    } elseif ($response) {
+                        // Mirror the MAL non-2xx logging for this fallback: include
+                        // the HTTP status and the response body so a 404/403/etc. is
+                        // visible rather than silently falling through to the generic
+                        // "Failed to fetch/update" message below.
+                        $data = $response->json();
+                        $failedResponseMessage = 'Failed update response from kitsu.io for anime: '.$row->title.' HTTP status: '.$response->status().' '.print_r($data, true);
+                        $logger && $logger($failedResponseMessage);
+                        Log::channel('anime_import')->warning($failedResponseMessage);
                     }
                 } catch (\Exception $e) {
                     $logger && $logger('Error fetching data from kitsu.io for anime: '.$row->title.'. Error: '.$e->getMessage());
