@@ -81,239 +81,246 @@ class AnimeAdditionalDataImportService
             $this->unzipSqlFile();
         }
 
-        foreach ($anime as $row) {
-            $malId = null;
-            $notifyMoeId = null;
-            $kitsuId = null;
-            if (isset($row->sources)) {
-                $sources = explode(',', $row->sources);
-                foreach ($sources as $source) {
-                    if (strpos($source, 'myanimelist.net/anime/') !== false) {
-                        $malId = explode('/', rtrim($source, '/'))[4];
-                    }
-                    if (strpos($source, 'notify.moe/anime/') !== false) {
-                        $notifyMoeId = explode('/', rtrim($source, '/'))[4];
-                    }
-                    if (strpos($source, 'kitsu.io/anime/') !== false) {
-                        $kitsuId = explode('/', rtrim($source, '/'))[4];
-                    }
-                }
-            } else {
-                // This probably shouldn't ever happen, sources should probably always be set, or maybe not.
-                $logger && $logger('Sources not set for anime: '.$row->title.' row: '.print_r($row, true));
-            }
-
-            $description = null;
-            $genres = null;
-            $malRank = null;
-            $malMean = null;
-            $malPopularity = null;
-            $malUsers = null;
-            $malMembers = null;
-            $averageDuration = null;
-            $rating = null;
-            $source = null;
-            $background = null;
-            $recommendations = null;
-            $studios = null;
-            $broadcast = null;
-            $relatedAnime = null;
-            $relatedManga = null;
-
-            // Try MAL first
-            if ($malId) {
-                try {
-                    // Sometimes the data for certain columns returned by the MAL API is unexpected/unclean even with safe_json_encode, so we could always SELECT DISTINCT columns if necessary and then even hardcode any arrays with said data for any input/display validation. It's better to have the format in an incorrect/weird format than to not have it at all.
-                    $response = $this->getWithRateLimitBackoff(function () use ($malId) {
-                        return Http::withHeaders([
-                            'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
-                        ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users,source,background,recommendations,studios,broadcast,related_anime,related_manga');
-                    }, 'MAL', $row->title, $logger);
-                    if ($response && $response->successful()) {
-                        $data = $response->json();
-                        $description = $data['synopsis'] ?? null;
-                        $genres = array_map(function ($genre) {
-                            return str_replace('"', '', $genre['name']);
-                        }, $data['genres'] ?? []);
-                        $genres = $genres ? implode(',', $genres) : null;
-                        $malRank = $data['rank'] ?? null;
-                        $malMean = $data['mean'] ?? null;
-                        $malPopularity = $data['popularity'] ?? null;
-                        $malUsers = $data['num_scoring_users'] ?? null; // The users who have scored/ranked the anime.
-                        $malMembers = $data['num_list_users'] ?? null; // The members with this anime on their list.
-                        $averageDuration = $data['average_episode_duration'] ?? null; // The average episode duration (or duration).
-                        $rating = $data['rating'] ?? null; // The rating of the series.
-                        $source = $data['source'] ?? null; // Is it Manga, LN, etc.
-                        $background = $data['background'] ?? null; // A brief description of the background, like it's a 2003 DVD that released in Japan but never released overseas, etc.
-                        $recommendations = safe_json_encode($data['recommendations'] ?? []); // Recommended anime by other users.
-                        $studios = safe_json_encode($data['studios'] ?? []); // Studio(s) that worked on this anime.
-                        $broadcast = safe_json_encode($data['broadcast'] ?? []); // The date and time it was originally broadcast.
-                        $relatedAnime = safe_json_encode($data['related_anime'] ?? []); // Any similarly related anime to this.
-                        $relatedManga = safe_json_encode($data['related_manga'] ?? []); // Any similarly related manga to this.
-
-                        // Build one detailed success message and send it to both
-                        // the console and the anime_import log file. Previously the
-                        // console showed only the bare title and the file got
-                        // nothing, so a run's log could show MAL failures with zero
-                        // successes and make it look like MAL was never reached when
-                        // it actually worked fine. Including the mean/rank/scoring
-                        // values makes it visible at a glance which anime MAL is
-                        // still withholding a score for.
-                        $malSuccessMessage = 'Updated data for anime: '.$row->title.' from MAL. mean: '.($malMean ?? 'null').', rank: '.($malRank ?? 'null').', scoring_users: '.($malUsers ?? 'null');
-                        $logger && $logger($malSuccessMessage);
-                        Log::channel('anime_import')->info($malSuccessMessage);
-
-                        // Note which MAL stat fields came back empty. MAL does
-                        // not publish a mean score or rank (and sometimes not
-                        // even scoring users) until an anime crosses a minimum
-                        // scoring-member threshold, so these are routinely null
-                        // for low-popularity/new anime even when popularity and
-                        // members are present. Logging this makes it clear the
-                        // gap is MAL withholding the data, not our import.
-                        $missingMalFields = array_keys(array_filter([
-                            'rank' => $malRank,
-                            'mean' => $malMean,
-                            'popularity' => $malPopularity,
-                            'scoring_users' => $malUsers,
-                            'members' => $malMembers,
-                        ], function ($value) {
-                            return empty($value);
-                        }));
-                        if ($missingMalFields) {
-                            $logger && $logger('MAL returned no '.implode(', ', $missingMalFields).' for anime: '.$row->title);
-                            // Log withheld MAL fields to the file too, so a later
-                            // missing score can be traced to MAL withholding it
-                            // (below its scoring threshold) rather than an import bug.
-                            Log::channel('anime_import')->info('MAL returned no '.implode(', ', $missingMalFields).' for anime: '.$row->title);
+        // Wrap the download loop in try/finally so the SQL handle is always
+        // closed and the zip is always (re)generated, even when a pass is
+        // interrupted by an exception mid-loop (for example an API error).
+        // Without this a partial run leaves the committed zip stale while the
+        // appended .sql keeps growing.
+        try {
+            foreach ($anime as $row) {
+                $malId = null;
+                $notifyMoeId = null;
+                $kitsuId = null;
+                if (isset($row->sources)) {
+                    $sources = explode(',', $row->sources);
+                    foreach ($sources as $source) {
+                        if (strpos($source, 'myanimelist.net/anime/') !== false) {
+                            $malId = explode('/', rtrim($source, '/'))[4];
                         }
-                    } elseif ($response) {
-                        $data = $response->json();
-                        // Include the HTTP status code so the failure kind is clear
-                        // at a glance (404 not_found for a dead/removed MAL id, 401/403
-                        // for an auth problem, 429 for rate limiting, etc.) rather than
-                        // only the response body.
-                        $failedResponseMessage = 'Failed update response from MAL for anime: '.$row->title.' HTTP status: '.$response->status().' '.print_r($data, true);
-                        $logger && $logger($failedResponseMessage);
-                        // A non-2xx MAL response (bad/removed MAL id, auth issue,
-                        // rate limit) is distinct from a network exception, so
-                        // record it to the file as well rather than console-only.
-                        Log::channel('anime_import')->warning($failedResponseMessage);
+                        if (strpos($source, 'notify.moe/anime/') !== false) {
+                            $notifyMoeId = explode('/', rtrim($source, '/'))[4];
+                        }
+                        if (strpos($source, 'kitsu.io/anime/') !== false) {
+                            $kitsuId = explode('/', rtrim($source, '/'))[4];
+                        }
                     }
-                } catch (\Exception $e) {
-                    $logger && $logger('Error fetching data from MAL for anime: '.$row->title.'. Error: '.$e->getMessage());
-                    Log::channel('anime_import')->error('Error fetching data from MAL for anime: '.$row->title.'. Error: '.$e->getMessage());
+                } else {
+                    // This probably shouldn't ever happen, sources should probably always be set, or maybe not.
+                    $logger && $logger('Sources not set for anime: '.$row->title.' row: '.print_r($row, true));
                 }
-            } else {
-                // Optional logging, we likely don't need this logging unless we know it's not fetching descriptions from MAL when it should be.
-                // $logger && $logger("No MAL ID for anime: " . $row->title . ", verify versus DB to see if MAL source exists for this anime");
-            }
 
-            // Then try notify.moe if MAL fails
-            if ((! $description || ! $genres) && $notifyMoeId) {
-                try {
-                    $response = $this->getWithRateLimitBackoff(function () use ($notifyMoeId) {
-                        return Http::get('https://notify.moe/api/anime/'.$notifyMoeId);
-                    }, 'notify.moe', $row->title, $logger);
-                    if ($response && $response->successful()) {
-                        $data = $response->json();
-                        $description = $data['summary'] ?? null;
-                        $genres = $data['genres'] ? implode(',', $data['genres']) : null;
-                        $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from notify.moe');
-                    } elseif ($response) {
-                        // Mirror the MAL non-2xx logging for this fallback: include
-                        // the HTTP status and the response body so a 404/403/etc. is
-                        // visible rather than silently falling through to the generic
-                        // "Failed to fetch/update" message below.
-                        $data = $response->json();
-                        $failedResponseMessage = 'Failed update response from notify.moe for anime: '.$row->title.' HTTP status: '.$response->status().' '.print_r($data, true);
-                        $logger && $logger($failedResponseMessage);
-                        Log::channel('anime_import')->warning($failedResponseMessage);
+                $description = null;
+                $genres = null;
+                $malRank = null;
+                $malMean = null;
+                $malPopularity = null;
+                $malUsers = null;
+                $malMembers = null;
+                $averageDuration = null;
+                $rating = null;
+                $source = null;
+                $background = null;
+                $recommendations = null;
+                $studios = null;
+                $broadcast = null;
+                $relatedAnime = null;
+                $relatedManga = null;
+
+                // Try MAL first
+                if ($malId) {
+                    try {
+                        // Sometimes the data for certain columns returned by the MAL API is unexpected/unclean even with safe_json_encode, so we could always SELECT DISTINCT columns if necessary and then even hardcode any arrays with said data for any input/display validation. It's better to have the format in an incorrect/weird format than to not have it at all.
+                        $response = $this->getWithRateLimitBackoff(function () use ($malId) {
+                            return Http::withHeaders([
+                                'X-MAL-CLIENT-ID' => config('global.mal_client_id'),
+                            ])->get('https://api.myanimelist.net/v2/anime/'.$malId.'?fields=id,title,synopsis,average_episode_duration,rating,genres,mean,rank,popularity,num_scoring_users,num_list_users,source,background,recommendations,studios,broadcast,related_anime,related_manga');
+                        }, 'MAL', $row->title, $logger);
+                        if ($response && $response->successful()) {
+                            $data = $response->json();
+                            $description = $data['synopsis'] ?? null;
+                            $genres = array_map(function ($genre) {
+                                return str_replace('"', '', $genre['name']);
+                            }, $data['genres'] ?? []);
+                            $genres = $genres ? implode(',', $genres) : null;
+                            $malRank = $data['rank'] ?? null;
+                            $malMean = $data['mean'] ?? null;
+                            $malPopularity = $data['popularity'] ?? null;
+                            $malUsers = $data['num_scoring_users'] ?? null; // The users who have scored/ranked the anime.
+                            $malMembers = $data['num_list_users'] ?? null; // The members with this anime on their list.
+                            $averageDuration = $data['average_episode_duration'] ?? null; // The average episode duration (or duration).
+                            $rating = $data['rating'] ?? null; // The rating of the series.
+                            $source = $data['source'] ?? null; // Is it Manga, LN, etc.
+                            $background = $data['background'] ?? null; // A brief description of the background, like it's a 2003 DVD that released in Japan but never released overseas, etc.
+                            $recommendations = safe_json_encode($data['recommendations'] ?? []); // Recommended anime by other users.
+                            $studios = safe_json_encode($data['studios'] ?? []); // Studio(s) that worked on this anime.
+                            $broadcast = safe_json_encode($data['broadcast'] ?? []); // The date and time it was originally broadcast.
+                            $relatedAnime = safe_json_encode($data['related_anime'] ?? []); // Any similarly related anime to this.
+                            $relatedManga = safe_json_encode($data['related_manga'] ?? []); // Any similarly related manga to this.
+
+                            // Build one detailed success message and send it to both
+                            // the console and the anime_import log file. Previously the
+                            // console showed only the bare title and the file got
+                            // nothing, so a run's log could show MAL failures with zero
+                            // successes and make it look like MAL was never reached when
+                            // it actually worked fine. Including the mean/rank/scoring
+                            // values makes it visible at a glance which anime MAL is
+                            // still withholding a score for.
+                            $malSuccessMessage = 'Updated data for anime: '.$row->title.' from MAL. mean: '.($malMean ?? 'null').', rank: '.($malRank ?? 'null').', scoring_users: '.($malUsers ?? 'null');
+                            $logger && $logger($malSuccessMessage);
+                            Log::channel('anime_import')->info($malSuccessMessage);
+
+                            // Note which MAL stat fields came back empty. MAL does
+                            // not publish a mean score or rank (and sometimes not
+                            // even scoring users) until an anime crosses a minimum
+                            // scoring-member threshold, so these are routinely null
+                            // for low-popularity/new anime even when popularity and
+                            // members are present. Logging this makes it clear the
+                            // gap is MAL withholding the data, not our import.
+                            $missingMalFields = array_keys(array_filter([
+                                'rank' => $malRank,
+                                'mean' => $malMean,
+                                'popularity' => $malPopularity,
+                                'scoring_users' => $malUsers,
+                                'members' => $malMembers,
+                            ], function ($value) {
+                                return empty($value);
+                            }));
+                            if ($missingMalFields) {
+                                $logger && $logger('MAL returned no '.implode(', ', $missingMalFields).' for anime: '.$row->title);
+                                // Log withheld MAL fields to the file too, so a later
+                                // missing score can be traced to MAL withholding it
+                                // (below its scoring threshold) rather than an import bug.
+                                Log::channel('anime_import')->info('MAL returned no '.implode(', ', $missingMalFields).' for anime: '.$row->title);
+                            }
+                        } elseif ($response) {
+                            $data = $response->json();
+                            // Include the HTTP status code so the failure kind is clear
+                            // at a glance (404 not_found for a dead/removed MAL id, 401/403
+                            // for an auth problem, 429 for rate limiting, etc.) rather than
+                            // only the response body.
+                            $failedResponseMessage = 'Failed update response from MAL for anime: '.$row->title.' HTTP status: '.$response->status().' '.print_r($data, true);
+                            $logger && $logger($failedResponseMessage);
+                            // A non-2xx MAL response (bad/removed MAL id, auth issue,
+                            // rate limit) is distinct from a network exception, so
+                            // record it to the file as well rather than console-only.
+                            Log::channel('anime_import')->warning($failedResponseMessage);
+                        }
+                    } catch (\Exception $e) {
+                        $logger && $logger('Error fetching data from MAL for anime: '.$row->title.'. Error: '.$e->getMessage());
+                        Log::channel('anime_import')->error('Error fetching data from MAL for anime: '.$row->title.'. Error: '.$e->getMessage());
                     }
-                } catch (\Exception $e) {
-                    $logger && $logger('Error fetching data from notify.moe for anime: '.$row->title.'. Error: '.$e->getMessage());
-                    Log::channel('anime_import')->error('Error fetching data from notify.moe for anime: '.$row->title.'. Error: '.$e->getMessage());
+                } else {
+                    // Optional logging, we likely don't need this logging unless we know it's not fetching descriptions from MAL when it should be.
+                    // $logger && $logger("No MAL ID for anime: " . $row->title . ", verify versus DB to see if MAL source exists for this anime");
                 }
-            }
 
-            // Finally, try kitsu.io if both MAL and notify.moe fail
-            if ((! $description || ! $genres) && $kitsuId) {
-                try {
-                    $response = $this->getWithRateLimitBackoff(function () use ($kitsuId) {
-                        return Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId);
-                    }, 'kitsu.io', $row->title, $logger);
-                    if ($response && $response->successful()) {
-                        $data = $response->json();
-                        $description = $data['data']['attributes']['synopsis'] ?? null; // There seems to be a synopsis variable and a description variable, but their API docs only mention synopsis so let's use synopsis for now.
-                        $genresResponse = $this->getWithRateLimitBackoff(function () use ($kitsuId) {
-                            return Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId.'/genres');
+                // Then try notify.moe if MAL fails
+                if ((! $description || ! $genres) && $notifyMoeId) {
+                    try {
+                        $response = $this->getWithRateLimitBackoff(function () use ($notifyMoeId) {
+                            return Http::get('https://notify.moe/api/anime/'.$notifyMoeId);
+                        }, 'notify.moe', $row->title, $logger);
+                        if ($response && $response->successful()) {
+                            $data = $response->json();
+                            $description = $data['summary'] ?? null;
+                            $genres = $data['genres'] ? implode(',', $data['genres']) : null;
+                            $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from notify.moe');
+                        } elseif ($response) {
+                            // Mirror the MAL non-2xx logging for this fallback: include
+                            // the HTTP status and the response body so a 404/403/etc. is
+                            // visible rather than silently falling through to the generic
+                            // "Failed to fetch/update" message below.
+                            $data = $response->json();
+                            $failedResponseMessage = 'Failed update response from notify.moe for anime: '.$row->title.' HTTP status: '.$response->status().' '.print_r($data, true);
+                            $logger && $logger($failedResponseMessage);
+                            Log::channel('anime_import')->warning($failedResponseMessage);
+                        }
+                    } catch (\Exception $e) {
+                        $logger && $logger('Error fetching data from notify.moe for anime: '.$row->title.'. Error: '.$e->getMessage());
+                        Log::channel('anime_import')->error('Error fetching data from notify.moe for anime: '.$row->title.'. Error: '.$e->getMessage());
+                    }
+                }
+
+                // Finally, try kitsu.io if both MAL and notify.moe fail
+                if ((! $description || ! $genres) && $kitsuId) {
+                    try {
+                        $response = $this->getWithRateLimitBackoff(function () use ($kitsuId) {
+                            return Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId);
                         }, 'kitsu.io', $row->title, $logger);
-                        $genresData = $genresResponse->json();
-                        $genres = array_map(function ($genre) {
-                            return $genre['attributes']['name'];
-                        }, $genresData['data'] ?? []);
-                        $genres = $genres ? implode(',', $genres) : null;
-                        $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from kitsu.io');
-                    } elseif ($response) {
-                        // Mirror the MAL non-2xx logging for this fallback: include
-                        // the HTTP status and the response body so a 404/403/etc. is
-                        // visible rather than silently falling through to the generic
-                        // "Failed to fetch/update" message below.
-                        $data = $response->json();
-                        $failedResponseMessage = 'Failed update response from kitsu.io for anime: '.$row->title.' HTTP status: '.$response->status().' '.print_r($data, true);
-                        $logger && $logger($failedResponseMessage);
-                        Log::channel('anime_import')->warning($failedResponseMessage);
+                        if ($response && $response->successful()) {
+                            $data = $response->json();
+                            $description = $data['data']['attributes']['synopsis'] ?? null; // There seems to be a synopsis variable and a description variable, but their API docs only mention synopsis so let's use synopsis for now.
+                            $genresResponse = $this->getWithRateLimitBackoff(function () use ($kitsuId) {
+                                return Http::get('https://kitsu.io/api/edge/anime/'.$kitsuId.'/genres');
+                            }, 'kitsu.io', $row->title, $logger);
+                            $genresData = $genresResponse->json();
+                            $genres = array_map(function ($genre) {
+                                return $genre['attributes']['name'];
+                            }, $genresData['data'] ?? []);
+                            $genres = $genres ? implode(',', $genres) : null;
+                            $logger && $logger('Updated description and/or genres for anime: '.$row->title.' from kitsu.io');
+                        } elseif ($response) {
+                            // Mirror the MAL non-2xx logging for this fallback: include
+                            // the HTTP status and the response body so a 404/403/etc. is
+                            // visible rather than silently falling through to the generic
+                            // "Failed to fetch/update" message below.
+                            $data = $response->json();
+                            $failedResponseMessage = 'Failed update response from kitsu.io for anime: '.$row->title.' HTTP status: '.$response->status().' '.print_r($data, true);
+                            $logger && $logger($failedResponseMessage);
+                            Log::channel('anime_import')->warning($failedResponseMessage);
+                        }
+                    } catch (\Exception $e) {
+                        $logger && $logger('Error fetching data from kitsu.io for anime: '.$row->title.'. Error: '.$e->getMessage());
+                        Log::channel('anime_import')->error('Error fetching data from kitsu.io for anime: '.$row->title.'. Error: '.$e->getMessage());
                     }
-                } catch (\Exception $e) {
-                    $logger && $logger('Error fetching data from kitsu.io for anime: '.$row->title.'. Error: '.$e->getMessage());
-                    Log::channel('anime_import')->error('Error fetching data from kitsu.io for anime: '.$row->title.'. Error: '.$e->getMessage());
                 }
-            }
-            // We only check the description since we don't really need genres to exist in order to update a description, also we can check genres separately and prevent overwriting existing genres with empty ones separately.
-            if ($description) {
-                // Prevent overwriting existing genres with empty ones, since we only check for a description before updating anime data, we should fetch existing genres if the new genres are empty.
-                if (empty($genres)) {
-                    $existingGenres = DB::table('anime')
+                // We only check the description since we don't really need genres to exist in order to update a description, also we can check genres separately and prevent overwriting existing genres with empty ones separately.
+                if ($description) {
+                    // Prevent overwriting existing genres with empty ones, since we only check for a description before updating anime data, we should fetch existing genres if the new genres are empty.
+                    if (empty($genres)) {
+                        $existingGenres = DB::table('anime')
+                            ->where('id', $row->id)
+                            ->value('genres'); // Fetch only the genres column
+
+                        if (! empty($existingGenres)) {
+                            $genres = $existingGenres; // Retain existing genres if they exist
+                        }
+                    }
+                    $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $averageDuration, $rating, $source, $background, $recommendations, $studios, $broadcast, $relatedAnime, $relatedManga, $sqlFile, $logger);
+                    $logger && $logger('Successfully updated description and genres for anime: '.$row->title);
+                    Log::channel('anime_import')->info('Successfully updated description and genres for anime: '.$row->title);
+                    $count++;
+                } else {
+                    $logger && $logger('Failed to fetch/update description and genres for anime: '.$row->title);
+                    Log::channel('anime_import')->info('Failed to fetch/update description and genres for anime: '.$row->title);
+                    Log::error('Failed to fetch additional data for anime: '.$row->title);
+                    DB::table('anime')
                         ->where('id', $row->id)
-                        ->value('genres'); // Fetch only the genres column
-
-                    if (! empty($existingGenres)) {
-                        $genres = $existingGenres; // Retain existing genres if they exist
-                    }
+                        ->update(['api_descriptions_empty' => true]);
                 }
-                $this->updateAnimeData($row, $description, $genres, $malRank, $malMean, $malPopularity, $malUsers, $malMembers, $averageDuration, $rating, $source, $background, $recommendations, $studios, $broadcast, $relatedAnime, $relatedManga, $sqlFile, $logger);
-                $logger && $logger('Successfully updated description and genres for anime: '.$row->title);
-                Log::channel('anime_import')->info('Successfully updated description and genres for anime: '.$row->title);
-                $count++;
-            } else {
-                $logger && $logger('Failed to fetch/update description and genres for anime: '.$row->title);
-                Log::channel('anime_import')->info('Failed to fetch/update description and genres for anime: '.$row->title);
-                Log::error('Failed to fetch additional data for anime: '.$row->title);
-                DB::table('anime')
-                    ->where('id', $row->id)
-                    ->update(['api_descriptions_empty' => true]);
+                // Mirror api_descriptions_empty for MAL details: if this anime has a
+                // MAL source but the fetch left some MAL detail empty (no studios or
+                // no mal_mean score), flag it as empty so it is retried via the
+                // empty-only pass rather than on every normal pass. This uses the same
+                // studios-OR-mal_mean gap as the selection query above: MAL withholds
+                // the score until an anime crosses a minimum scoring-member threshold,
+                // so a still-empty score is the signal that there is more to fetch
+                // later. Reset the flag with app:clear-anime-mal-details-empty to
+                // retry from the normal pass.
+                if ($malId && (empty($studios) || $studios === '[]' || empty($malMean))) {
+                    DB::table('anime')
+                        ->where('id', $row->id)
+                        ->update(['mal_details_empty' => true]);
+                }
+                $sleepTime = config('global.additional_data_service_sleep_time', 15);
+                $logger && $logger("Sleeping for $sleepTime seconds");
+                sleep($sleepTime);
             }
-            // Mirror api_descriptions_empty for MAL details: if this anime has a
-            // MAL source but the fetch left some MAL detail empty (no studios or
-            // no mal_mean score), flag it as empty so it is retried via the
-            // empty-only pass rather than on every normal pass. This uses the same
-            // studios-OR-mal_mean gap as the selection query above: MAL withholds
-            // the score until an anime crosses a minimum scoring-member threshold,
-            // so a still-empty score is the signal that there is more to fetch
-            // later. Reset the flag with app:clear-anime-mal-details-empty to
-            // retry from the normal pass.
-            if ($malId && (empty($studios) || $studios === '[]' || empty($malMean))) {
-                DB::table('anime')
-                    ->where('id', $row->id)
-                    ->update(['mal_details_empty' => true]);
+        } finally {
+            if ($generateSqlFile) {
+                fclose($sqlFile);
+                $this->zipSqlFile();
             }
-            $sleepTime = config('global.additional_data_service_sleep_time', 15);
-            $logger && $logger("Sleeping for $sleepTime seconds");
-            sleep($sleepTime);
-        }
-
-        if ($generateSqlFile) {
-            fclose($sqlFile);
-            $this->zipSqlFile();
         }
 
         $duration = microtime(true) - $startTime;
