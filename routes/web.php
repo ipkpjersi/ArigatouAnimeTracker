@@ -48,7 +48,7 @@ Route::get('/anime/getAnimeData', [AnimeController::class, 'getAnimeData'])->nam
 
 // Must be registered before the /anime/{id}/{title?} catch-all below, otherwise
 // "merge-candidates" is treated as a title and the detail page is served instead.
-Route::get('/anime/{animeId}/merge-candidates', [AnimeController::class, 'mergeCandidates'])->name('anime.mergeCandidates')->middleware(['auth', '2fa']);
+Route::get('/anime/{animeId}/merge-candidates', [AnimeController::class, 'mergeCandidates'])->name('anime.mergeCandidates')->middleware(['auth', '2fa', 'admin']);
 
 Route::get('/anime/{id}/other-anime', [AnimeController::class, 'otherAnime'])->name('anime.otherAnime')->middleware('2fa');
 
@@ -97,8 +97,6 @@ Route::middleware('auth', '2fa')->group(function () {
 
     Route::delete('/anime/{id}/delete-from-list/{redirect?}', [AnimeController::class, 'removeFromList'])->name('anime.deleteFromList');
 
-    Route::post('/users/{userId}/ban', [UserController::class, 'banUser'])->name('users.ban');
-    Route::post('/users/{userId}/unban', [UserController::class, 'unbanUser'])->name('users.unban');
     Route::post('/users/{userId}/remove-avatar', [UserController::class, 'removeAvatar'])->name('users.removeAvatar');
 
     Route::post('/user/{userId}/delete-avatar', [UserController::class, 'deleteAvatar'])->name('avatar.delete');
@@ -126,8 +124,6 @@ Route::middleware('auth', '2fa')->group(function () {
     Route::post('/add-friend/{friendId}', [UserController::class, 'addFriend'])->name('add-friend');
     Route::post('/remove-friend/{friendId}', [UserController::class, 'removeFriend'])->name('remove-friend');
 
-    Route::post('/anime/{animeId}/merge', [AnimeController::class, 'mergeAnime'])->name('anime.merge');
-
     Route::post('/anime/{animeId}/add-to-favourites', [UserController::class, 'addToFavourites'])->name('anime.addToFavourites');
     Route::put('/anime/{animeId}/update-favourite', [UserController::class, 'updateFavourite'])->name('anime.updateFavourite');
     Route::delete('/anime/{animeId}/remove-from-favourites', [UserController::class, 'removeFromFavourites'])->name('anime.removeFromFavourites');
@@ -135,14 +131,23 @@ Route::middleware('auth', '2fa')->group(function () {
     Route::post('/anime/add-review', [AnimeController::class, 'addReview'])->name('anime.addReview');
     Route::put('/anime/{id}/update-review', [AnimeController::class, 'updateReview'])->name('anime.updateReview');
     Route::delete('/anime/{id}/delete-review', [AnimeController::class, 'deleteReview'])->name('anime.deleteReview');
-    Route::post('/reviews/{review}/remove', [UserController::class, 'removeReview'])->name('reviews.remove');
 
     Route::post('/toggle-friend-publicly/{id}', [UserController::class, 'toggleFriendPublicly'])->name('toggle-friend-publicly');
 
-    Route::post('/invite-codes/generate-invite-codes', [InviteCodeController::class, 'generateInviteCodes'])->name('generate-invite-codes');
-    Route::post('/invite-codes/revoke-unused-invite-codes', [InviteCodeController::class, 'revokeUnusedInviteCodes'])->name('revoke-unused-invite-codes');
-    Route::get('/invite-codes', [InviteCodeController::class, 'index'])->name('invite-codes-index');
-    Route::get('/invite-codes/data', [InviteCodeController::class, 'data'])->name('invite-codes-data');
+    // Admin-only routes. The middleware gates the whole group so a new route
+    // added here cannot be exposed by forgetting a per-controller check.
+    Route::middleware('admin')->group(function () {
+        Route::post('/users/{userId}/ban', [UserController::class, 'banUser'])->name('users.ban');
+        Route::post('/users/{userId}/unban', [UserController::class, 'unbanUser'])->name('users.unban');
+
+        Route::post('/anime/{animeId}/merge', [AnimeController::class, 'mergeAnime'])->name('anime.merge');
+        Route::post('/reviews/{review}/remove', [UserController::class, 'removeReview'])->name('reviews.remove');
+
+        Route::post('/invite-codes/generate-invite-codes', [InviteCodeController::class, 'generateInviteCodes'])->name('generate-invite-codes');
+        Route::post('/invite-codes/revoke-unused-invite-codes', [InviteCodeController::class, 'revokeUnusedInviteCodes'])->name('revoke-unused-invite-codes');
+        Route::get('/invite-codes', [InviteCodeController::class, 'index'])->name('invite-codes-index');
+        Route::get('/invite-codes/data', [InviteCodeController::class, 'data'])->name('invite-codes-data');
+    });
 
 });
 

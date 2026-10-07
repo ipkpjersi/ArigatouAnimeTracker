@@ -250,7 +250,7 @@ class UserController extends Controller
     public function removeReview(Request $request, $reviewId)
     {
         // Ensure only admins can remove reviews
-        if (! auth()->user()->isAdmin()) {
+        if (auth()->user() === null || ! auth()->user()->isAdmin()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
