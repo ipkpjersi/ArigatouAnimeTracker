@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        if (! config('global.registrations_enabled')) {
+        if (! config('global.registration_enabled')) {
             return redirect()->route('register')->with('error', 'Registrations are currently closed. Please try again later.');
         }
 
