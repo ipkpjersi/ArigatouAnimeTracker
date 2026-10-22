@@ -10,7 +10,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xs sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <table style="width:100%" id="animeTable" class="display text-gray-900 dark:text-gray-100">
                         <thead>
@@ -64,7 +64,7 @@
                 ],
                 search: { search: initialSearch },
                 initComplete: function() {
-                    let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="window.location.href = \'/anime\'">Reset Filters</button>');
+                    let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm mr-4" onclick="window.location.href = \'/anime\'">Reset Filters</button>');
                     $('#animeTable_filter').prepend(resetBtn);
                 },
                 responsive: true

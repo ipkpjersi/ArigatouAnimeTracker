@@ -10,7 +10,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xs sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100 flex flex-wrap">
                     <!-- Left Column -->
                     <div class="w-full md:w-56 mb-6 md:mb-0 md:mr-6 flex-none mt-0">
@@ -27,9 +27,9 @@
                         @if(auth()->user()?->is_admin && !$isOwnProfile && $user->is_admin !== 1)
                             <div class="w-full mt-4">
                                 @if ($user->is_banned)
-                                    <button data-user-id="{{ $user->id }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded unbanUser">Unban</button>
+                                    <button data-user-id="{{ $user->id }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-sm unbanUser">Unban</button>
                                 @else
-                                    <button data-user-id="{{ $user->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded banUser">Ban</button>
+                                    <button data-user-id="{{ $user->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm banUser">Ban</button>
                                 @endif
                             </div>
                         @endif
@@ -67,7 +67,7 @@
                                                        value="1"
                                                        onchange="document.getElementById('toggle-friend-publicly-form-{{ $user->id }}').submit();"
                                                        {{ $friendUser->pivot->show_friend_publicly === 1 ? 'checked' : '' }}
-                                                       class="form-checkbox rounded border-gray-300 dark:bg-gray-700">
+                                                       class="form-checkbox rounded-sm border-gray-300 dark:bg-gray-700">
                                                 <span class="text-gray-700 dark:text-gray-200">Show Friend Publicly</span>
                                             </label>
                                         </div>
@@ -158,7 +158,7 @@
                                         <p class="mt-1"><strong>By:</strong> <img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y H:i:s A') }}</p>
                                         <!-- Remove Review Button -->
                                         @if (auth()->user()->isAdmin())
-                                            <button data-review-id="{{ $review->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded removeReview mt-2 mb-3">Remove Review</button>
+                                            <button data-review-id="{{ $review->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm removeReview mt-2 mb-3">Remove Review</button>
                                         @endif
                                     </div>
                                 @endforeach
@@ -196,7 +196,7 @@
                                         <div class="relative z-20">
                                             <a href="/users/{{ $friend->username }}">
                                                 <h3 class="text-xl font-semibold mb-2">{{ $friend->username }}</h3>
-                                                <img src="{{ $friend->avatar }}" alt="{{ $friend->username }}" class="rounded mb-4 avatar-image" onerror="this.onerror=null; this.src='/img/notfound.gif';">
+                                                <img src="{{ $friend->avatar }}" alt="{{ $friend->username }}" class="rounded-sm mb-4 avatar-image" onerror="this.onerror=null; this.src='/img/notfound.gif';">
                                             </a>
                                             <p class="text-sm">Added on: {{ $friend->pivot->created_at->format('M d, Y h:i:s A') }}</p>
                                         </div>
@@ -242,7 +242,7 @@
                                         <div class="relative z-20">
                                             <a href="{{ route('anime.detail', $favourite->id) }}">
                                                 <h3 class="text-xl font-semibold mb-2">{{ $favourite->title }}</h3>
-                                                <img src="{{ $favourite->picture }}" alt="{{ $favourite->title }}" class="rounded mb-4 avatar-image"
+                                                <img src="{{ $favourite->picture }}" alt="{{ $favourite->title }}" class="rounded-sm mb-4 avatar-image"
                                                      onerror="this.onerror=null; this.src='/img/notfound.gif';">
                                             </a>
                                             <p class="text-sm">Added on: {{ $favourite->pivot->created_at->format('M d, Y h:i:s A') }}</p>
@@ -322,7 +322,7 @@
                                                      alt="{{ $favourite->title }}"
                                                      class="rounded-lg shadow-md w-16 h-24 object-cover"
                                                      onerror="this.onerror=null; this.src='/img/notfound.gif';">
-                                                <span class="absolute bottom-1 left-1 text-xs bg-black text-white px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <span class="absolute bottom-1 left-1 text-xs bg-black text-white px-1 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity">
                                                     {{ $favourite->title }}
                                                 </span>
                                             </a>

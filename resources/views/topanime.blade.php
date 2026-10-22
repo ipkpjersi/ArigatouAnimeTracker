@@ -10,10 +10,10 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xs sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <div id="status-modal" class="hidden fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50">
-                      <div class="p-4 bg-white dark:bg-black rounded">
+                    <div id="status-modal" class="hidden fixed top-0 left-0 w-full h-full bg-black/50 flex justify-center items-center z-50">
+                      <div class="p-4 bg-white dark:bg-black rounded-sm">
                         <p id="status-message"></p>
                       </div>
                     </div>
@@ -59,7 +59,7 @@
                                                 @endphp
                                                 <div class="no_dropdown_arrow_blank_select-wrapper @if ($watchStatusId === null) bg-blue-500 @else bg-gray-500 @endif">
                                                     <select
-                                                        class="text-sm text-white rounded p-1 flex-1 focus:outline-none z-50 update-anime-status no_dropdown_arrow_blank"
+                                                        class="text-sm text-white rounded-sm p-1 flex-1 focus:outline-hidden z-50 update-anime-status no_dropdown_arrow_blank"
                                                         data-anime-id="{{ $anime->id }}"
                                                     >
                                                         <option value="0">{{ 'Add to List' }}</option>

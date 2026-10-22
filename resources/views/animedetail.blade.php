@@ -10,10 +10,10 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xs sm:rounded-lg">
                 @if (session()->has('popup'))
-                    <div id="status-modal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50">
-                      <div class="p-4 bg-white dark:bg-black rounded">
+                    <div id="status-modal" class="fixed top-0 left-0 w-full h-full bg-black/50 flex justify-center items-center z-50">
+                      <div class="p-4 bg-white dark:bg-black rounded-sm">
                         <p id="status-message">{{ session()->get('popup') }}</p>
                       </div>
                     </div>
@@ -22,7 +22,7 @@
                     <span class="text-center">{{ session()->get('message') }}</span>
                 @endif
                 @if ($errors->any())
-                    <div class="bg-red-100 border border-red-400 text-white-700 px-4 py-3 rounded relative" role="alert">
+                    <div class="bg-red-100 border border-red-400 text-white-700 px-4 py-3 rounded-sm relative" role="alert">
                         <span class="block sm:inline">There were one or more errors:</span>
                         <ul>
                             @foreach ($errors->all() as $error)
@@ -89,7 +89,7 @@
                             @if (!auth()->user()->anime->contains($anime->id))
                                 <form action="{{ route('anime.addToList', $anime->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm w-full">
                                         Add to My Anime List
                                     </button>
                                 </form>
@@ -97,11 +97,11 @@
                                 <form action="{{ route('anime.deleteFromList', $anime->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full">
+                                    <button type="submit" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm w-full">
                                         Delete from My Anime List
                                     </button>
                                 </form>
-                                <form action="{{ route('user.anime.update',  ['username' => Auth::user()->username, 'redirectBack' => true]) }}" method="POST" class="bg-white dark:bg-gray-700 p-4 rounded shadow mt-2">
+                                <form action="{{ route('user.anime.update',  ['username' => Auth::user()->username, 'redirectBack' => true]) }}" method="POST" class="bg-white dark:bg-gray-700 p-4 rounded-sm shadow-sm mt-2">
                                     @csrf
                                     @method('POST')
 
@@ -165,7 +165,7 @@
                                         </select>
                                     </div>
 
-                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm">
                                         Update My Anime List
                                     </button>
                                 </form>
@@ -178,7 +178,7 @@
                                 <!-- Add to Favourites Button -->
                                 <form action="{{ route('anime.addToFavourites', $anime->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm w-full">
                                         Add to Favourites
                                     </button>
                                 </form>
@@ -187,12 +187,12 @@
                                 <form action="{{ route('anime.removeFromFavourites', $anime->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full">
+                                    <button type="submit" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm w-full">
                                         Remove from Favourites
                                     </button>
                                 </form>
                                 <!-- Manage Favourites Form -->
-                                <form action="{{ route('anime.updateFavourite', $anime->id) }}" method="POST" class="bg-white dark:bg-gray-700 p-4 rounded shadow mt-2">
+                                <form action="{{ route('anime.updateFavourite', $anime->id) }}" method="POST" class="bg-white dark:bg-gray-700 p-4 rounded-sm shadow-sm mt-2">
                                     @csrf
                                     @method('PUT')
 
@@ -214,7 +214,7 @@
                                         <input type="number" name="sort_order" value="{{ $favourite->sort_order ?? 0 }}" min="0" class="mt-1 dark:bg-gray-800 dark:text-gray-300 form-input block w-full">
                                     </div>
 
-                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+                                    <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm w-full">
                                         Update Favourites
                                     </button>
                                 </form>
@@ -223,7 +223,7 @@
 
                         @if (auth()->user() && auth()->user()->isAdmin())
                             <!-- Merge Anime Button (admin only) -->
-                            <button type="button" onclick="openMergeModal()" class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded w-full">
+                            <button type="button" onclick="openMergeModal()" class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-sm w-full">
                                 Merge Anime
                             </button>
 
@@ -237,8 +237,8 @@
                             </style>
 
                             <!-- Merge Anime Modal -->
-                            <div id="merge-modal" class="hidden fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50">
-                                <div class="bg-white dark:bg-gray-800 dark:text-gray-200 p-6 rounded shadow-lg w-11/12 max-w-lg max-h-screen overflow-y-auto">
+                            <div id="merge-modal" class="hidden fixed top-0 left-0 w-full h-full bg-black/50 flex justify-center items-center z-50">
+                                <div class="bg-white dark:bg-gray-800 dark:text-gray-200 p-6 rounded-sm shadow-lg w-11/12 max-w-lg max-h-screen overflow-y-auto">
                                     <h3 class="text-lg font-bold mb-2">Merge Anime</h3>
                                     <p class="mb-4 text-sm">
                                         This will merge <strong>{{ $anime->title }}</strong> (ID {{ $anime->id }}, the anime you are currently viewing)
@@ -259,7 +259,7 @@
                                         <!-- Target anime dropdown -->
                                         <div class="mb-4">
                                             <label for="target_anime_list" class="block text-sm font-medium text-gray-600 dark:text-gray-300">Merge into:</label>
-                                            <div id="target_anime_list" role="listbox" tabindex="0" class="mt-1 dark:bg-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded block w-full" style="height: 12rem; overflow: auto; white-space: nowrap;">
+                                            <div id="target_anime_list" role="listbox" tabindex="0" class="mt-1 dark:bg-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-sm block w-full" style="height: 12rem; overflow: auto; white-space: nowrap;">
                                                 @foreach ($similarAnime as $candidate)
                                                     <div class="merge-option" role="option" aria-selected="false" data-id="{{ $candidate->id }}" onclick="selectMergeCandidate(this)">{{ $candidate->label }}</div>
                                                 @endforeach
@@ -277,8 +277,8 @@
                                         </div>
 
                                         <div class="flex justify-end gap-2">
-                                            <button type="button" onclick="closeMergeModal()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded">Cancel</button>
-                                            <button type="submit" id="merge_confirm_button" disabled class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed">Confirm Merge</button>
+                                            <button type="button" onclick="closeMergeModal()" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded-sm">Cancel</button>
+                                            <button type="submit" id="merge_confirm_button" disabled class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm opacity-50 cursor-not-allowed">Confirm Merge</button>
                                         </div>
                                     </form>
                                 </div>
@@ -296,7 +296,7 @@
 
                     <!-- Right Column -->
                     <div class="w-full md:w-3/5 mt-0">
-                        <div class="bg-white dark:bg-gray-700 rounded shadow mb-4 p-4 w-3/5">
+                        <div class="bg-white dark:bg-gray-700 rounded-sm shadow-sm mb-4 p-4 w-3/5">
                             <!-- First Row: MAL Score and Users -->
                             <div class="grid grid-cols-2 gap-1 max-w-md mx-auto">
                                 <!-- First Row -->
@@ -397,7 +397,7 @@
                                         <p class="mt-1"><strong>By:</strong> <a href="{{route('users.detail', $review->user->username)}}"><img src="{{ $review->user->avatar ?? '/img/default-avatar.png' }}" alt="Avatar" style="width:50px; max-height:70px" onerror="this.onerror=null; this.src='/img/notfound.gif';"/> {{ $review->user->username }} on {{ $review->created_at->format('M d, Y H:i:s A') }}</a></p>
                                         <!-- Remove Review Button -->
                                         @if (auth()->user() && auth()->user()->isAdmin())
-                                            <button data-review-id="{{ $review->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded removeReview mt-2 mb-3">Remove Review</button>
+                                            <button data-review-id="{{ $review->id }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm removeReview mt-2 mb-3">Remove Review</button>
                                         @endif
                                     </div>
                                 @empty
@@ -410,7 +410,7 @@
 
                             <!-- Add/Update Review Button -->
                             @if(auth()->user() !== null)
-                                <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="toggleReviewForm" onclick="toggleReviewForm()">
+                                <button class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm" id="toggleReviewForm" onclick="toggleReviewForm()">
                                     {{ $userHasReview ? 'Update Review' : 'Add Review' }}
                                 </button>
                                 @if (session()->has('reviewmessage'))
@@ -419,7 +419,7 @@
                             @endif
 
                             <!-- Review Form -->
-                            <div id="reviewForm" class="hidden bg-white dark:bg-gray-800 p-4 rounded shadow mt-4">
+                            <div id="reviewForm" class="hidden bg-white dark:bg-gray-800 p-4 rounded-sm shadow-sm mt-4">
                                 <form action="{{ $userHasReview ? route('anime.updateReview', $anime->id) : route('anime.addReview') }}" method="POST" class="space-y-4">
                                     @csrf
                                     @if($userHasReview)
@@ -432,19 +432,19 @@
                                     <!-- Review Title -->
                                     <div>
                                         <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Review Title:</label>
-                                        <input type="text" id="title" name="title" value="{{ $userReview->title ?? '' }}" class="form-input w-full rounded border-gray-300 dark:bg-gray-700 dark:text-gray-200">
+                                        <input type="text" id="title" name="title" value="{{ $userReview->title ?? '' }}" class="form-input w-full rounded-sm border-gray-300 dark:bg-gray-700 dark:text-gray-200">
                                     </div>
 
                                     <!-- Review Body -->
                                     <div>
                                         <label for="body" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Review:</label>
-                                        <textarea id="body" name="body" class="form-textarea w-full rounded border-gray-300 dark:bg-gray-700 dark:text-gray-200" rows="4">{{ $userReview->body ?? '' }}</textarea>
+                                        <textarea id="body" name="body" class="form-textarea w-full rounded-sm border-gray-300 dark:bg-gray-700 dark:text-gray-200" rows="4">{{ $userReview->body ?? '' }}</textarea>
                                     </div>
 
                                     <!-- Recommendation Dropdown -->
                                     <div>
                                         <label for="recommendation" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Your Recommendation:</label>
-                                        <select id="recommendation" name="recommendation" class="mt-1 form-select w-full rounded border-gray-300 dark:bg-gray-700 dark:text-gray-200">
+                                        <select id="recommendation" name="recommendation" class="mt-1 form-select w-full rounded-sm border-gray-300 dark:bg-gray-700 dark:text-gray-200">
                                             <option value="recommended" {{ (empty($userReview->recommendation) || $userReview->recommendation === 'recommended') ? 'selected' : '' }}>Recommended</option>
                                             <option value="mixed" {{ ($userReview->recommendation ?? '') === 'mixed' ? 'selected' : '' }}>Mixed</option>
                                             <option value="not_recommended" {{ ($userReview->recommendation ?? '') === 'not_recommended' ? 'selected' : '' }}>Not Recommended</option>
@@ -455,7 +455,7 @@
                                     <!-- Spoiler Checkbox -->
                                     <div class="flex items-center">
                                         <label class="flex items-center space-x-2">
-                                            <input type="checkbox" id="contains_spoilers" name="contains_spoilers" value="1" {{ $userReview->contains_spoilers ?? false ? 'checked' : '' }} class="form-checkbox rounded border-gray-300 dark:bg-gray-700">
+                                            <input type="checkbox" id="contains_spoilers" name="contains_spoilers" value="1" {{ $userReview->contains_spoilers ?? false ? 'checked' : '' }} class="form-checkbox rounded-sm border-gray-300 dark:bg-gray-700">
                                             <span class="text-gray-700 dark:text-gray-200">Contains Spoilers</span>
                                         </label>
                                     </div>
@@ -463,18 +463,18 @@
                                     <!-- Show Review Publicly Checkbox -->
                                     <div class="flex items-center mt-4">
                                         <label class="flex items-center space-x-2">
-                                            <input type="checkbox" id="show_review_publicly" name="show_review_publicly" value="1" {{ $userReview->show_review_publicly ?? true ? 'checked' : '' }} class="form-checkbox rounded border-gray-300 dark:bg-gray-700">
+                                            <input type="checkbox" id="show_review_publicly" name="show_review_publicly" value="1" {{ $userReview->show_review_publicly ?? true ? 'checked' : '' }} class="form-checkbox rounded-sm border-gray-300 dark:bg-gray-700">
                                             <span class="text-gray-700 dark:text-gray-200">Show Review Publicly</span>
                                         </label>
                                     </div>
 
 
                                     <!-- Submit Button -->
-                                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit Review</button>
+                                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm">Submit Review</button>
 
                                     <!-- Delete Review Button (only if the user has a review) -->
                                     @if($userHasReview)
-                                        <button form="deleteReviewForm" type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete Review</button>
+                                        <button form="deleteReviewForm" type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm">Delete Review</button>
                                     @endif
                                 </form>
 
@@ -487,7 +487,7 @@
                                 @endif
 
                                 <!-- Hide Review Form Button -->
-                                <button class="mt-2 bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded" onclick="toggleReviewForm()">Hide Form</button>
+                                <button class="mt-2 bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded-sm" onclick="toggleReviewForm()">Hide Form</button>
                             </div>
                         @endif
                     </div>

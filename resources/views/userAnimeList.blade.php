@@ -10,10 +10,10 @@
 
     <div class="py-12">
         <div class="max-w-[1700px] mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
-                <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 hidden overflow-y-auto">
-                    <div class="bg-white dark:bg-gray-700 rounded relative w-128 h-64">
-                        <button id="closeModal" class="absolute top-2 right-4 bg-red-500 text-white p-2 pl-4 pr-4 mb-2 rounded">X</button>
+            <div class="bg-white dark:bg-gray-800 shadow-xs sm:rounded-lg">
+                <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-black/50 flex justify-center items-center z-50 hidden overflow-y-auto">
+                    <div class="bg-white dark:bg-gray-700 rounded-sm relative w-128 h-64">
+                        <button id="closeModal" class="absolute top-2 right-4 bg-red-500 text-white p-2 pl-4 pr-4 mb-2 rounded-sm">X</button>
                         <div class="p-4 mt-10">
                             <p id="clearAnimeText"></p>
                             <div class="flex items-center mt-2">
@@ -21,8 +21,8 @@
                               <label for="confirmCheckbox" class="ml-2">I understand the consequences</label>
                             </div>
                             <input type="text" id="confirmUsername" placeholder="Enter your username to confirm" class="bg-white dark:bg-gray-800 mt-3 w-full">
-                            <button id="confirmClear" class="bg-red-500 text-white p-2 pl-6 pr-6 rounded mt-4">Yes</button>
-                            <button id="cancelClear" class="bg-gray-500 text-white p-2 pl-6 pr-6 rounded mt-4 ml-3">No</button>
+                            <button id="confirmClear" class="bg-red-500 text-white p-2 pl-6 pr-6 rounded-sm mt-4">Yes</button>
+                            <button id="cancelClear" class="bg-gray-500 text-white p-2 pl-6 pr-6 rounded-sm mt-4 ml-3">No</button>
                             <div id="errorText" class="text-red-500 hidden mt-1"></div>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->anime_status?->status }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
-                                                    <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800  min-w-[145px] desktop-only" style="padding-right: 36px">
+                                                    <select name="watch_status_id[]" class="border rounded-sm w-full py-2 px-3 dark:bg-gray-800  min-w-[145px] desktop-only" style="padding-right: 36px">
                                                         <option value="">Pick a status...</option>
                                                         @foreach ($watchStatuses as $status)
                                                             <option value="{{ $status->id }}" @if ($anime->pivot->watch_status_id == $status->id) selected @endif>
@@ -125,7 +125,7 @@
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
-                                                    <select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 desktop-only" style="padding-right: 36px">
+                                                    <select name="progress[]" class="border rounded-sm w-full py-2 px-3 dark:bg-gray-800 desktop-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= $anime->episodes; $i++)
                                                             <option value="{{ $i }}" @if ($anime->pivot->progress == $i) selected @endif>
@@ -139,7 +139,7 @@
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200 min-w-[70px]">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
-                                                    <select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[70px] desktop-only" style="padding-right: 36px">
+                                                    <select name="score[]" class="border rounded-sm w-full py-2 px-3 dark:bg-gray-800 min-w-[70px] desktop-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= 10; $i++)
                                                             <option value="{{ $i }}" @if ($anime->pivot->score == $i) selected @endif>{{ $i }}</option>
@@ -152,7 +152,7 @@
                                             @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                 <td class="py-2 px-4 border-b border-gray-200">
                                                     <div class="flex items-center desktop-only">
-                                                        <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">
+                                                        <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded-sm w-24 py-2 px-3 dark:bg-gray-800">
                                                         <!-- Up Arrow -->
                                                         <button onclick="swapAndSubmitSortOrder({{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}, 'up')" class="ml-2 text-gray-600 hover:text-gray-800">
                                                             ⬆️
@@ -168,13 +168,13 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->season }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->year }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                <textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 desktop-only" {{ (auth()->user() === null || strtolower(auth()->user()->username) !== strtolower($username)) ? 'readonly' : '' }}>{{ $anime->notes ?? '' }}</textarea>
+                                                <textarea name="notes[]" class="border rounded-sm w-full py-2 px-3 dark:bg-gray-800 desktop-only" {{ (auth()->user() === null || strtolower(auth()->user()->username) !== strtolower($username)) ? 'readonly' : '' }}>{{ $anime->notes ?? '' }}</textarea>
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <button
                                                         onclick="deleteAnime({{ $anime->id }}, event)"
-                                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+                                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-sm"
                                                     >
                                                         Delete
                                                     </button>
@@ -206,7 +206,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200"><a href="/anime/{{$anime->id}}">{{ $anime->title }}</a></td>
                                             <td class="py-2 px-4 border-b border-gray-200 min-w-[70px]">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
-                                                    <select name="score[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[70px] mobile-only" style="padding-right: 36px">
+                                                    <select name="score[]" class="border rounded-sm w-full py-2 px-3 dark:bg-gray-800 min-w-[70px] mobile-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= 10; $i++)
                                                             <option value="{{ $i }}" @if ($anime->pivot->score == $i) selected @endif>{{ $i }}</option>
@@ -223,7 +223,7 @@
                                             <td class="py-2 px-4 border-b border-gray-200">{{ $anime->anime_status?->status }}</td>
                                             <td class="py-2 px-4 border-b border-gray-200 min-w-[150px]">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
-                                                    <select name="watch_status_id[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 min-w-[150px] mobile-only" style="padding-right: 36px">
+                                                    <select name="watch_status_id[]" class="border rounded-sm w-full py-2 px-3 dark:bg-gray-800 min-w-[150px] mobile-only" style="padding-right: 36px">
                                                         <option value="">Pick a status...</option>
                                                         @foreach ($watchStatuses as $status)
                                                             <option value="{{ $status->id }}" @if ($anime->pivot->watch_status_id == $status->id) selected @endif>
@@ -237,7 +237,7 @@
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
-                                                    <select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 mobile-only" style="padding-right: 36px">
+                                                    <select name="progress[]" class="border rounded-sm w-full py-2 px-3 dark:bg-gray-800 mobile-only" style="padding-right: 36px">
                                                         <option value="">Pick an option...</option>
                                                         @for ($i = 1; $i <= $anime->episodes; $i++)
                                                             <option value="{{ $i }}" @if ($anime->pivot->progress == $i) selected @endif>
@@ -252,7 +252,7 @@
                                             @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                 <td class="py-2 px-4 border-b border-gray-200">
                                                     <div class="flex items-center mobile-only">
-                                                        <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">
+                                                        <input type="number" min="1" name="sort_order[]" value="{{ $anime->pivot->sort_order }}" class="border rounded-sm w-24 py-2 px-3 dark:bg-gray-800">
                                                         <!-- Up Arrow -->
                                                         <button onclick="swapAndSubmitSortOrder({{ (($userAnime->currentPage() - 1) * $userAnime->perPage()) + $loop->iteration }}, 'up')" class="ml-2 text-gray-600 hover:text-gray-800">
                                                             ⬆️
@@ -265,13 +265,13 @@
                                                 </td>
                                             @endif
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                <textarea name="notes[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800 mobile-only min-w-[90px]" {{ (auth()->user() === null || strtolower(auth()->user()->username) !== strtolower($username)) ? 'readonly' : '' }}>{{ $anime->pivot->notes ?? '' }}</textarea>
+                                                <textarea name="notes[]" class="border rounded-sm w-full py-2 px-3 dark:bg-gray-800 mobile-only min-w-[90px]" {{ (auth()->user() === null || strtolower(auth()->user()->username) !== strtolower($username)) ? 'readonly' : '' }}>{{ $anime->pivot->notes ?? '' }}</textarea>
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                                                     <button
                                                         onclick="deleteAnime({{ $anime->id }}, event)"
-                                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+                                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-sm"
                                                     >
                                                         Delete
                                                     </button>
@@ -283,7 +283,7 @@
                             </table>
                         </div>
                         @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username) && $userAnime->isNotEmpty())
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm mt-4">
                                 Save Changes
                             </button>
                             @if (session()->has('message'))
@@ -305,19 +305,19 @@
                     @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                         <div class="md:flex">
                             <a href="{{ route('import.animelist') }}">
-                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm mt-4">
                                     Import from MyAnimeList and More
                                 </button>
                             </a>
                             <a href="{{ route('export.animelist') }}">
-                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm mt-4 md:ml-2">
                                     Export to MyAnimeList and More
                                 </button>
                             </a>
                             @if (auth()->user()->show_clear_anime_list_button)
                                 <form id="clearForm" class="inline-block" action="{{ route('user.anime.clear', ['username' => $username]) }}" method="post">
                                     @csrf
-                                    <button type="button" id="clearListBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
+                                    <button type="button" id="clearListBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm mt-4 md:ml-2">
                                         Delete Anime List
                                     </button>
                                 </form>
@@ -325,7 +325,7 @@
                             @if (auth()->user()->show_clear_anime_list_sort_orders_button)
                                 <form id="clearSortOrdersForm" class="inline-block" action="{{ route('user.anime.clearSortOrders', ['username' => $username]) }}" method="post">
                                     @csrf
-                                    <button type="button" id="clearSortOrdersBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
+                                    <button type="button" id="clearSortOrdersBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm mt-4 md:ml-2">
                                         Delete Anime List Sort Orders
                                     </button>
                                 </form>

@@ -10,10 +10,10 @@
 
     <div class="py-12">
         <div class="max-w-[1700px] mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center z-50 hidden overflow-y-auto">
-                    <div class="bg-white dark:bg-gray-700 rounded relative w-128 h-64">
-                        <button id="closeModal" class="absolute top-2 right-4 bg-red-500 text-white p-2 pl-4 pr-4 mb-2 rounded">X</button>
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xs sm:rounded-lg">
+                <div id="clearModal" class="fixed top-0 left-0 w-full h-full bg-black/50 flex justify-center items-center z-50 hidden overflow-y-auto">
+                    <div class="bg-white dark:bg-gray-700 rounded-sm relative w-128 h-64">
+                        <button id="closeModal" class="absolute top-2 right-4 bg-red-500 text-white p-2 pl-4 pr-4 mb-2 rounded-sm">X</button>
                         <div class="p-4 mt-10">
                             <p id="clearAnimeText"></p>
                             <div class="flex items-center mt-2">
@@ -21,8 +21,8 @@
                               <label for="confirmCheckbox" class="ml-2">I understand the consequences</label>
                             </div>
                             <input type="text" id="confirmUsername" placeholder="Enter your username to confirm" class="bg-white dark:bg-gray-800 mt-3 w-full">
-                            <button id="confirmClear" class="bg-red-500 text-white p-2 pl-6 pr-6 rounded mt-4">Yes</button>
-                            <button id="cancelClear" class="bg-gray-500 text-white p-2 pl-6 pr-6 rounded mt-4 ml-3">No</button>
+                            <button id="confirmClear" class="bg-red-500 text-white p-2 pl-6 pr-6 rounded-sm mt-4">Yes</button>
+                            <button id="cancelClear" class="bg-gray-500 text-white p-2 pl-6 pr-6 rounded-sm mt-4 ml-3">No</button>
                             <div id="errorText" class="text-red-500 hidden mt-1"></div>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
                             </tbody>
                         </table>
                         @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username) && $userAnimeCount > 0)
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm mt-4">
                                 Save Changes
                             </button>
                             @if (session()->has('message'))
@@ -82,19 +82,19 @@
                     @if (auth()->user() != null && strtolower(auth()->user()->username) === strtolower($username))
                         <div class="flex flex-col md:flex-row">
                             <a href="{{ route('import.animelist') }}">
-                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm mt-4">
                                     Import from MyAnimeList and More
                                 </button>
                             </a>
                             <a href="{{ route('export.animelist') }}">
-                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
+                                <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm mt-4 md:ml-2">
                                     Export to MyAnimeList and More
                                 </button>
                             </a>
                             @if (auth()->user()->show_clear_anime_list_button)
                                 <form id="clearForm" class="inline-block" action="{{ route('user.anime.clear', ['username' => $username]) }}" method="post">
                                     @csrf
-                                    <button type="button" id="clearListBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
+                                    <button type="button" id="clearListBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm mt-4 md:ml-2">
                                         Clear Anime List
                                     </button>
                                 </form>
@@ -102,7 +102,7 @@
                             @if (auth()->user()->show_clear_anime_list_sort_orders_button)
                                 <form id="clearSortOrdersForm" class="inline-block" action="{{ route('user.anime.clearSortOrders', ['username' => $username]) }}" method="post">
                                     @csrf
-                                    <button type="button" id="clearSortOrdersBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4 md:ml-2">
+                                    <button type="button" id="clearSortOrdersBtn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm mt-4 md:ml-2">
                                         Delete Anime List Sort Orders
                                     </button>
                                 </form>
@@ -217,7 +217,7 @@
                         var options = '';
                         options += options += '<option value="">Pick an option...</option>';
                         options += '@foreach ($watchStatuses as $status) <option value="{{ $status->id }}" ' + (data === {{ $status->id }} ? 'selected' : '') + '>{{ $status->status }}</option> @endforeach';
-                        return '<select name="watch_status_id[]" class="border rounded w-[151px] py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
+                        return '<select name="watch_status_id[]" class="border rounded-sm w-[151px] py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
                     } else {
                         return watchStatusMap[data] || 'UNKNOWN';
                     }
@@ -233,7 +233,7 @@
                             for(var i = 1; i <= row.episodes; i++) {
                                 options += '<option value="'+i+'" '+(data == i ? 'selected' : '')+'>'+i+'</option>';
                             }
-                            return '<select name="progress[]" class="border rounded w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
+                            return '<select name="progress[]" class="border rounded-sm w-full py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
                         } else {
                             return data || '0';
                         }
@@ -250,7 +250,7 @@
                             for(var i = 1; i <= 10; i++) {
                                 options += '<option value="'+i+'" '+(data == i ? 'selected' : '')+'>'+i+'</option>';
                             }
-                            return '<select name="score[]" class="border rounded w-[70px] py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
+                            return '<select name="score[]" class="border rounded-sm w-[70px] py-2 px-3 dark:bg-gray-800" style="padding-right: 36px">' + options + '</select>';
                         } else {
                             return data || 'UNKNOWN';
                         }
@@ -266,7 +266,7 @@
                     render: function(data, type, row, meta) {
                         return `
                             <div style="display: flex; align-items: center;">
-                                <input type="number" min="1" name="sort_order[]" value="${data}" class="border rounded w-24 py-2 px-3 dark:bg-gray-800">
+                                <input type="number" min="1" name="sort_order[]" value="${data}" class="border rounded-sm w-24 py-2 px-3 dark:bg-gray-800">
                                 <!-- Up Arrow -->
                                 <button onclick="swapAndSubmitSortOrder(${meta.row + 1}, 'up')" class="ml-2 text-gray-600 hover:text-gray-800">⬆️</button>
                                 <!-- Down Arrow -->
@@ -301,10 +301,10 @@
                 render: function(data, type, row) {
                     if('{{ strtolower(auth()->user()?->username ?? '') }}' === '{{ strtolower($username) }}') {
                         // If the user matches, make textarea editable
-                        return '<textarea name="notes[]" class="border rounded py-2 px-3 dark:bg-gray-800">' + (data ? data : '') + '</textarea>';
+                        return '<textarea name="notes[]" class="border rounded-sm py-2 px-3 dark:bg-gray-800">' + (data ? data : '') + '</textarea>';
                     } else {
                         // If the user doesn't match, make textarea read-only
-                        return '<textarea name="notes[]" class="border rounded py-2 px-3 dark:bg-gray-800" readonly>' + (data ? data : '') + '</textarea>';
+                        return '<textarea name="notes[]" class="border rounded-sm py-2 px-3 dark:bg-gray-800" readonly>' + (data ? data : '') + '</textarea>';
                     }
                 }
             });
@@ -316,7 +316,7 @@
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
-                        return '<button type="button" onclick="deleteAnime(' + data + ', event)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">Delete</button>';
+                        return '<button type="button" onclick="deleteAnime(' + data + ', event)" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-sm">Delete</button>';
                     }
                 });
             }
@@ -386,7 +386,7 @@
                     ajax: customUrl.toString(),
                     columns: columns,
                     initComplete: function() {
-                        let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="location.reload()">Reset Filters</button>');
+                        let resetBtn = $('<button type="button" id="resetFilters" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm mr-4" onclick="location.reload()">Reset Filters</button>');
                         $('#userAnimeTable_filter').prepend(resetBtn);
                     },
                     scrollX: scrollWidth,

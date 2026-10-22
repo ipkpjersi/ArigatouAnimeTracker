@@ -32,7 +32,7 @@
                           :value="old('email', $user->email)" required autocomplete="email"/>
             <x-input-error class="mt-2" :messages="$errors->get('email')"/>
 
-            <div id="confirmation-modal" class="fixed inset-0 bg-opacity-50 flex items-center justify-center hidden">
+            <div id="confirmation-modal" class="fixed inset-0 flex items-center justify-center hidden">
                 <div class="bg-gray-100 dark:bg-black p-4 rounded-lg text-center">
                     <p class="mb-4">Are you sure you want to delete your avatar?</p>
                     <div class="flex justify-around">
@@ -54,7 +54,7 @@
             <input id="avatar" name="avatar" type="file" class="mt-1 block w-full" value="old('avatar', $user->avatar)"
                    accept="image/*" autocomplete="avatar"/>
             <button type="button" id="delete-avatar-button"
-                    class="mt-3 text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded shadow">{{ __('Delete Avatar') }}</button>
+                    class="mt-3 text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-sm shadow-sm">{{ __('Delete Avatar') }}</button>
             <x-input-error class="mt-2" :messages="$errors->get('avatar')"/>
 
             <!-- Dark Mode -->
@@ -619,7 +619,7 @@
                         {{ __('Your email address is unverified.') }}
 
                         <button form="send-verification"
-                                class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                                class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
                     </p>
